@@ -1,0 +1,268 @@
+:root {
+    --primary-color: #ff1744; /* AMD primary */
+    --secondary-color: #ff1744; /* AMD secondary */
+    --background-color: #0a0a0a; /* AMD bg */
+    --text-color: #ffffff; /* AMD fg */
+    --card-bg: #1a1a1a; /* AMD dark */
+    --border-color: #ffffff; /* AMD border */
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.navbar {
+    background-color: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.navbar-brand {
+    color: var(--primary-color) !important;
+    font-weight: 700;
+}
+
+.nav-link {
+    color: var(--text-color) !important;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color) !important;
+}
+
+.hero-section {
+    padding: 100px 0;
+    background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(255, 23, 68, 0.1)); /* Adjusted to use primary color */
+}
+
+.hero-section h1 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.hero-section .lead {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--background-color);
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #cc1236; /* Darkened primary for hover */
+    border-color: #cc1236;
+    transform: translateY(-2px);
+}
+
+.btn-outline-light {
+    border-color: var(--text-color);
+    color: var(--text-color);
+    font-weight: 700;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover {
+    background-color: var(--text-color);
+    color: var(--background-color);
+    transform: translateY(-2px);
+}
+
+.features-section {
+    padding: 80px 0;
+}
+
+.feature-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    height: 100%;
+    transition: transform 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.feature-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.reviews-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(255, 23, 68, 0.1)); /* Adjusted to use primary color */
+}
+
+.review-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.review-text {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.review-author {
+    color: var(--primary-color);
+    font-weight: 700;
+}
+
+.download-section {
+    padding: 80px 0;
+}
+
+.download-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+}
+
+.download-instructions {
+    margin: 2rem 0;
+    padding-left: 1.5rem;
+}
+
+.download-instructions li {
+    margin-bottom: 1rem;
+}
+
+.support-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(255, 23, 68, 0.1)); /* Adjusted to use primary color */
+}
+
+.support-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.support-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.support-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+}
+
+.support-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 2rem 0;
+}
+
+.social-link {
+    color: var(--text-color);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.social-link:hover {
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0;
+        text-align: center;
+    }
+
+    .hero-section img {
+        margin-top: 2rem;
+    }
+
+    .support-options {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Animations */
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--primary-color);
+    }
+    100% {
+        box-shadow: 0 0 5px var(--primary-color);
+    }
+}
+
+.feature-card:hover,
+.review-card:hover,
+.download-card:hover,
+.support-card:hover {
+    animation: glow 2s infinite;
+}
+
+.version-section {
+    padding: 80px 0;
+    background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(255, 23, 68, 0.1)); /* Adjusted to use primary color */
+}
+
+.version-section h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-bottom: 3rem;
+}
+
+.version-section .feature-card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 2rem;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.version-section .feature-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-color);
+    animation: glow 2s infinite;
+}
+
+.version-section .feature-card h3 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.version-section .download-instructions {
+    margin: 1.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.version-section .download-instructions li {
+    margin-bottom: 0.75rem;
+    color: var(--text-color);
+}

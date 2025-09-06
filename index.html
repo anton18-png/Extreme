@@ -6,12 +6,554 @@
     <title>Extreme - Универсальный инструмент для тонкой настройки Windows</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff1744;
+            --secondary-color: #ff1744;
+            --background-color: #0a0a0a;
+            --text-color: #ffffff;
+            --card-bg: #1a1a1a;
+            --border-color: #ffffff;
+            --accent-color: #00ffea;
+            --success-color: #00e676;
+        }
+
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+
+        .navbar {
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            color: var(--primary-color) !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--text-color) !important;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--primary-color);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::after,
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color) !important;
+        }
+
+        .hero-section {
+            padding: 120px 0;
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(0, 255, 234, 0.1));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 23, 68, 0.15), transparent 60%);
+        }
+
+        .hero-section h1 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 15px rgba(255, 23, 68, 0.5);
+        }
+
+        .hero-section .lead {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: var(--background-color);
+            font-weight: 700;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #cc1236;
+            border-color: #cc1236;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 23, 68, 0.3);
+        }
+
+        .btn-outline-light {
+            border-color: var(--text-color);
+            color: var(--text-color);
+            font-weight: 700;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            background-color: var(--text-color);
+            color: var(--background-color);
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            position: relative;
+            margin-bottom: 3rem;
+            text-align: center;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-color);
+            margin: 15px auto;
+        }
+
+        .features-section {
+            padding: 80px 0;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .feature-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-card h3 i {
+            margin-right: 10px;
+        }
+
+        .reviews-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(0, 255, 234, 0.1));
+        }
+
+        .review-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .review-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .review-text::before {
+            content: '"';
+            font-size: 3rem;
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            top: -1rem;
+            opacity: 0.3;
+        }
+
+        .review-author {
+            color: var(--primary-color);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .review-author img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .download-section {
+            padding: 80px 0;
+        }
+
+        .download-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .download-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .download-instructions {
+            margin: 2rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .download-instructions li {
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .download-instructions li::before {
+            content: '→';
+            color: var(--primary-color);
+            position: absolute;
+            left: -1.5rem;
+        }
+
+        .support-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, rgba(255, 23, 68, 0.1), rgba(0, 255, 234, 0.1));
+        }
+
+        .support-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .support-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .support-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-color);
+        }
+
+        .support-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 2rem 0;
+        }
+
+        .social-link {
+            color: var(--text-color);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            transition: color 0.3s ease;
+            font-size: 1.5rem;
+        }
+
+        .social-link:hover {
+            color: var(--primary-color);
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .category-tabs {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .category-tabs .nav-link {
+            color: var(--text-color) !important;
+            border: none;
+            border-radius: 0;
+            padding: 1rem 1.5rem;
+            position: relative;
+        }
+
+        .category-tabs .nav-link.active {
+            color: var(--primary-color) !important;
+            background: transparent;
+        }
+
+        .category-tabs .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .script-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .script-card:hover {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .script-card h5 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .script-card p {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 0;
+        }
+
+        .script-card .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+        }
+
+        .code-block {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .code-block code {
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+        }
+
+        .code-keyword {
+            color: #569cd6;
+        }
+
+        .code-comment {
+            color: #6a9955;
+        }
+
+        .code-string {
+            color: #ce9178;
+        }
+
+        .stats-box {
+            background: linear-gradient(135deg, var(--card-bg), #252525);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stats-label {
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 80px 0;
+                text-align: center;
+            }
+
+            .hero-section img {
+                margin-top: 2rem;
+            }
+
+            .support-options {
+                grid-template-columns: 1fr;
+            }
+
+            .category-tabs .nav-link {
+                padding: 0.8rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes glow {
+            0% {
+                box-shadow: 0 0 5px var(--primary-color);
+            }
+            50% {
+                box-shadow: 0 0 20px var(--primary-color);
+            }
+            100% {
+                box-shadow: 0 0 5px var(--primary-color);
+            }
+        }
+
+        .feature-card:hover,
+        .review-card:hover,
+        .download-card:hover,
+        .support-card:hover {
+            animation: glow 2s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .floating {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .scroll-top.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 23, 68, 0.4);
+        }
+    </style>
 </head>
 <body class="cyberpunk-theme">
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Extreme</a>
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt me-2"></i>Extreme
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -24,7 +566,7 @@
                         <a class="nav-link" href="#features">Возможности</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#reviews">Отзывы</a>
+                        <a class="nav-link" href="#scripts">Скрипты</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#download">Скачать</a>
@@ -42,14 +584,38 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <h1 class="display-4 mb-4">Extreme</h1>
-                    <p class="lead mb-4">Мощная утилита для персонализации и оптимизации Windows с более чем 100 различными твиками</p>
-                    <div class="d-flex gap-3">
-                        <a href="#download" class="btn btn-primary btn-lg">Скачать</a>
-                        <!-- <a href="docs/index.html" class="btn btn-outline-light btn-lg">Документация</a> -->
+                    <p class="lead mb-4">Мощная утилита для персонализации и оптимизации Windows с более чем 1000 различных твиков и скриптов</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a href="#download" class="btn btn-primary btn-lg">
+                            <i class="fas fa-download me-2"></i>Скачать
+                        </a>
+                        <a href="#scripts" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-code me-2"></i>Скрипты
+                        </a>
+                    </div>
+                    <div class="mt-5 row">
+                        <div class="col-4">
+                            <div class="stats-box">
+                                <div class="stats-number">1000+</div>
+                                <div class="stats-label">Скриптов</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stats-box">
+                                <div class="stats-number">50+</div>
+                                <div class="stats-label">Категорий</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stats-box">
+                                <div class="stats-number">15+</div>
+                                <div class="stats-label">Разделов</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <img src="img\hero-image.png" alt="Extreme Interface" class="img-fluid rounded shadow" style="width: 85%">
+                    <img src="img/hero-image.png" alt="Extreme Interface" class="img-fluid rounded shadow floating" style="border: 2px solid #ff1744">
                 </div>
             </div>
         </div>
@@ -57,43 +623,222 @@
 
     <section id="features" class="features-section">
         <div class="container">
-            <h2 class="text-center mb-5">Основные возможности</h2>
+            <h2 class="text-center mb-5 section-title">Основные возможности</h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Интерфейс</h3>
-                        <p>Изменение внешнего вида графического интерфейса пользователя</p>
+                        <h3><i class="fas fa-desktop"></i> Интерфейс</h3>
+                        <p>Изменение внешнего вида графического интерфейса пользователя, настройка тем, меню и визуальных эффектов</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Оптимизация</h3>
-                        <p>Улучшение производительности системы и приложений</p>
+                        <h3><i class="fas fa-tachometer-alt"></i> Оптимизация</h3>
+                        <p>Улучшение производительности системы и приложений, ускорение загрузки и отклика Windows</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Очистка</h3>
-                        <p>Удаление мусорных встроенных UWP-приложений</p>
+                        <h3><i class="fas fa-broom"></i> Очистка</h3>
+                        <p>Удаление мусорных встроенных UWP-приложений, временных файлов и системного кэша</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Службы</h3>
-                        <p>Отключение ненужных служб и процессов</p>
+                        <h3><i class="fas fa-cogs"></i> Службы</h3>
+                        <p>Отключение ненужных служб и процессов для освобождения ресурсов системы</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Восстановление</h3>
-                        <p>Очистка логов и восстановление нерабочих компонентов</p>
+                        <h3><i class="fas fa-redo"></i> Восстановление</h3>
+                        <p>Очистка логов и восстановление нерабочих компонентов системы</p>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="feature-card">
-                        <h3>Терапия</h3>
-                        <p>Автоматическое отключение телеметрии после обновлений</p>
+                        <h3><i class="fas fa-shield-alt"></i> Терапия</h3>
+                        <p>Автоматическое отключение телеметрии после обновлений Windows</p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="scripts" class="features-section bg-dark">
+        <div class="container">
+            <h2 class="text-center mb-5 section-title">Категории скриптов</h2>
+            <p class="text-center mb-5">Extreme содержит более 1000 скриптов для тонкой настройки Windows. Вот некоторые из основных категорий:</p>
+            
+            <ul class="nav nav-tabs category-tabs" id="scriptsTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="main-tab" data-bs-toggle="tab" data-bs-target="#main" type="button" role="tab">Основные</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="optimization-tab" data-bs-toggle="tab" data-bs-target="#optimization" type="button" role="tab">Оптимизация</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="drivers-tab" data-bs-toggle="tab" data-bs-target="#drivers" type="button" role="tab">Драйверы</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="power-tab" data-bs-toggle="tab" data-bs-target="#power" type="button" role="tab">Электропитание</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="scriptsTabsContent">
+                <div class="tab-pane fade show active" id="main" role="tabpanel">
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-primary">Активация</span>
+                                <h5>Ohook Активатор Windows AIO</h5>
+                                <p>Комплексный активатор всех версий Windows</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-success">Приватность</span>
+                                <h5>Telemetry Disabler Ultimate</h5>
+                                <p>Полное отключение телеметрии Windows</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-info">Резервное копирование</span>
+                                <h5>Бэкап Chromium</h5>
+                                <p>Создание резервных копий настроек браузеров на основе Chromium</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-warning">Обновления</span>
+                                <h5>Отключить автоматическое обновление Windows</h5>
+                                <p>Блокировка автоматических обновлений системы</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="optimization" role="tabpanel">
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-primary">Безопасная</span>
+                                <h5>Rebuild Performance Counters</h5>
+                                <p>Восстановление счетчиков производительности системы</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-success">Основная</span>
+                                <h5>Включить GameMode</h5>
+                                <p>Активация игрового режима Windows</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-info">Углубленная</span>
+                                <h5>Large System Cache</h5>
+                                <p>Оптимизация кэширования системы</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-warning">Максимальная</span>
+                                <h5>Твики для памяти</h5>
+                                <p>Оптимизация использования оперативной памяти</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="drivers" role="tabpanel">
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-primary">NVIDIA</span>
+                                <h5>Загрузка драйверов NVIDIA</h5>
+                                <p>Автоматическая загрузка последних драйверов NVIDIA</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-success">AMD</span>
+                                <h5>Загрузка драйверов AMD</h5>
+                                <p>Автоматическая загрузка последних драйверов AMD</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-info">Оптимизация</span>
+                                <h5>Advanced Hidden Nvidia Gpu Tweaks</h5>
+                                <p>Расширенные настройки для видеокарт NVIDIA</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-warning">DirectX</span>
+                                <h5>Оптимизация DirectX</h5>
+                                <p>Настройка и оптимизация DirectX для улучшения производительности в играх</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="power" role="tabpanel">
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-primary">Высокая производительность</span>
+                                <h5>Bitsum Highest Performance</h5>
+                                <p>Схема электропитания для максимальной производительности</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-success">Низкая задержка</span>
+                                <h5>Calypto's Low Latency</h5>
+                                <p>Схема электропитания для минимальной задержки</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-info">Игровая</span>
+                                <h5>GGOSv0_8_5</h5>
+                                <p>Оптимизированная схема электропитания для игр</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="script-card">
+                                <span class="badge bg-warning">Для ноутбуков</span>
+                                <h5>Laptop Power Plan by Tom</h5>
+                                <p>Специальная схема электропитания для ноутбуков</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <h3 class="mb-4">Пример кода скрипта</h3>
+                <div class="code-block">
+                    <code>
+                        <span class="code-keyword">@echo</span> off<br>
+                        <span class="code-keyword">title</span> Extreme Tweaker - Оптимизация системы<br>
+                        <span class="code-keyword">color</span> 0A<br>
+                        <br>
+                        <span class="code-comment">:: Отключение телеметрии</span><br>
+                        <span class="code-keyword">reg</span> add "HKLM\SOFTWARE\Policies\Microsoft\Windows\DataCollection" /v "AllowTelemetry" /t REG_DWORD /d 0 /f<br>
+                        <br>
+                        <span class="code-comment">:: Отключение игровой панели</span><br>
+                        <span class="code-keyword">reg</span> add "HKLM\SOFTWARE\Policies\Microsoft\Windows\GameDVR" /v "AllowGameDVR" /t REG_DWORD /d 0 /f<br>
+                        <br>
+                        <span class="code-comment">:: Оптимизация питания для высокой производительности</span><br>
+                        <span class="code-keyword">powercfg</span> -duplicatescheme e9a42b02-d5df-448d-aa00-03f14749eb61<br>
+                        <br>
+                        <span class="code-keyword">echo</span> <span class="code-string">Оптимизация завершена!</span><br>
+                        <span class="code-keyword">pause</span><br>
+                    </code>
                 </div>
             </div>
         </div>
@@ -101,16 +846,25 @@
 
     <section id="download" class="download-section">
         <div class="container">
-            <h2 class="text-center mb-5">Скачать Extreme</h2>
+            <h2 class="text-center mb-5 section-title">Скачать Extreme</h2>
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="download-card">
-                        <h3>Установка</h3>
+                        <h3><i class="fas fa-download me-2"></i>Установка</h3>
                         <ol class="download-instructions">
-                            <li>Скачайте и запустите</li>
+                            <li>Скачайте архив с программой</li>
+                            <li>Распакуйте архив в удобную папку</li>
+                            <li>Запустите файл Extreme.exe</li>
+                            <li>Следуйте инструкциям на экране</li>
                         </ol>
+                        <div class="alert alert-dark mt-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Внимание:</strong> Перед использованием сделайте резервную копию системы или точку восстановления.
+                        </div>
                         <div class="text-center mt-4">
-                            <a href="https://github.com/anton18-png/Extreme" class="btn btn-primary btn-lg">Скачать Extreme</a>
+                            <a href="https://github.com/anton18-png/Extreme" class="btn btn-primary btn-lg">
+                                <i class="fas fa-download me-2"></i>Скачать Extreme
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -120,21 +874,24 @@
 
     <section id="support" class="support-section">
         <div class="container">
-            <h2 class="text-center mb-5">Поддержать автора</h2>
+            <h2 class="text-center mb-5 section-title">Поддержать автора</h2>
             <div class="row justify-content-center">
-                <div class="col-lg-8">
+                <div class="col-lg-10">
                     <div class="support-options">
-                        <!-- <div class="support-card">
-                            <h3>Boosty</h3>
-                            <a href="https://boosty.to/scode18/donate" class="btn btn-outline-light">Поддержать</a>
-                        </div> -->
                         <div class="support-card">
-                            <h3>Т-Банк</h3>
-                            <a href="https://www.tinkoff.ru/cf/2VBH9zSztcW" class="btn btn-outline-light">Поддержать</a>
+                            <h3><i class="fas fa-credit-card me-2"></i>Т-Банк</h3>
+                            <p>Поддержка через Tinkoff</p>
+                            <a href="https://www.tinkoff.ru/cf/2VBH9zSztcW" class="btn btn-outline-light mt-3">Поддержать</a>
                         </div>
                         <div class="support-card">
-                            <h3>Sharem</h3>
-                            <a href="https://sharem.tech/r/user3e27791d" class="btn btn-outline-light">Поддержать</a>
+                            <h3><i class="fas fa-hand-holding-usd me-2"></i>Sharem</h3>
+                            <p>Поддержка через Sharem</p>
+                            <a href="https://sharem.tech/r/user3e27791d" class="btn btn-outline-light mt-3">Поддержать</a>
+                        </div>
+                        <div class="support-card">
+                            <h3><i class="fab fa-github me-2"></i>GitHub</h3>
+                            <p>Star на GitHub</p>
+                            <a href="https://github.com/anton18-png/Extreme" class="btn btn-outline-light mt-3">Поставить звезду</a>
                         </div>
                     </div>
                 </div>
@@ -146,16 +903,67 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <p>&copy; 2025 All Tweaker. Все права защищены.</p>
+                    <p>&copy; 2025 Extreme. Все права защищены.</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <a href="https://github.com/anton18-png/Extreme" class="social-link">GitHub</a>
-                    <a href="https://t.me/all_tweaker" class="social-link">Telegram</a>
+                    <a href="https://github.com/anton18-png/Extreme" class="social-link">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://t.me/all_tweaker" class="social-link">
+                        <i class="fab fa-telegram"></i>
+                    </a>
+                    <a href="#" class="social-link">
+                        <i class="fab fa-discord"></i>
+                    </a>
                 </div>
             </div>
         </div>
     </footer>
 
+    <div class="scroll-top" id="scrollTop">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Scroll to top button
+        const scrollTop = document.getElementById('scrollTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollTop.classList.add('active');
+            } else {
+                scrollTop.classList.remove('active');
+            }
+        });
+        
+        scrollTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Tab activation
+        document.addEventListener('DOMContentLoaded', function() {
+            const triggerTabList = [].slice.call(document.querySelectorAll('#scriptsTabs button'));
+            triggerTabList.forEach(function (triggerEl) {
+                new bootstrap.Tab(triggerEl);
+            });
+        });
+
+        // Simple animation for stats boxes
+        const statsBoxes = document.querySelectorAll('.stats-box');
+        statsBoxes.forEach(box => {
+            box.addEventListener('mouseenter', () => {
+                box.style.transform = 'translateY(-5px)';
+                box.style.boxShadow = '0 10px 20px rgba(0, 0, 0, 0.2)';
+            });
+            
+            box.addEventListener('mouseleave', () => {
+                box.style.transform = 'translateY(0)';
+                box.style.boxShadow = 'none';
+            });
+        });
+    </script>
 </body>
-</html> 

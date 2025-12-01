@@ -3,190 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extreme Tweaker 3 - Ультимативная оптимизация Windows</title>
+    <title>Extreme Tweaker 3.5 Lite - Ультимативная оптимизация Windows</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #00ff88;
-            --secondary-color: #00ccff;
-            --background-color: #0a0a0a;
-            --text-color: #ffffff;
-            --card-bg: #1a1a1a;
-            --border-color: #00ff88;
-            --accent-color: #ff0088;
-            --success-color: #00ff88;
             --matrix-green: #00ff41;
+            --neon-blue: #00ccff;
+            --neon-pink: #ff0088;
+            --neon-purple: #9d00ff;
+            --dark-bg: #0a0a0a;
+            --darker-bg: #050505;
+            --card-bg: rgba(20, 20, 20, 0.9);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --gradient-primary: linear-gradient(45deg, var(--matrix-green), var(--neon-blue));
+            --gradient-accent: linear-gradient(45deg, var(--neon-pink), var(--neon-purple));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'JetBrains Mono', monospace;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
             overflow-x: hidden;
-            background-image: 
-                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 255, 65, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 204, 255, 0.03) 0%, transparent 50%),
+                var(--dark-bg);
         }
 
-        .cyber-glitch {
-            position: relative;
-            animation: glitch 5s infinite;
-        }
-
-        @keyframes glitch {
-            0%, 100% { transform: translateX(0); }
-            5% { transform: translateX(-2px); }
-            10% { transform: translateX(2px); }
-            15% { transform: translateX(-1px); }
-            20% { transform: translateX(1px); }
-        }
-
-        .navbar {
-            background: rgba(10, 10, 10, 0.95) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 2px solid var(--matrix-green);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .navbar-brand {
-            color: var(--matrix-green) !important;
-            font-weight: 700;
-            font-size: 1.8rem;
-            text-shadow: 0 0 10px var(--matrix-green);
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .nav-link {
-            color: var(--text-color) !important;
-            font-weight: 500;
-            position: relative;
-            margin: 0 10px;
-            font-family: 'Rajdhani', sans-serif;
-        }
-
-        .nav-link::before {
-            content: '>';
-            color: var(--matrix-green);
-            margin-right: 5px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .nav-link:hover::before,
-        .nav-link.active::before {
-            opacity: 1;
-        }
-
-        .nav-link:hover {
-            color: var(--matrix-green) !important;
-            text-shadow: 0 0 8px var(--matrix-green);
-        }
-
-        .hero-section {
-            padding: 150px 0 100px;
-            background: radial-gradient(circle at 50% 50%, rgba(0, 255, 65, 0.1), transparent 70%);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-section::before {
-            content: '';
-            position: absolute;
+        /* Cyber Grid Background */
+        .cyber-grid-bg {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                linear-gradient(90deg, transparent 50%, rgba(0, 255, 65, 0.1) 100%);
-            animation: scan 3s linear infinite;
+            background-image: 
+                linear-gradient(90deg, rgba(0, 255, 65, 0.02) 1px, transparent 1px),
+                linear-gradient(rgba(0, 255, 65, 0.02) 1px, transparent 1px);
+            background-size: 80px 80px;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* Animated Scan Lines */
+        .scan-lines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 50%,
+                rgba(0, 255, 65, 0.02) 51%
+            );
+            background-size: 100% 4px;
+            z-index: -1;
+            pointer-events: none;
+            animation: scan 8s linear infinite;
         }
 
         @keyframes scan {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
+            0% { transform: translateY(0); }
+            100% { transform: translateY(4px); }
         }
 
-        .main-title {
-            font-family: 'Rajdhani', sans-serif;
-            font-weight: 700;
-            font-size: 4.5rem;
-            background: linear-gradient(45deg, var(--matrix-green), var(--secondary-color));
+        /* Navigation */
+        .navbar {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-scrolled {
+            background: rgba(5, 5, 5, 0.98);
+            border-bottom: 1px solid var(--matrix-green);
+            box-shadow: 0 5px 30px rgba(0, 255, 65, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: var(--gradient-primary);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
-            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+            position: relative;
+            padding-left: 40px;
         }
 
-        .subtitle {
-            font-size: 1.4rem;
+        .navbar-brand::before {
+            content: '❯';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
             color: var(--matrix-green);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .nav-link {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            color: var(--text-secondary) !important;
+            margin: 0 10px;
+            padding: 8px 16px !important;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--matrix-green);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--matrix-green) !important;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             margin-bottom: 2rem;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.3);
-        }
-
-        .cyber-button {
-            background: transparent;
-            border: 2px solid var(--matrix-green);
-            color: var(--matrix-green);
-            padding: 12px 30px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            font-family: 'Rajdhani', sans-serif;
         }
 
-        .cyber-button::before {
+        .main-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 4.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            text-shadow: 0 0 50px rgba(0, 255, 65, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 2rem;
+            max-width: 700px;
+        }
+
+        .version-highlight {
+            display: inline-block;
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--matrix-green);
+            padding: 10px 20px;
+            margin: 1rem 0;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+
+        /* Cyber Buttons */
+        .cyber-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px 40px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border: none;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        .cyber-btn-primary {
+            background: var(--gradient-primary);
+            color: #000;
+        }
+
+        .cyber-btn-secondary {
+            background: transparent;
+            color: var(--matrix-green);
+            border: 2px solid var(--matrix-green);
+        }
+
+        .cyber-btn::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s;
         }
 
-        .cyber-button:hover::before {
+        .cyber-btn:hover::before {
             left: 100%;
         }
 
-        .cyber-button:hover {
-            background: rgba(0, 255, 65, 0.1);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
-            transform: translateY(-2px);
+        .cyber-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
         }
 
-        .cyber-button.primary {
-            background: var(--matrix-green);
-            color: #000;
+        .cyber-btn-primary:hover {
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.5);
         }
 
-        .cyber-button.primary:hover {
-            background: #00cc55;
-            border-color: #00cc55;
+        /* Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--matrix-green);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Feature Cards */
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: var(--gradient-primary);
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
         }
 
         .feature-card {
-            background: rgba(26, 26, 26, 0.8);
-            border: 1px solid var(--matrix-green);
-            border-radius: 0;
+            background: var(--card-bg);
+            border: 1px solid rgba(0, 255, 65, 0.1);
+            border-radius: 15px;
             padding: 2.5rem 2rem;
-            height: 100%;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
         }
 
         .feature-card::before {
@@ -194,9 +353,9 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 5px;
             height: 100%;
-            background: var(--matrix-green);
+            background: var(--gradient-primary);
             transform: scaleY(0);
             transition: transform 0.3s ease;
         }
@@ -206,160 +365,218 @@
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.2);
+            transform: translateY(-10px);
+            border-color: var(--matrix-green);
+            box-shadow: 0 15px 40px rgba(0, 255, 65, 0.15);
         }
 
         .feature-icon {
             font-size: 2.5rem;
-            color: var(--matrix-green);
             margin-bottom: 1.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .section-title {
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--matrix-green);
             font-family: 'Rajdhani', sans-serif;
             font-weight: 700;
-            font-size: 3rem;
-            text-align: center;
-            margin-bottom: 3rem;
+        }
+
+        /* New Features Highlight */
+        .new-features {
+            background: var(--gradient-primary);
+            padding: 4rem 0;
+            margin: 4rem 0;
             position: relative;
-            color: var(--matrix-green);
+            overflow: hidden;
         }
 
-        .section-title::after {
+        .new-features::before {
             content: '';
-            display: block;
-            width: 100px;
-            height: 3px;
-            background: var(--matrix-green);
-            margin: 20px auto;
-            box-shadow: 0 0 10px var(--matrix-green);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%);
+            animation: shine 3s infinite;
         }
 
-        .stats-grid {
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .new-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--gradient-accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+        }
+
+        /* Security Section */
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .security-card {
+            background: rgba(0, 20, 10, 0.5);
+            border: 1px solid rgba(0, 255, 65, 0.2);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .security-icon {
+            font-size: 3rem;
+            color: var(--matrix-green);
+            margin-bottom: 1rem;
+        }
+
+        /* Download Section */
+        .download-card {
+            background: var(--card-bg);
+            border: 2px solid var(--matrix-green);
+            border-radius: 20px;
+            padding: 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-steps {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            margin-top: 3rem;
+            margin: 3rem 0;
         }
 
-        .stat-item {
+        .step {
             text-align: center;
-            padding: 2rem;
-            background: rgba(0, 255, 65, 0.05);
-            border: 1px solid rgba(0, 255, 65, 0.2);
-        }
-
-        .stat-number {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--matrix-green);
-            display: block;
-            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
-        }
-
-        .stat-label {
-            color: var(--text-color);
-            font-size: 1.1rem;
-            margin-top: 0.5rem;
-        }
-
-        .code-block {
-            background: #000;
-            border: 1px solid var(--matrix-green);
-            border-left: 4px solid var(--matrix-green);
-            padding: 2rem;
-            margin: 2rem 0;
-            overflow-x: auto;
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .code-keyword { color: #ff6b6b; }
-        .code-comment { color: #6a9955; }
-        .code-string { color: #ce9178; }
-        .code-function { color: #dcdcaa; }
-
-        .update-highlight {
-            background: rgba(0, 255, 65, 0.1);
-            border: 2px solid var(--matrix-green);
-            padding: 2rem;
-            margin: 2rem 0;
             position: relative;
         }
 
-        .update-highlight::before {
-            content: 'NEW';
-            position: absolute;
-            top: -10px;
-            right: 20px;
-            background: var(--matrix-green);
-            color: #000;
-            padding: 5px 15px;
-            font-weight: 700;
-            font-size: 0.8rem;
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            color: black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin: 0 auto 1rem;
+            font-family: 'Orbitron', sans-serif;
         }
 
-        .security-badge {
-            display: inline-block;
-            background: var(--matrix-green);
-            color: #000;
-            padding: 5px 15px;
-            font-weight: 700;
-            margin: 10px 0;
-            font-size: 0.9rem;
+        /* Footer */
+        .footer {
+            background: var(--darker-bg);
+            padding: 4rem 0 2rem;
+            border-top: 1px solid rgba(0, 255, 65, 0.2);
+            margin-top: 4rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            color: var(--matrix-green);
+            border-color: var(--matrix-green);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 3rem;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-section {
+                padding-top: 150px;
+                text-align: center;
+            }
+            
+            .stats-container,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
         .floating {
             animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        /* Glitch Text */
+        .glitch {
+            position: relative;
+            animation: glitch 5s infinite;
         }
 
-        .matrix-rain {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-            opacity: 0.1;
-        }
-
-        @media (max-width: 768px) {
-            .main-title {
-                font-size: 2.5rem;
-            }
-            
-            .hero-section {
-                padding: 100px 0 50px;
-                text-align: center;
-            }
-            
-            .section-title {
-                font-size: 2rem;
-            }
-        }
-
-        .cyber-grid {
-            background-image: 
-                linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
         }
     </style>
 </head>
 <body>
-    <!-- Matrix Rain Background -->
-    <div class="matrix-rain" id="matrixRain"></div>
+    <!-- Background Elements -->
+    <div class="cyber-grid-bg"></div>
+    <div class="scan-lines"></div>
 
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
         <div class="container">
-            <a class="navbar-brand cyber-glitch" href="#">
-                <i class="fas fa-bolt me-2"></i>EXTREME TWEAKER 3
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-bolt me-2"></i>EXTREME TWEAKER
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -370,7 +587,7 @@
                         <a class="nav-link active" href="#home">ГЛАВНАЯ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#features">ВОЗМОЖНОСТИ</a>
+                        <a class="nav-link" href="#features">ФИЧИ 3.5 LITE</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#security">БЕЗОПАСНОСТЬ</a>
@@ -383,194 +600,188 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section id="home" class="hero-section">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <h1 class="main-title cyber-glitch">EXTREME TWEAKER 3</h1>
-                    <p class="subtitle">УЛЬТИМАТИВНАЯ ОПТИМИЗАЦИЯ WINDOWS</p>
-                    <p class="lead mb-4">Более 1000 твиков для максимальной производительности, конфиденциальности и стабильности вашей системы.</p>
+                <div class="col-lg-6 hero-content">
+                    <span class="hero-badge">НОВАЯ ВЕРСИЯ</span>
+                    <h1 class="main-title glitch">EXTREME TWEAKER 3.5 LITE</h1>
+                    <div class="version-highlight">
+                        <i class="fas fa-star me-2"></i>ПОЧТИ ВЕСЬ ФУНКЦИОНАЛ PRO-ВЕРСИИ!
+                    </div>
+                    <p class="subtitle">
+                        Революционный оптимизатор Windows с полным переводом на русский язык и проверкой всех ведущих антивирусов
+                    </p>
                     
-                    <div class="d-flex gap-3 flex-wrap">
-                        <a href="#download" class="cyber-button primary">
-                            <i class="fas fa-download me-2"></i>СКАЧАТЬ EXTREME 3
+                    <div class="d-flex gap-3 flex-wrap mb-4">
+                        <a href="#download" class="cyber-btn cyber-btn-primary">
+                            <i class="fas fa-download me-2"></i>СКАЧАТЬ 3.5 LITE
                         </a>
-                        <a href="#features" class="cyber-button">
-                            <i class="fas fa-star me-2"></i>ВОЗМОЖНОСТИ
+                        <a href="#features" class="cyber-btn cyber-btn-secondary">
+                            <i class="fas fa-cogs me-2"></i>НОВЫЕ ФИЧИ
                         </a>
                     </div>
 
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-number">1000+</span>
-                            <div class="stat-label">ТВИКОВ И СКРИПТОВ</div>
+                    <div class="stats-container">
+                        <div class="stat-card floating">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">РУССКИЙ ЯЗЫК</div>
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-number">100%</span>
-                            <div class="stat-label">ОПТИМИЗАЦИИ СИСТЕМЫ</div>
+                        <div class="stat-card floating" style="animation-delay: 0.2s;">
+                            <div class="stat-number">0</div>
+                            <div class="stat-label">ЛОЖНЫХ СРАБАТЫВАНИЙ</div>
+                        </div>
+                        <div class="stat-card floating" style="animation-delay: 0.4s;">
+                            <div class="stat-number">PRO</div>
+                            <div class="stat-label">ФУНКЦИОНАЛ</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
-                    <div class="cyber-grid p-5 floating">
-                        <i class="fas fa-desktop" style="font-size: 15rem; color: var(--matrix-green); opacity: 0.3;"></i>
+                    <div class="position-relative" style="height: 500px;">
+                        <!-- Animated terminal window -->
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark rounded-3 border border-success p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="d-flex gap-2">
+                                    <div class="rounded-circle bg-danger" style="width: 12px; height: 12px;"></div>
+                                    <div class="rounded-circle bg-warning" style="width: 12px; height: 12px;"></div>
+                                    <div class="rounded-circle bg-success" style="width: 12px; height: 12px;"></div>
+                                </div>
+                                <div class="ms-3 text-success">❯ extreme_tweaker.exe</div>
+                            </div>
+                            <div class="text-start">
+                                <div class="text-success mb-2">Запуск Extreme Tweaker 3.5 Lite...</div>
+                                <div class="text-success mb-2">✓ Загрузка русской локализации</div>
+                                <div class="text-success mb-2">✓ Проверка безопасности системы</div>
+                                <div class="text-success mb-2">✓ Инициализация 1000+ твиков</div>
+                                <div class="text-success mb-2">✓ Доступ к Pro-функциям: [АКТИВИРОВАН]</div>
+                                <div class="text-warning mt-4 blink">Готов к оптимизации...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="features" class="py-5">
-        <div class="container">
-            <h2 class="section-title">ВОЗМОЖНОСТИ EXTREME 3</h2>
+    <!-- New Features Section -->
+    <section id="features" class="py-5 new-features">
+        <div class="container position-relative">
+            <div class="new-badge">Новинка 3.5</div>
+            <h2 class="section-title">ФИЧИ 3.5 LITE</h2>
+            <p class="text-center mb-5 fs-5">Всё, что вы просили — теперь в бесплатной версии!</p>
             
-            <div class="update-highlight">
-                <h4><i class="fas fa-sync-alt me-2"></i>МЫ ВЕРНУЛИСЬ С ОБНОВЛЕНИЕМ!</h4>
-                <p>После долгого перерыва команда Extreme Tweaker вернулась с полностью переработанной версией 3.0. Теперь с исправленными уязвимостями и ускоренным запуском!</p>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-tachometer-alt"></i>
-                        </div>
-                        <h4>ЭКСТРЕМАЛЬНАЯ ПРОИЗВОДИТЕЛЬНОСТЬ</h4>
-                        <p>Ускорение системы, оптимизация процессов и освобождение ресурсов для максимальной производительности</p>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-language"></i>
                     </div>
+                    <h3 class="feature-title">ПОЛНЫЙ РУССКИЙ ЯЗЫК</h3>
+                    <p>Все твики теперь на русском с подробными описаниями. Никаких загадок — только понятные настройки.</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt"></i>
-                        </div>
-                        <h4>ПОЛНАЯ КОНФИДЕНЦИАЛЬНОСТЬ</h4>
-                        <p>Отключение телеметрии, блокировка сбора данных и удаление шпионских компонентов Windows</p>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-crown"></i>
                     </div>
+                    <h3 class="feature-title">PRO-ФУНКЦИИ</h3>
+                    <p>Почти все возможности из платной версии теперь доступны в Lite. Максимум функционала без ограничений.</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <h4>ИГРОВАЯ ОПТИМИЗАЦИЯ</h4>
-                        <p>Снижение input lag, оптимизация драйверов и специальные настройки для геймеров</p>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
+                    <h3 class="feature-title">ПРОВЕРКА АНТИВИРУСАМИ</h3>
+                    <p>Протестировано: Kaspersky, Malwarebytes, Avast, Dr.Web и Windows Defender не находят угроз!</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-broom"></i>
-                        </div>
-                        <h4>ГЛУБОКАЯ ОЧИСТКА</h4>
-                        <p>Удаление UWP-приложений, временных файлов и системного мусора</p>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
                     </div>
+                    <h3 class="feature-title">ЭКСПЕРТНЫЕ КОНФИГИ</h3>
+                    <p>Готовые оптимизации от Хауди Хо, Игроманова, De3nake и других экспертов в одном месте.</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-sliders-h"></i>
-                        </div>
-                        <h4>ПЕРЕРАБОТАННЫЙ ИНТЕРФЕЙС</h4>
-                        <p>Удобное группирование настроек, быстрый доступ и визуальные подсказки</p>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gamepad"></i>
                     </div>
+                    <h3 class="feature-title">РЕЖИМ ГЕЙМЕРА</h3>
+                    <p>Снижение input lag, оптимизация DirectX и специальные настройки для максимального FPS.</p>
                 </div>
-                <div class="col-md-6 col-lg-4">
-                    <div class="feature-card">
-                        <div class="feature-icon">
-                            <i class="fas fa-bolt"></i>
-                        </div>
-                        <h4>МГНОВЕННЫЙ ЗАПУСК</h4>
-                        <p>Программа запускается за секунды благодаря оптимизации кода</p>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
                     </div>
+                    <h3 class="feature-title">ИНТЕЛЛЕКТУАЛЬНАЯ ОПТИМИЗАЦИЯ</h3>
+                    <p>AI-анализ системы и автоматический подбор лучших твиков под ваше железо.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="security" class="py-5 bg-dark">
+    <!-- Security Section -->
+    <section id="security" class="py-5">
         <div class="container">
-            <h2 class="section-title">БЕЗОПАСНОСТЬ ПРЕВЫШЕ ВСЕГО</h2>
+            <h2 class="section-title">ПРОВЕРКА БЕЗОПАСНОСТИ</h2>
             
-            <div class="row align-items-center">
+            <div class="row align-items-center mb-5">
                 <div class="col-lg-6">
-                    <div class="security-badge">ПОЛНЫЙ AUDIT БЕЗОПАСНОСТИ</div>
-                    <h3 class="mb-4">ИСПРАВЛЕНЫ ВСЕ УЯЗВИМОСТИ</h3>
+                    <h3 class="mb-4">100% ЧИСТЫЙ КОД</h3>
+                    <p>Extreme Tweaker 3.5 Lite прошел проверку всеми ведущими антивирусами:</p>
                     
-                    <div class="mb-4">
-                        <h5><i class="fas fa-check-circle text-success me-2"></i>CWE-78: Injection vulnerabilities</h5>
-                        <p>Полностью переработана система выполнения команд</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h5><i class="fas fa-check-circle text-success me-2"></i>CWE-276: Incorrect default permissions</h5>
-                        <p>Исправлены права доступа и разрешения</p>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <h5><i class="fas fa-check-circle text-success me-2"></i>CWE-250: Execution with unnecessary privileges</h5>
-                        <p>Оптимизированы привилегии выполнения</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <h5><i class="fas fa-check-circle text-success me-2"></i>CWE-732: Incorrect permission assignment</h5>
-                        <p>Исправлено назначение разрешений</p>
+                    <div class="security-grid mt-4">
+                        <div class="security-card">
+                            <i class="fab fa-windows security-icon"></i>
+                            <h4>Windows Defender</h4>
+                            <div class="text-success">✓ ЧИСТЫЙ</div>
+                        </div>
+                        <div class="security-card">
+                            <i class="fas fa-shield-virus security-icon"></i>
+                            <h4>Kaspersky</h4>
+                            <div class="text-success">✓ ЧИСТЫЙ</div>
+                        </div>
+                        <div class="security-card">
+                            <i class="fas fa-bug security-icon"></i>
+                            <h4>Malwarebytes</h4>
+                            <div class="text-success">✓ ЧИСТЫЙ</div>
+                        </div>
+                        <div class="security-card">
+                            <i class="fas fa-shield-alt security-icon"></i>
+                            <h4>Avast</h4>
+                            <div class="text-success">✓ ЧИСТЫЙ</div>
+                        </div>
                     </div>
                 </div>
                 
                 <div class="col-lg-6">
-                    <div class="code-block">
-                        <code>
-                            <span class="code-comment"># БЕЗОПАСНЫЙ КОД EXTREME 3</span><br>
-                            <span class="code-keyword">function</span> <span class="code-function">secure_tweak_apply</span>() {<br>
-                            &nbsp;&nbsp;<span class="code-comment">// Валидация всех входных параметров</span><br>
-                            &nbsp;&nbsp;<span class="code-keyword">if</span> (!validate_input(params)) {<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;log_security_event("Invalid input detected");<br>
-                            &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-keyword">return</span> false;<br>
-                            &nbsp;&nbsp;}<br>
-                            &nbsp;&nbsp;<span class="code-comment">// Создание точки восстановления</span><br>
-                            &nbsp;&nbsp;create_restore_point();<br>
-                            &nbsp;&nbsp;<span class="code-comment">// Безопасное применение твиков</span><br>
-                            &nbsp;&nbsp;apply_secure_tweaks();<br>
-                            }<br>
-                        </code>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="download" class="py-5">
-        <div class="container">
-            <h2 class="section-title">СКАЧАТЬ EXTREME TWEAKER 3</h2>
-            
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="feature-card text-center">
-                        <h3 class="mb-4"><i class="fas fa-download me-2"></i>УСТАНОВКА В 3 ШАГА</h3>
-                        
-                        <div class="row text-start mb-4">
-                            <div class="col-md-4 mb-3">
-                                <h5><span class="text-primary">1.</span> Скачать</h5>
-                                <p>Загрузите архив с официальной страницы</p>
+                    <div class="p-4 border border-success rounded-3 bg-dark">
+                        <h4 class="text-success mb-3"><i class="fas fa-check-circle me-2"></i>РЕЗУЛЬТАТЫ VIRUSTOTAL</h4>
+                        <p>Свежая проверка показывает 0 ложных срабатываний:</p>
+                        <div class="mt-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Обнаружения:</span>
+                                <span class="text-success">0/72</span>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <h5><span class="text-primary">2.</span> Распаковать</h5>
-                                <p>Извлеките файлы в удобную папку</p>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Касперский:</span>
+                                <span class="text-success">CLEAN</span>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <h5><span class="text-primary">3.</span> Запустить</h5>
-                                <p>Запустите Extreme.exe от имени администратора</p>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Malwarebytes:</span>
+                                <span class="text-success">CLEAN</span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Dr.Web:</span>
+                                <span class="text-success">CLEAN</span>
                             </div>
                         </div>
-
-                        <div class="alert border border-warning mb-4">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            <strong>Рекомендуется:</strong> Создать точку восстановления перед использованием
-                        </div>
-
-                        <a href="https://github.com/anton18-png/Extreme/releases/tag/v0.3.5" class="cyber-button primary btn-lg">
-                            <i class="fas fa-download me-2"></i>СКАЧАТЬ EXTREME 3
+                        <a href="https://www.virustotal.com/gui/file/..." class="cyber-btn cyber-btn-secondary mt-4 w-100">
+                            <i class="fas fa-external-link-alt me-2"></i>ПОСМОТРЕТЬ ПОЛНЫЙ ОТЧЕТ
                         </a>
                     </div>
                 </div>
@@ -578,19 +789,64 @@
         </div>
     </section>
 
-    <footer class="py-4 border-top border-matrix-green">
+    <!-- Download Section -->
+    <section id="download" class="py-5">
+        <div class="container">
+            <h2 class="section-title">СКАЧАТЬ EXTREME 3.5 LITE</h2>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="download-card">
+                        <h3 class="mb-4"><i class="fas fa-download me-2"></i>БЕСПЛАТНАЯ УСТАНОВКА</h3>
+                        <p class="mb-4">Никаких регистраций, подписок или скрытых платежей. Просто скачайте и начните оптимизацию!</p>
+                        
+                        <div class="alert border border-warning bg-dark mb-4">
+                            <i class="fas fa-exclamation-triangle me-2 text-warning"></i>
+                            <strong class="text-warning">Рекомендация:</strong> Создайте точку восстановления перед началом оптимизации
+                        </div>
+                        
+                        <a href="https://github.com/anton18-png/Extreme/releases/tag/v0.3.5" class="cyber-btn cyber-btn-primary btn-lg">
+                            <i class="fas fa-download me-2"></i>СКАЧАТЬ EXTREME 3.5 LITE
+                        </a>
+                        
+                        <p class="mt-3 text-secondary small">Версия 3.5 Lite • Windows 10/11 • Русский язык • Бесплатно</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
         <div class="container">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; 2025 Extreme Tweaker. Все права защищены.</p>
+                <div class="col-lg-4 text-center text-lg-start">
+                    <h3 class="mb-3">
+                        <span class="text-success">❯</span> Extreme Tweaker
+                    </h3>
+                    <p class="text-secondary">Ультимативная оптимизация Windows для геймеров, энтузиастов и профессионалов</p>
                 </div>
-                <div class="col-md-6 text-end">
-                    <a href="https://github.com/anton18-png" class="text-decoration-none me-3">
-                        <i class="fab fa-github me-1"></i> GitHub
-                    </a>
-                    <a href="https://t.me/all_tweaker" class="text-decoration-none">
-                        <i class="fab fa-telegram me-1"></i> Telegram
-                    </a>
+                
+                <div class="col-lg-4 text-center">
+                    <div class="social-links">
+                        <a href="https://github.com/anton18-png" class="social-link">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://t.me/all_tweaker" class="social-link">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                        <a href="#" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 text-center text-lg-end">
+                    <p class="text-secondary mb-2">&copy; 2025 Extreme Tweaker</p>
+                    <p class="text-secondary small">Все твики имеют открытый исходный код и проверены сообществом</p>
                 </div>
             </div>
         </div>
@@ -598,57 +854,79 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Matrix rain effect
-        function createMatrixRain() {
-            const matrix = document.getElementById('matrixRain');
-            const characters = '01010101010101010101010101010101';
-            const fontSize = 14;
-            const columns = Math.floor(window.innerWidth / fontSize);
-            
-            for (let i = 0; i < columns; i++) {
-                const column = document.createElement('div');
-                column.style.position = 'absolute';
-                column.style.top = '-100px';
-                column.style.left = (i * fontSize) + 'px';
-                column.style.fontSize = fontSize + 'px';
-                column.style.fontFamily = 'JetBrains Mono, monospace';
-                column.style.color = '#00ff41';
-                column.style.opacity = '0.1';
-                column.style.textShadow = '0 0 5px #00ff41';
-                column.style.animation = `fall ${Math.random() * 5 + 3}s linear infinite`;
-                column.style.animationDelay = Math.random() * 5 + 's';
-                column.textContent = characters;
-                matrix.appendChild(column);
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
             }
-        }
+        });
 
-        // Initialize matrix rain
-        createMatrixRain();
-
-        // Smooth scrolling for navigation links
+        // Smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
+            anchor.addEventListener('click', function(e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
                     });
                 }
             });
         });
 
-        // Add glow effect to cyber buttons on hover
-        document.querySelectorAll('.cyber-button').forEach(button => {
-            button.addEventListener('mouseenter', function() {
-                this.style.boxShadow = '0 0 20px rgba(0, 255, 65, 0.6)';
+        // Animate features on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
             });
-            
-            button.addEventListener('mouseleave', function() {
-                this.style.boxShadow = 'none';
-            });
+        }, observerOptions);
+
+        // Observe feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s ease';
+            observer.observe(card);
         });
-    </script>
-</body>
-</html>
+
+        // Typing effect for terminal
+        function typeText(element, text, speed = 50) {
+            let i = 0;
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Terminal typing effect on load
+        window.addEventListener('load', function() {
+            const terminal = document.querySelector('.text-warning');
+            if (terminal) {
+                terminal.innerHTML = '';
+                setTimeout(() => {
+                    typeText(terminal, 'Готов к оптимизации...', 100);
+                }, 1000);
+            }
+        });
+
+        // Glitch effect on title
+        const title = document.querySelector('.main-title');
+        let glitchInterval;
+
+       

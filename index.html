@@ -1019,93 +1019,150 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Security Explanation -->
-            <div class="security-explanation">
-                <h4 class="text-info mb-3">🛡 ПОЧЕМУ АНТИВИРУСЫ "РУГАЮТСЯ" НА EXTREME TWEAKER?</h4>
-                <p><strong>ПОЛНОЕ РАЗЪЯСНЕНИЕ</strong></p>
-                <p>Друзья, мы видим вопросы о том, почему некоторые системы безопасности отмечают наш твикер. Давайте честно разберёмся, что происходит и почему это НОРМАЛЬНО для такого типа софта!</p>
-                
-                <h5 class="text-warning mt-3">🤔 ПОЧЕМУ БРАУЗЕРЫ И АНТИВИРУСЫ НЕ ДОВЕРЯЮТ?</h5>
-                <ul>
-                    <li><strong>НЕТ СЕРТИФИКАТА</strong> — Мы не можем позволить дорогостоящий EV-сертификат</li>
-                    <li><strong>МАЛО СКАЧИВАНИЙ</strong> — Новый софт без репутации автоматически вызывает подозрения</li>
-                    <li><strong>PYINSTALLER</strong> — Используем стандартный инструмент сборки Python в EXE</li>
-                </ul>
-                
-                <h5 class="text-warning mt-3">🔧 ЧТО НА САМОМ ДЕЛЕ ДЕЛАЕТ EXTREME TWEAKER?</h5>
-                <p>Давайте посмотрим на результаты анализа песочницы:</p>
-                <ul>
-                    <li><strong>ФАЙЛОВЫЕ ОПЕРАЦИИ:</strong> Работает в C:\Apps\Extreme\, создает BAT-файлы, удаляет временные файлы Microsoft</li>
-                    <li><strong>РЕЕСТР И СИСТЕМА:</strong> Модифицирует настройки реестра для оптимизации</li>
-                    <li><strong>ПРОЦЕССЫ:</strong> Запускает cmd.exe для выполнения скриптов, останавливает ненужные процессы</li>
-                </ul>
-                
-                <h5 class="text-warning mt-3">📊 ЧТО ПОКАЗЫВАЮТ РЕЗУЛЬТАТЫ АНАЛИЗА?</h5>
-                <p>Вот краткий разбор:</p>
-                <ul>
-                    <li><strong>3 обнаружения из 72 антивирусов</strong> — отличный результат!</li>
-                    <li><strong>Большинство систем (CAPE, VirusTotal)</strong> — 0 угроз</li>
-                    <li><strong>Zenbox отмечает как "троян"</strong> — ЛОЖНОЕ СРАБАТЫВАНИЕ из-за:
-                        <ul>
-                            <li>Удаления файлов Microsoft</li>
-                            <li>Остановки служб</li>
-                            <li>Работы с реестром</li>
-                        </ul>
-                    </li>
-                </ul>
-                
-                <h5 class="text-warning mt-3">🛠 MITRE ATT&CK ТЕХНИКИ (ЭТО НЕ ВРЕДОНОСНО!)</h5>
-                <p>Вот почему системы безопасности могут помечать наш софт:</p>
-                <ul>
-                    <li><strong>Т1059</strong> — Исполнение скриптов (наши BAT-файлы)</li>
-                    <li><strong>Т1064</strong> — Скриптинг (оптимизация)</li>
-                    <li><strong>Т1070</strong> — Удаление индикаторов (очистка логов)</li>
-                    <li><strong>Т1548</strong> — Повышение привилегий (запуск от админа)</li>
-                </ul>
-                
-                <div class="mt-4 p-3 border border-success rounded-3 bg-dark">
-                    <h5 class="text-success mb-3">💡 ВАЖНО ПОНИМАТЬ:</h5>
-                    <p>Extreme Tweaker делает ТОЧНО ТО, для чего создан:</p>
-                    <ul class="mb-0">
-                        <li><strong class="text-success">✅ Удаляет телеметрию и шпионские модули Microsoft</strong></li>
-                        <li><strong class="text-success">✅ Оптимизирует реестр и системные настройки</strong></li>
-                        <li><strong class="text-success">✅ Останавливает ненужные службы</strong></li>
-                        <li><strong class="text-success">✅ Очищает временные файлы</strong></li>
-                        <li><strong class="text-success">✅ Настраивает Windows под максимальную производительность</strong></li>
-                    </ul>
-                </div>
-                
-                <div class="alert alert-dark border border-info mt-4">
-                    <h6 class="text-info">🎯 НАША ПОЗИЦИЯ:</h6>
-                    <p class="mb-2">Мы <strong>НЕ</strong> готовы жертвовать функциональностью ради "спокойствия" антивирусов. Чтобы убрать все ложные срабатывания, нам придется:</p>
-                    <ol class="mb-2">
-                        <li>Убрать 50% функций твикера</li>
-                        <li>Отказаться от глубокой оптимизации</li>
-                        <li>Перестать работать с реестром</li>
-                        <li>Не трогать службы Microsoft</li>
-                    </ol>
-                    <p class="mb-0">Ложные срабатывания — это цена за глубокую оптимизацию Windows! Мы работаем честно и открыто — каждая функция имеет свою цель и объяснение.</p>
-                </div>
-                
-                <div class="mt-4 p-3 border border-warning rounded-3">
-                    <h5 class="text-warning mb-3">📞 ВАШИ ДЕЙСТВИЯ:</h5>
-                    <ol>
-                        <li><strong>Добавьте в исключения антивируса</strong> — это безопасно и необходимо для работы всех функций</li>
-                        <li><strong>Проверьте сами на VirusTotal</strong> — смотрите вкладку "Поведение" для полной картины</li>
-                        <li><strong>Используйте точку восстановления</strong> — стандартная практика перед любыми системными изменениями</li>
-                    </ol>
-                    <p class="mb-0 text-center">
-                        <a href="https://www.virustotal.com/gui/file/cc97c9412727aceaa6ce4076eed64ea146bd40dbc82010d03d0929dee9e445de?nocache=1" 
-                           class="cyber-btn cyber-btn-secondary mt-2" target="_blank">
-                            <i class="fas fa-shield-alt me-2"></i>ПОСМОТРЕТЬ ПОЛНЫЙ ОТЧЕТ VIRUSTOTAL
-                        </a>
-                    </p>
+            
+    <!-- Security Explanation -->
+    <div class="security-explanation">
+        <h4 class="text-info mb-3">🛡 ПОЧЕМУ АНТИВИРУСЫ "РУГАЮТСЯ" НА EXTREME TWEAKER?</h4>
+        <p><strong>ПОЛНОЕ РАЗЪЯСНЕНИЕ</strong></p>
+        <p>Друзья, мы видим вопросы о том, почему некоторые системы безопасности отмечают наш твикер. Давайте честно разберёмся, что происходит и почему это НОРМАЛЬНО для такого типа софта!</p>
+        
+        <div class="alert alert-dark border border-warning mt-4">
+            <h5 class="text-warning">🚬 Интересная ситуация с "вирусами" в последнее время</h5>
+            <p class="mb-2">Заметили, как браузеры стали агрессивно блокировать скачивание файлов? Мол, "опасно", "подозрительно", "вирус". Особенно достается твикерам и оптимизаторам.</p>
+            <p class="mb-0">Возьмем, к примеру, наш Extreme Tweaker 🤔 Браузеры нервничают, антивирусы сигналят... А по факту — весь код открыт на GitHub, можно проверить каждую строчку. Но нет, система "знает лучше".</p>
+        </div>
+        
+        <div class="mt-4 p-3 border border-danger rounded-3 bg-dark">
+            <h5 class="text-danger mb-3">💸 ГЛАВНЫЙ "СЕКРЕТ" АНТИВИРУСОВ</h5>
+            <p>А вот главный прикол: <strong>90% этих "обнаружений" — просто потому что у .exe файлов нет цифровой подписи.</strong></p>
+            <p>И угадайте, сколько стоит эта подпись? Правильно, деньги 💸 И не малые — <strong>300-500$ в год!</strong></p>
+            
+            <div class="mt-3 p-3 bg-black rounded">
+                <p class="text-center mb-2"><strong>АБСУРДНАЯ ЛОГИКА:</strong></p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center p-2 border border-danger rounded">
+                            <h6 class="text-danger">🟥 БЕЗ ПОДПИСИ</h6>
+                            <p class="small mb-1">= "вирус"</p>
+                            <p class="small text-secondary">(даже если это Хауди Хо с открытым кодом)</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center p-2 border border-success rounded">
+                            <h6 class="text-success">🟩 С ПОДПИСЬЮ</h6>
+                            <p class="small mb-1">= "безопасно"</p>
+                            <p class="small text-secondary">(даже если это реальный майнер)</p>
+                        </div>
+                    </div>
                 </div>
             </div>
+            
+            <p class="mt-3"><strong>Самое смешное:</strong> если взять реальный вирус и подписать его — многие антивирусы пройдут мимо, мол, "все окей, подпись есть" 😂</p>
         </div>
-    </section>
-
+        
+        <div class="mt-4 p-3 border border-info rounded-3 bg-dark">
+            <h5 class="text-info mb-3">🎯 ИСТОРИЯ ХАУДИ ХО — ТОЧЬ-В-ТОЧЬ ТАК ЖЕ!</h5>
+            <p>Та же самая ситуация происходит у <strong>Хауди Хо</strong> — одного из самых популярных IT-блогеров в СНГ с <strong>2 млн подписчиков</strong> на YouTube.</p>
+            
+            <p>Его программы тоже блокируют браузеры и антивирусы, хотя:</p>
+            <ul>
+                <li><strong class="text-success">✅ Проекты с открытым исходным кодом</strong></li>
+                <li><strong class="text-success">✅ Миллионы скачиваний</strong></li>
+                <li><strong class="text-success">✅ Репутация проверенного разработчика</strong></li>
+                <li><strong class="text-success">✅ Десятки тысяч положительных отзывов</strong></li>
+            </ul>
+            
+            <p class="mt-3">Но система безопасности Chrome/Firefox/Edge всё равно говорит: <strong>"Опасно! Не качай!"</strong></p>
+        </div>
+        
+        <div class="mt-4 p-4 border border-warning rounded-3" style="background: linear-gradient(135deg, rgba(40, 20, 0, 0.7), rgba(60, 30, 0, 0.5));">
+            <h5 class="text-center text-warning mb-3">🎭 ВЫВОД: ЭТО СИСТЕМНАЯ ПРОБЛЕМА</h5>
+            <p class="text-center">Когда у самого авторитетного IT-специалиста в русскоязычном сегменте такие же проблемы с блокировками — это говорит не о качестве ПО, а о системной проблеме.</p>
+            <h4 class="text-center mt-3" style="color: #ff6600;">
+                Антивирусы и браузеры превратились в "проверку кошелька":<br>
+                есть деньги на сертификат — ты безопасен, нет денег — ты вирус.
+            </h4>
+            <p class="text-center mt-3"><strong>Всё просто. 💰</strong></p>
+        </div>
+    
+        <h5 class="text-warning mt-5">🤔 ПОЧЕМУ БРАУЗЕРЫ И АНТИВИРУСЫ НЕ ДОВЕРЯЮТ?</h5>
+        <ul>
+            <li><strong>НЕТ СЕРТИФИКАТА</strong> — Мы не можем позволить дорогостоящий EV-сертификат</li>
+            <li><strong>МАЛО СКАЧИВАНИЙ</strong> — Новый софт без репутации автоматически вызывает подозрения</li>
+            <li><strong>PYINSTALLER</strong> — Используем стандартный инструмент сборки Python в EXE</li>
+        </ul>
+        
+        <h5 class="text-warning mt-3">🔧 ЧТО НА САМОМ ДЕЛЕ ДЕЛАЕТ EXTREME TWEAKER?</h5>
+        <p>Давайте посмотрим на результаты анализа песочницы:</p>
+        <ul>
+            <li><strong>ФАЙЛОВЫЕ ОПЕРАЦИИ:</strong> Работает в C:\Apps\Extreme\, создает BAT-файлы, удаляет временные файлы Microsoft</li>
+            <li><strong>РЕЕСТР И СИСТЕМА:</strong> Модифицирует настройки реестра для оптимизации</li>
+            <li><strong>ПРОЦЕССЫ:</strong> Запускает cmd.exe для выполнения скриптов, останавливает ненужные процессы</li>
+        </ul>
+        
+        <h5 class="text-warning mt-3">📊 ЧТО ПОКАЗЫВАЮТ РЕЗУЛЬТАТЫ АНАЛИЗА?</h5>
+        <p>Вот краткий разбор:</p>
+        <ul>
+            <li><strong>3 обнаружения из 72 антивирусов</strong> — отличный результат!</li>
+            <li><strong>Большинство систем (CAPE, VirusTotal)</strong> — 0 угроз</li>
+            <li><strong>Zenbox отмечает как "троян"</strong> — ЛОЖНОЕ СРАБАТЫВАНИЕ из-за:
+                <ul>
+                    <li>Удаления файлов Microsoft</li>
+                    <li>Остановки служб</li>
+                    <li>Работы с реестром</li>
+                </ul>
+            </li>
+        </ul>
+        
+        <h5 class="text-warning mt-3">🛠 MITRE ATT&CK ТЕХНИКИ (ЭТО НЕ ВРЕДОНОСНО!)</h5>
+        <p>Вот почему системы безопасности могут помечать наш софт:</p>
+        <ul>
+            <li><strong>Т1059</strong> — Исполнение скриптов (наши BAT-файлы)</li>
+            <li><strong>Т1064</strong> — Скриптинг (оптимизация)</li>
+            <li><strong>Т1070</strong> — Удаление индикаторов (очистка логов)</li>
+            <li><strong>Т1548</strong> — Повышение привилегий (запуск от админа)</li>
+        </ul>
+        
+        <div class="mt-4 p-3 border border-success rounded-3 bg-dark">
+            <h5 class="text-success mb-3">💡 ВАЖНО ПОНИМАТЬ:</h5>
+            <p>Extreme Tweaker делает ТОЧНО ТО, для чего создан:</p>
+            <ul class="mb-0">
+                <li><strong class="text-success">✅ Удаляет телеметрию и шпионские модули Microsoft</strong></li>
+                <li><strong class="text-success">✅ Оптимизирует реестр и системные настройки</strong></li>
+                <li><strong class="text-success">✅ Останавливает ненужные службы</strong></li>
+                <li><strong class="text-success">✅ Очищает временные файлы</strong></li>
+                <li><strong class="text-success">✅ Настраивает Windows под максимальную производительность</strong></li>
+            </ul>
+        </div>
+        
+        <div class="alert alert-dark border border-info mt-4">
+            <h6 class="text-info">🎯 НАША ПОЗИЦИЯ:</h6>
+            <p class="mb-2">Мы <strong>НЕ</strong> готовы жертвовать функциональностью ради "спокойствия" антивирусов. Чтобы убрать все ложные срабатывания, нам придется:</p>
+            <ol class="mb-2">
+                <li>Убрать 50% функций твикера</li>
+                <li>Отказаться от глубокой оптимизации</li>
+                <li>Перестать работать с реестром</li>
+                <li>Не трогать службы Microsoft</li>
+            </ol>
+            <p class="mb-0">Ложные срабатывания — это цена за глубокую оптимизацию Windows! Мы работаем честно и открыто — каждая функция имеет свою цель и объяснение.</p>
+        </div>
+        
+        <div class="mt-4 p-3 border border-warning rounded-3">
+            <h5 class="text-warning mb-3">📞 ВАШИ ДЕЙСТВИЯ:</h5>
+            <ol>
+                <li><strong>Добавьте в исключения антивируса</strong> — это безопасно и необходимо для работы всех функций</li>
+                <li><strong>Проверьте сами на VirusTotal</strong> — смотрите вкладку "Поведение" для полной картины</li>
+                <li><strong>Используйте точку восстановления</strong> — стандартная практика перед любыми системными изменениями</li>
+            </ol>
+            <p class="mb-0 text-center">
+                <a href="https://www.virustotal.com/gui/file/cc97c9412727aceaa6ce4076eed64ea146bd40dbc82010d03d0929dee9e445de?nocache=1" 
+                   class="cyber-btn cyber-btn-secondary mt-2" target="_blank">
+                    <i class="fas fa-shield-alt me-2"></i>ПОСМОТРЕТЬ ПОЛНЫЙ ОТЧЕТ VIRUSTOTAL
+                </a>
+            </p>
+        </div>
+    </div>
+            
     <!-- Download Section -->
     <section id="download" class="py-5">
         <div class="container">

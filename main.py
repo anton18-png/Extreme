@@ -14,55 +14,17 @@ import json  # Для работы с JSON файлами
 import shutil  # Для копирования файлов
 from telemetry.logger import Logger  # Импортируем класс Logger
 import tkinter.messagebox as messagebox  # Добавляем модуль для вывода сообщений
-from gpt import GPTClient  # Импортируем GPTClient
+# from gpt import GPTClient  # Импортируем GPTClient
 from pathlib import Path
 from windows_vote import WindowsVoteWindow
 import random
 
 # при вероятности 5% открываем рекламу
 def open_random_site(numder_open_random_site):
-    # Проверяем настройку ad_enabled (безопасно, если config еще не определен)
-    try:
-        if 'config' in globals() and not config.getboolean("General", "ad_enabled", fallback=True):
-            return
-    except:
-        pass  # Если config еще не определен, продолжаем выполнение
-    if random.randint(0, 100) < int(numder_open_random_site):
-        import webbrowser
-        urls = [
-            "https://shre.su/WXFN",
-            "https://shre.su/CFST",
-            "https://shre.su/4A56",
-            "https://shre.su/CL39",
-            "https://shre.su/3SIN",
-            "https://shre.su/UEO7",
-            "https://shre.su/HHN2",
-            "https://shre.su/WX89",
-            "https://shre.su/WX89",
-            "https://shre.su/0KO3",
-            "https://shre.su/L7VO",
-            "https://shre.su/NSBL",
-            "https://shre.su/UU41",
-            "https://shre.su/H9FB",
-            "https://shre.su/4ON2",
-            "https://shre.su/KC77",
-            "https://shre.su/84W8",
-            "https://shre.su/DHBU",
-            "https://shre.su/JXFN",
-            "https://shre.su/WH7K",
-            "https://shre.su/2JXF",
-            "https://shre.su/SRCL",
-            "https://shre.su/MICD"
-        ]
-        print(random.choice(urls))
-        webbrowser.open(random.choice(urls))
-
-# if not os.path.exists("tweaks"):
-#     subprocess.call('7za.exe x "tweaks.7z" -o"." -y', shell=True)
-#     open_random_site(50)
+    pass
 
 # Версия программы
-version = "v0.3.6 Tabs Fixed"
+version = "v0.3.7.1 Winter Wizard"
 
 # Импортируем путь для доступа к модулям
 # Этот код добавляет папку tweaks в путь поиска модулей, чтобы импортировать скрипты из этой директории
@@ -120,10 +82,11 @@ config.read("user_data//settings.ini", encoding="cp1251")  # Чтение в ANS
 # Создаем обязательные секции с настройками по умолчанию
 required_sections = {
     "General": {
-        "theme": "newhone",   # Тема интерфейса
-        "font_family": "GitHub: scode18",  # Шрифт интерфейса
-        "font_size": "9",  # Размер шрифта интерфейса
+        "theme": "nord",   # Тема интерфейса
+        "font_family": "Terminal",  # Шрифт интерфейса
+        "font_size": "12",  # Размер шрифта интерфейса
         "checkbox_font_size": "12",  # Размер шрифта чекбоксов
+        "quick_button_font_size": "16",  # Размер шрифта кнопок быстрого доступа
         "tooltips_enabled": "True",  # Включение всплывающих подсказок
         "checkbox_display_mode": "rectangle",  # Режим отображения чекбоксов: regular, rectangle или wide
         "first_run_completed": "False",  # Флаг первого запуска
@@ -131,12 +94,12 @@ required_sections = {
         "offer_backup_enabled": "False",  # Предложение создания бэкапа
         "confirm_switch_tab_enabled": "False",  # Подтверждение переключения вкладок
         "developer_mode": "True",  # Режим разработчика
-        "novice_mode": "True",  # Режим новичка
+        "novice_mode": "False",  # Режим новичка
         "qqnwr_warning_enabled": "True",  # Предупреждение при переходе в QQNWR
         "initial_tab": "switch_to_minimal_wrapper", # Вкладка по умолчанию
         "show_top_panel": "True",  # Показывать верхнее меню
         "show_sidebar": "True",  # Показывать боковое меню
-        "tweak_execution_mode": "default",  # Способ запуска твиков: default, no_launcher, launcher, powerrun, cmd
+        "tweak_execution_mode": "create_config_and_run",  # Способ запуска твиков: default, no_launcher, launcher, powerrun, cmd, create_config_and_run
     },
     "Window": {"fullscreen": "False"},  # Полноэкранный режим
     "Columns": {"default": "2"},  # Количество колонок в окне
@@ -147,24 +110,38 @@ required_sections = {
 }
 
 # Этот код проверяет, есть ли секция в конфигурации и если нет, то добавляет её
+config_changed = False  # Отслеживаем изменения конфигурации
 for (
     section,
     options,
 ) in required_sections.items():  # Проверяем, есть ли секция в конфигурации
     if not config.has_section(section):  # Если секции нет, то добавляем её
         config.add_section(section)  # Добавляем секцию
+        config_changed = True  # Конфиг изменился
     for key, value in options.items():  # Проверяем, есть ли ключ в секции
         if not config.has_option(section, key):  # Если ключа нет, то добавляем его
             config[section][key] = value  # Добавляем ключ и значение
+            config_changed = True  # Конфиг изменился
 
-# Сохраняем обновленный конфиг
-with open(
-    "user_data//settings.ini", "w", encoding="cp1251"
-) as configfile:  # Запись в ANSI
-    config.write(configfile)  # Записываем конфигурацию в файл
+# Сохраняем обновленный конфиг только если были изменения
+if config_changed:
+    with open(
+        "user_data//settings.ini", "w", encoding="cp1251"
+    ) as configfile:  # Запись в ANSI
+        config.write(configfile)  # Записываем конфигурацию в файл
 
-# Вызываем open_random_site после инициализации config
-open_random_site(5)
+# Функция для получения шрифта больших меток (определена раньше, чтобы быть доступной в show_license_window)
+def get_large_label_font():
+    """Возвращает шрифт для больших меток"""
+    try:
+        font_family = current_font[0]
+        base_size = current_font[1]
+    except (NameError, IndexError):
+        # Если current_font еще не определен, используем значения из config
+        font_family = config.get("General", "font_family", fallback="Segoe UI")
+        base_size = int(config.get("General", "font_size", fallback="12"))
+    large_size = max(11, int(base_size * 1.2))  # Минимум 11, примерно в 1.2 раза больше базового
+    return (font_family, large_size, "bold")
 
 # Функция для показа лицензионного окна
 def show_license_window():
@@ -190,7 +167,7 @@ def show_license_window():
     title_label = ttk.Label(
         main_frame,
         text="Лицензионное соглашение",
-        font=("Segoe UI", 16, "bold")
+        font=get_large_label_font()
     )
     title_label.pack(pady=(0, 15))
     
@@ -198,10 +175,19 @@ def show_license_window():
     license_text_frame = ttk.Frame(main_frame)
     license_text_frame.pack(fill="both", expand=True, pady=(0, 15))
     
+    # Получаем шрифт из конфигурации (current_font может быть еще не определен)
+    try:
+        license_font = current_font
+    except NameError:
+        license_font = (
+            config.get("General", "font_family", fallback="Segoe UI"),
+            int(config.get("General", "font_size", fallback="12"))
+        )
+    
     license_text = tk.Text(
         license_text_frame,
         wrap=tk.WORD,
-        font=("Segoe UI", 10),
+        font=license_font,
         padx=15,
         pady=15,
         relief="flat",
@@ -1010,8 +996,42 @@ def offer_backup():
         export_full_registry()
 
 def execute_old():  # Функция для выполнения старых скриптов
-    open_random_site(5)
     offer_backup()
+    
+    # Получаем настройку способа запуска твиков
+    execution_mode = config.get("General", "tweak_execution_mode", fallback="default")
+    
+    # Если режим "create_config_and_run", сначала создаем конфиг
+    if execution_mode == "create_config_and_run":
+        # Собираем все выбранные чекбоксы
+        activated_checkboxes = [
+            checkbox_name
+            for checkbox_name, checkbox_var in checkboxes.items()
+            if checkbox_var.get()
+        ]
+        
+        if not activated_checkboxes:
+            messagebox.showwarning(
+                "Нет выбранных твиков",
+                "Пожалуйста, выберите хотя бы один твик для создания конфига."
+            )
+            return
+        
+        # Создаем конфиг
+        try:
+            filename = create_batch_file(activated_checkboxes)
+            update_config_file_list()
+            # messagebox.showinfo(
+            #     "Конфиг создан",
+            #     f"Конфиг успешно создан:\n{filename}\n\nЗапускаю твики..."
+            # )
+        except Exception as e:
+            messagebox.showerror(
+                "Ошибка",
+                f"Не удалось создать конфиг:\n{str(e)}"
+            )
+            return
+    
     for checkbox_name, checkbox_var in checkboxes.items():  # Проходим по всем чекбоксам
         if checkbox_var.get():  # Если чекбокс включен
             tab_name = get_tab_name(checkbox_name)  # Получаем имя вкладки
@@ -1045,21 +1065,21 @@ def execute_old():  # Функция для выполнения старых с
             +----------------------------------------+
             """
             
-            # Получаем настройку способа запуска твиков
-            execution_mode = config.get("General", "tweak_execution_mode", fallback="default")
+            # Определяем режим запуска твика (если режим "create_config_and_run", используем "default")
+            tweak_execution_mode = execution_mode if execution_mode != "create_config_and_run" else "default"
             
             # Функция для запуска твика в зависимости от режима
             def run_tweak_by_mode(tweak_path, is_reg=False):
-                if execution_mode == "no_launcher":
+                if tweak_execution_mode == "no_launcher":
                     # Запуск без launcher
                     subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
-                elif execution_mode == "launcher":
+                elif tweak_execution_mode == "launcher":
                     # Запуск через launcher
                     subprocess.call(f'Utils\\launcher.exe "{tweak_path}"', shell=True)
-                elif execution_mode == "powerrun":
+                elif tweak_execution_mode == "powerrun":
                     # Запуск через PowerRun
                     subprocess.call(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True)
-                elif execution_mode == "cmd":
+                elif tweak_execution_mode == "cmd":
                     # Запуск через cmd /c
                     subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
                 else:  # default - как было по умолчанию
@@ -1093,7 +1113,7 @@ def execute_old():  # Функция для выполнения старых с
                     logger.log_info(f"Скрипт скопирован как {temp_ps1_path}")
                     
                     # Запускаем через JetBrains WinElevator (для PS1 всегда через launcher)
-                    if execution_mode == "no_launcher":
+                    if tweak_execution_mode == "no_launcher":
                         subprocess.run([
                             'powershell.exe', '-ExecutionPolicy', 'Bypass', '-File', temp_ps1_path
                         ])
@@ -1197,7 +1217,7 @@ def create_batch_file(
     # datetime.now() - текущая дата и время
     # strftime - форматирует дату и время в строку
     filename = f"user_data\\Configs\\Config Extreme {datetime.now().strftime('%Y-%m-%d %H-%M-%S')}.bat"  # Создаем уникальное имя файла с текущей датой и временем
-
+    
     # Создаем директорию Configs, если она не существует
     # exist_ok=True - не вызывает ошибку, если директория уже существует
     os.makedirs(
@@ -1406,23 +1426,20 @@ def restart():  # Функция для перезапуска программ�
 
 # Настраиваем основные цвета и стили
 style = ttk.Style()  # Создаем объект стиля
-style.configure(".", font=("Segoe UI", 10))  # Настраиваем шрифт для всех виджетов
-style.configure("TNotebook.Tab", font=("Segoe UI", 10))  # Настраиваем шрифт для вкладок
+# Шрифты будут настроены позже через update_font_style() после инициализации current_font
 
-# Настраиваем стиль для кнопок
+# Настраиваем стиль для кнопок (без шрифта, он будет установлен позже)
 style.configure(
     "Custom.TButton",
-    font=("Segoe UI", 10),  # Настраиваем шрифт для кнопок
     padding=5,  # Отступы внутри кнопки
     relief="solid",  # Делаем обводку видимой
     borderwidth=1,  # Делаем обводку видимой
 )
 
-# Настраиваем стиль для вкладок
+# Настраиваем стиль для вкладок (без шрифта, он будет установлен позже)
 style.configure(
     "TNotebook.Tab",
     padding=[10, 5],  # Отступы внутри вкладок
-    font=("Segoe UI", 10),  # Настраиваем шрифт для вкладок
 )
 
 # Создаем пустой словарь для хранения переменных состояния чекбоксов
@@ -1458,10 +1475,12 @@ font_family_values = [
     "hooge 05_53",
     "hooge 05_54",
     "hooge 05_55",
+    "JetBrainsMono Nerd Font",
+    "JetBrainsMono Nerd Font Mono",
 ]
 
 # Инициализация всех переменных
-font_size_var = tk.IntVar(value=12)  # Переменная для хранения размера шрифта
+font_size_var = tk.IntVar(value=int(config["General"].get("font_size", "12")))  # Переменная для хранения размера шрифта
 theme_var = tk.StringVar(
     value=config["General"]["theme"]
 )  # Переменная для хранения темы
@@ -1475,6 +1494,9 @@ config_file_var = tk.StringVar()  # Переменная для хранения
 font_family_var = tk.StringVar(
     value=config["General"]["font_family"]
 )  # Переменная для хранения шрифта
+quick_button_font_size_var = tk.IntVar(
+    value=int(config["General"].get("quick_button_font_size", "12"))
+)  # Переменная для хранения размера шрифта кнопок быстрого доступа
 
 # Инициализация списка файлов конфигурации
 config_file_values = (
@@ -1513,6 +1535,41 @@ current_font = (
 )  # Переменная для хранения текущего шрифта и размера шрифта
 current_theme = config["General"]["theme"]  # Переменная для хранения темы
 
+# Функции для получения размеров шрифтов для разных элементов
+def get_title_font():
+    """Возвращает шрифт для заголовка (увеличенный размер)"""
+    font_family = current_font[0]
+    base_size = current_font[1]
+    title_size = max(18, int(base_size * 2.5))  # Минимум 18, обычно в 2.5 раза больше базового
+    return (font_family, title_size, "bold", "italic")
+
+def get_version_font():
+    """Возвращает шрифт для версии (средний размер)"""
+    font_family = current_font[0]
+    base_size = current_font[1]
+    version_size = max(10, int(base_size * 1.3))  # Минимум 10, примерно в 1.3 раза больше базового
+    return (font_family, version_size)
+
+def get_icon_button_font():
+    """Возвращает шрифт для иконок кнопок (всегда использует размер из настроек)"""
+    font_family = current_font[0]
+    icon_size = quick_button_font_size_var.get()  # Всегда используем размер из настроек
+    return (font_family, icon_size)
+
+def get_medium_label_font():
+    """Возвращает шрифт для средних меток"""
+    font_family = current_font[0]
+    base_size = current_font[1]
+    medium_size = max(9, int(base_size * 1.0))  # Примерно базовый размер
+    return (font_family, medium_size)
+
+def get_small_label_font():
+    """Возвращает шрифт для маленьких меток"""
+    font_family = current_font[0]
+    base_size = current_font[1]
+    small_size = max(8, int(base_size * 0.9))  # Чуть меньше базового
+    return (font_family, small_size)
+
 # Создаем главный контейнер
 main_container = ttk.Frame(root)  # Создаем главный контейнер
 main_container.pack(
@@ -1528,14 +1585,13 @@ title_frame = ttk.Frame(top_panel)  # Создаем логотип и заго�
 title_frame.pack(side="left")  # Упаковываем логотип и заголовок
 
 # Создаем заголовок
-# if current_theme == "hone" or current_theme == "newhone":
-#     hone = "Hone Extreme"
-#     style
-# else:
-#     hone = "Extreme"
-hone = "Extreme Lite"
+if current_theme == "hone" or current_theme == "newhone":
+    hone = "Hone Extreme"
+    style
+else:
+    hone = "Extreme Lite"
 title_label = ttk.Label(
-    title_frame, text=hone, font=("Segoe UI", 24, "bold", "italic")
+    title_frame, text=hone, font=get_title_font()
 )  
 title_label.pack(side="left")  # Упаковываем заголовок
 
@@ -1544,7 +1600,7 @@ title_label.bind("<Button-1>", lambda e: switch_to_minimal())
 title_label.configure(cursor="hand2")  # Меняем курсор на указатель
 
 version_label = ttk.Label(
-    title_frame, text=version, font=("Segoe UI", 12)
+    title_frame, text=version, font=get_version_font()
 )  # Создаем версию
 version_label.pack(side="left", padx=(10, 0), pady=(10, 0))  # Упаковываем версию
 
@@ -1893,23 +1949,62 @@ def update_tooltip_state(*args):  # Функция для обновления �
 """
 
 
-def update_font_style():
+def update_font_style(update_window=True):
+    """Обновляет стили шрифтов для всех виджетов интерфейса"""
     style = ttk.Style()  # Создаем объект стиля
-    # Обновляем стили без кастомных цветов
+    
+    # Глобальный стиль по умолчанию
+    style.configure(".", font=current_font)  # Настраиваем шрифт для всех виджетов по умолчанию
+    
+    # Базовые стили ttk
     style.configure("TLabel", font=current_font)  # Обновляем стиль для Label
     style.configure("TButton", font=current_font)  # Обновляем стиль для Button
-    style.configure(
-        "TCheckbutton", font=checkbox_current_font
-    )  # Изменено на стандартный стиль
+    style.configure("TCheckbutton", font=checkbox_current_font)  # Чекбоксы используют checkbox_current_font
     style.configure("TCombobox", font=current_font)  # Обновляем стиль для Combobox
-    style.configure(
-        "TNotebook.Tab", font=current_font
-    )  # Обновляем стиль для Notebook.Tab
-    style.configure(
-        "Custom.TButton", font=current_font
-    )  # Обновляем стиль для Custom.TButton
-
-    root.update()  # Обновляем окно
+    style.configure("TEntry", font=current_font)  # Обновляем стиль для Entry
+    style.configure("TNotebook.Tab", font=current_font)  # Обновляем стиль для Notebook.Tab
+    # TScale не поддерживает настройку шрифта в ttkbootstrap (вызывает ошибку дублирования элемента)
+    try:
+        style.configure("TScale", font=current_font)  # Обновляем стиль для Scale
+    except Exception:
+        pass  # Игнорируем ошибку, так как TScale не использует шрифт напрямую
+    
+    # Кастомные стили
+    style.configure("Custom.TButton", font=current_font)  # Обновляем стиль для Custom.TButton
+    style.configure("Custom.TCheckbutton", font=checkbox_current_font)  # ВАЖНО: Чекбоксы используют checkbox_current_font
+    style.configure("Custom.TLabel", font=current_font)  # Обновляем стиль для Custom.TLabel
+    style.configure("Custom.TNotebook.Tab", font=current_font)  # Обновляем стиль для Custom.TNotebook.Tab
+    style.configure("Custom.TEntry", font=current_font)  # Обновляем стиль для Custom.TEntry
+    
+    # Стили для категорий
+    style.configure("Category.TButton", font=current_font)  # Используем current_font для категорий
+    style.configure("Category.TLabel", font=current_font)  # Используем current_font для категорий
+    
+    # Стиль для Treeview
+    try:
+        style.configure("Treeview", font=current_font)  # Обновляем стиль для Treeview
+        style.configure("Treeview.Heading", font=current_font)  # Обновляем стиль для заголовков Treeview
+    except:
+        pass
+    
+    # Применяем шрифт к виджетам tkinter через опции по умолчанию
+    try:
+        root.option_add("*Text.font", current_font)
+        root.option_add("*Text.Font", current_font)
+        root.option_add("*Entry.font", current_font)
+        root.option_add("*Entry.Font", current_font)
+        root.option_add("*Listbox.font", current_font)
+        root.option_add("*Listbox.Font", current_font)
+        root.option_add("*Label.font", current_font)
+        root.option_add("*Label.Font", current_font)
+        root.option_add("*Button.font", current_font)
+        root.option_add("*Button.Font", current_font)
+    except:
+        pass
+    
+    # Обновляем окно только если нужно (не при начальной загрузке)
+    if update_window:
+        root.update_idletasks()  # Используем update_idletasks вместо update для лучшей производительности
 
 
 """
@@ -1923,7 +2018,7 @@ def update_font_style():
 # функция для обновления стиля кнопок при смене на любые темы
 def update_button_style():
     # Создаем новый стиль для кнопок
-    style.configure("Icon.TButton", font=("Segoe UI", 16), padding=10, width=3)
+    style.configure("Icon.TButton", font=get_icon_button_font(), padding=10, width=3)
 
     # Список светлых тем
     light_themes = [
@@ -2009,15 +2104,29 @@ def update_font(event=None):  # Функция для обновления шр�
         )  # Обновляем значение шрифта
 
         global current_font  # Объявляем переменную current_font
+        # Получаем размер шрифта из переменной, а не из config
+        font_size = font_size_var.get()
         current_font = (
             font_family,
-            int(config["General"]["font_size"]),
+            font_size,
         )  # Обновляем значение шрифта
 
         update_font_style()  # Обновляем стиль шрифта
+        update_button_style()  # Обновляем стиль кнопок (включая Icon.TButton)
+        # Обновляем также специальные элементы интерфейса
+        try:
+            if 'title_label' in globals():
+                title_label.configure(font=get_title_font())
+            if 'version_label' in globals():
+                version_label.configure(font=get_version_font())
+        except:
+            pass
         config["General"]["font_family"] = (
             font_family  # Обновляем значение шрифта в конфигурации
         )
+        config["General"]["font_size"] = str(
+            font_size
+        )  # Обновляем размер шрифта в конфигурации
         config["General"]["checkbox_font_size"] = str(
             checkbox_font_size
         )  # Обновляем значение шрифта в конфигурации
@@ -2028,8 +2137,7 @@ def update_font(event=None):  # Функция для обновления шр�
         logger.log_settings_change(
             "font_settings", old_font, checkbox_current_font
         )  # Логируем изменение шрифта
-        root.update_idletasks()  # Обновляем окно
-        root.update()  # Обновляем окно
+        root.update_idletasks()  # Обновляем окно (используем update_idletasks вместо update для лучшей производительности)
     except Exception as e:  # Если возникает ошибка
         logger.log_error("Ошибка при обновлении шрифта", exc_info=e)  # Логируем ошибку
 
@@ -3878,15 +3986,15 @@ def switch_to_main():
         author_label = ttk.Label(
             scrollable_frame,
             # text="⭐ ОПТИМИЗАЦИИ ОТ АВТОРОВ ⭐",
-            # text="ОПТИМИЗАЦИИ ОТ ЭКСПЕРТОВ В WINDOWS (Доступно только в Pro версии) ⭐",
-            text="ОПТИМИЗАЦИИ ОТ ЭКСПЕРТОВ В WINDOWS ⭐", 
+            text="ОПТИМИЗАЦИИ ОТ ЭКСПЕРТОВ В WINDOWS (Доступно только в Pro версии) ⭐",
+            # text="ОПТИМИЗАЦИИ ОТ ЭКСПЕРТОВ В WINDOWS ⭐", 
             font=("Segoe UI", 16, "bold")
         )
         author_label.pack(anchor="w", pady=(10, 10), padx=10)
         
         author_frame = ttk.Labelframe(
             scrollable_frame,
-            # text="Доступно только в Pro версии",
+            text="Доступно только в Pro версии",
             padding=15
         )
         author_frame.pack(fill="x", padx=10, pady=5)
@@ -4407,7 +4515,7 @@ def switch_to_minimal():
     
     # Добавляем специальные вкладки
     special_tabs = ["Главная", "Оптимизация", "Драйверы", "Электропитание",
-                    "QQNWR", "Очистка", "Исправления", "Настройки", "Антон AI"]
+                    "QQNWR", "Очистка", "Исправления", "Настройки"]
     
     for tab_dict in all_tabs_dicts:
         for tab_name in tab_dict.keys():
@@ -4488,7 +4596,7 @@ def switch_to_minimal():
                 "Очистка": switch_to_clean_wrapper,
                 "Исправления": switch_to_fixes_wrapper,
                 "Настройки": switch_to_settings_wrapper,
-                "Антон AI": switch_to_gpt_wrapper,
+                # "Антон AI": switch_to_gpt_wrapper,
             }
             
             # Если это специальная вкладка, используем wrapper функцию
@@ -4625,8 +4733,45 @@ def switch_to_settings():
     settings1_tab = ttk.Frame(tab_control)
     tab_control.add(settings1_tab, text="Настройки")
 
+    # Создаем canvas и scrollbar для прокрутки
+    settings_canvas = tk.Canvas(settings1_tab)
+    settings_scrollbar = ttk.Scrollbar(settings1_tab, orient="vertical", command=settings_canvas.yview)
+    settings_scrollable_frame = ttk.Frame(settings_canvas)
+
+    def update_scroll_region(event=None):
+        settings_canvas.update_idletasks()
+        settings_canvas.configure(scrollregion=settings_canvas.bbox("all"))
+    
+    settings_scrollable_frame.bind("<Configure>", update_scroll_region)
+
+    settings_canvas.create_window((0, 0), window=settings_scrollable_frame, anchor="nw")
+    settings_canvas.configure(yscrollcommand=settings_scrollbar.set)
+    
+    # Обновляем область прокрутки при изменении размера canvas
+    def configure_canvas(event):
+        canvas_width = event.width
+        settings_canvas.itemconfig(settings_canvas.find_all()[0], width=canvas_width)
+        update_scroll_region()
+    settings_canvas.bind("<Configure>", configure_canvas)
+
+    # Привязываем прокрутку мышкой
+    def _on_mousewheel(event):
+        settings_canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+    
+    def _bind_to_mousewheel(event):
+        settings_canvas.bind_all("<MouseWheel>", _on_mousewheel)
+    
+    def _unbind_from_mousewheel(event):
+        settings_canvas.unbind_all("<MouseWheel>")
+    
+    settings_canvas.bind("<Enter>", _bind_to_mousewheel)
+    settings_canvas.bind("<Leave>", _unbind_from_mousewheel)
+
+    settings_canvas.pack(side="left", fill="both", expand=True)
+    settings_scrollbar.pack(side="right", fill="y")
+
     # Создаем основной контейнер с отступами
-    settings_frame = ttk.Frame(settings1_tab, padding=20)
+    settings_frame = ttk.Frame(settings_scrollable_frame, padding=20)
     settings_frame.pack(fill="both", expand=True)
 
     # Заголовок настроек
@@ -4635,17 +4780,21 @@ def switch_to_settings():
     )
     settings_title.pack(anchor="w", pady=(0, 20))
 
-    # Контейнер для двух колонок
+    # Контейнер для трех колонок
     columns_container = ttk.Frame(settings_frame)
     columns_container.pack(fill="both", expand=True)
 
-    # Левая колонка (основные настройки)
+    # Левая колонка (внешний вид)
     left_column = ttk.Frame(columns_container)
     left_column.pack(side="left", fill="both", expand=True, padx=(0, 15))
 
-    # Правая колонка (настройка колонок)
+    # Средняя колонка (режимы работы и безопасность)
+    middle_column = ttk.Frame(columns_container)
+    middle_column.pack(side="left", fill="both", expand=True, padx=(0, 15))
+
+    # Правая колонка (дополнительно)
     right_column = ttk.Frame(columns_container)
-    right_column.pack(side="right", fill="both", expand=True)
+    right_column.pack(side="left", fill="both", expand=True)
 
     # Группируем настройки в секции
     appearance_section = ttk.Labelframe(left_column, text="Внешний вид", padding=15)
@@ -4662,18 +4811,89 @@ def switch_to_settings():
     )
     font_family_dropdown.pack(anchor="w", pady=(0, 10))
 
-    ttk.Label(appearance_section, text="Размер шрифта:", font=("Segoe UI", 10)).pack(
+    # Фрейм для размера шрифта с полем ввода и кнопкой OK
+    font_size_frame = ttk.Frame(appearance_section)
+    font_size_frame.pack(anchor="w", pady=(0, 10), fill="x")
+    
+    ttk.Label(font_size_frame, text="Размер шрифта:", font=("Segoe UI", 10)).pack(
         anchor="w", pady=(0, 5)
     )
-    font_size_slider = ttk.Scale(
-        appearance_section,
-        variable=font_size_var,
-        from_=8,
-        to=12,
-        orient="horizontal",
-        length=200,
+    
+    font_size_input_frame = ttk.Frame(font_size_frame)
+    font_size_input_frame.pack(anchor="w", fill="x")
+    
+    font_size_entry_var = tk.StringVar(value=str(font_size_var.get()))
+    font_size_entry = ttk.Entry(
+        font_size_input_frame,
+        width=10,
+        textvariable=font_size_entry_var
     )
-    font_size_slider.pack(anchor="w", pady=(0, 10))
+    font_size_entry.pack(side="left", padx=(0, 5))
+    
+    def apply_font_size():
+        try:
+            new_size = int(font_size_entry_var.get())
+            if 8 <= new_size <= 72:  # Разумные пределы
+                font_size_var.set(new_size)
+                update_font()
+            else:
+                messagebox.showerror("Ошибка", "Размер шрифта должен быть от 8 до 72")
+                font_size_entry_var.set(str(font_size_var.get()))
+        except ValueError:
+            messagebox.showerror("Ошибка", "Введите корректное число")
+            font_size_entry_var.set(str(font_size_var.get()))
+    
+    font_size_ok_btn = ttk.Button(
+        font_size_input_frame,
+        text="OK",
+        command=apply_font_size,
+        width=5
+    )
+    font_size_ok_btn.pack(side="left")
+    
+    font_size_entry.bind("<Return>", lambda e: apply_font_size())
+    
+    # Настройка размера шрифта кнопок быстрого доступа
+    ttk.Label(appearance_section, text="Размер шрифта кнопок:", font=("Segoe UI", 10)).pack(
+        anchor="w", pady=(10, 5)
+    )
+    
+    quick_button_font_size_input_frame = ttk.Frame(appearance_section)
+    quick_button_font_size_input_frame.pack(anchor="w", fill="x", pady=(0, 10))
+    
+    quick_button_font_size_entry_var = tk.StringVar(value=str(quick_button_font_size_var.get()))
+    quick_button_font_size_entry = ttk.Entry(
+        quick_button_font_size_input_frame,
+        width=10,
+        textvariable=quick_button_font_size_entry_var
+    )
+    quick_button_font_size_entry.pack(side="left", padx=(0, 5))
+    
+    def apply_quick_button_font_size():
+        try:
+            new_size = int(quick_button_font_size_entry_var.get())
+            if 8 <= new_size <= 72:  # Разумные пределы
+                quick_button_font_size_var.set(new_size)
+                update_button_style()  # Обновляем стиль кнопок
+                config["General"]["quick_button_font_size"] = str(new_size)
+                with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+                    config.write(configfile)
+            else:
+                messagebox.showerror("Ошибка", "Размер шрифта должен быть от 8 до 72")
+                quick_button_font_size_entry_var.set(str(quick_button_font_size_var.get()))
+        except ValueError:
+            messagebox.showerror("Ошибка", "Введите корректное число")
+            quick_button_font_size_entry_var.set(str(quick_button_font_size_var.get()))
+    
+    quick_button_font_size_ok_btn = ttk.Button(
+        quick_button_font_size_input_frame,
+        text="OK",
+        command=apply_quick_button_font_size,
+        width=5
+    )
+    quick_button_font_size_ok_btn.pack(side="left")
+    
+    quick_button_font_size_entry.bind("<Return>", lambda e: apply_quick_button_font_size())
 
     ttk.Label(appearance_section, text="Тема оформления:", font=("Segoe UI", 10)).pack(
         anchor="w", pady=(0, 5)
@@ -4702,8 +4922,8 @@ def switch_to_settings():
     )
     theme_editor_btn.pack(side="left")
 
-    # Секция настроек режима новичка/разработчика (слева, ниже настроек интерфейса)
-    mode_settings_section = ttk.Labelframe(left_column, text="Режимы работы и безопасность", padding=15)
+    # Секция настроек режима новичка/разработчика (в средней колонке)
+    mode_settings_section = ttk.Labelframe(middle_column, text="Режимы работы и безопасность", padding=15)
     mode_settings_section.pack(fill="x", pady=(0, 15))
 
     # Секция настроек Telegram (удалена, username перенесен в вкладку Телеметрия)
@@ -4859,7 +5079,6 @@ def switch_to_settings():
 
     # Привязываем события к элементам управления
     font_family_dropdown.bind("<<ComboboxSelected>>", update_font)
-    font_size_slider.bind("<ButtonRelease-1>", update_font)
     theme_dropdown.bind("<<ComboboxSelected>>", update_theme)
     tooltip_control_dropdown.bind("<<ComboboxSelected>>", update_tooltip_state)
 
@@ -4881,7 +5100,7 @@ def switch_to_settings():
             "Очистка",
             "Исправления",
             "Настройки",
-            "Антон AI",
+            # "Антон AI",
             "Обновления",
             "Версия",
         ],
@@ -4915,30 +5134,30 @@ def switch_to_settings():
 
     initial_tab_dropdown.bind("<<ComboboxSelected>>", update_initial_tab)
 
-    # Настройка отключения рекламы
-    ad_enabled_var = tk.StringVar(
-        value="Включено"
-        if config.getboolean("General", "ad_enabled", fallback=True)
-        else "Выключено"
-    )
-    ttk.Label(
-        additional_section, text="Показывать рекламу:", font=("Segoe UI", 10)
-    ).pack(anchor="w", pady=(0, 5))
-    ad_enabled_dropdown = ttk.Combobox(
-        additional_section,
-        textvariable=ad_enabled_var,
-        values=["Включено", "Выключено"],
-        width=30,
-    )
-    ad_enabled_dropdown.pack(anchor="w", pady=(0, 10))
+    # # Настройка отключения рекламы
+    # ad_enabled_var = tk.StringVar(
+    #     value="Включено"
+    #     if config.getboolean("General", "ad_enabled", fallback=True)
+    #     else "Выключено"
+    # )
+    # ttk.Label(
+    #     additional_section, text="Показывать рекламу:", font=("Segoe UI", 10)
+    # ).pack(anchor="w", pady=(0, 5))
+    # ad_enabled_dropdown = ttk.Combobox(
+    #     additional_section,
+    #     textvariable=ad_enabled_var,
+    #     values=["Включено", "Выключено"],
+    #     width=30,
+    # )
+    # ad_enabled_dropdown.pack(anchor="w", pady=(0, 10))
 
-    def update_ad_enabled(event=None):
-        new_value = ad_enabled_var.get() == "Включено"
-        config["General"]["ad_enabled"] = str(new_value)
-        with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-            config.write(configfile)
+    # def update_ad_enabled(event=None):
+    #     new_value = ad_enabled_var.get() == "Включено"
+    #     config["General"]["ad_enabled"] = str(new_value)
+    #     with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+    #         config.write(configfile)
 
-    ad_enabled_dropdown.bind("<<ComboboxSelected>>", update_ad_enabled)
+    # ad_enabled_dropdown.bind("<<ComboboxSelected>>", update_ad_enabled)
 
     # Настройка режима новичка
     novice_mode_var = tk.StringVar(
@@ -5173,7 +5392,7 @@ def switch_to_settings():
     tweak_execution_mode_dropdown = ttk.Combobox(
         mode_settings_section,
         textvariable=tweak_execution_mode_var,
-        values=["default", "no_launcher", "launcher", "powerrun", "cmd"],
+        values=["default", "no_launcher", "launcher", "powerrun", "cmd", "create_config_and_run"],
         width=30,
     )
     tweak_execution_mode_dropdown.pack(anchor="w", pady=(0, 10))
@@ -5184,7 +5403,8 @@ def switch_to_settings():
         "no_launcher": "Без launcher (только cmd /c)",
         "launcher": "С launcher (Utils\\launcher.exe)",
         "powerrun": "Через PowerRun (Utils\\PowerRun.exe)",
-        "cmd": "Через cmd /c (только cmd /c)"
+        "cmd": "Через cmd /c (только cmd /c)",
+        "create_config_and_run": "Создать конфиг и запустить твики"
     }
     
     execution_mode_label = ttk.Label(
@@ -6417,119 +6637,6 @@ def switch_to_settings():
         command=lambda: WindowsVoteWindow(root),
     ).pack(side="left", padx=5)
 
-    # Секция просмотра телеметрии других пользователей
-    shared_telemetry_section = ttk.Labelframe(right_column, text="Просмотр телеметрии других пользователей", padding=15)
-    shared_telemetry_section.pack(fill="both", expand=True)
-
-    # Инструкция о боте
-    bot_instruction_text = """Для просмотра телеметрии других пользователей необходимо:
-
-1. Включить "Обмен телеметрией с другими пользователями" в настройках выше
-2. Отправить телеметрию через кнопку "Отправить телеметрию" (это автоматически включит обмен)
-3. Другие пользователи также должны включить эту функцию и отправить свою телеметрию
-4. Нажмите кнопку "Обновить список" для просмотра телеметрии других пользователей
-
-⚠️ ВАЖНО: Функция обмена телеметрией работает только если запущен бот.
-
-После отправки телеметрии с включенным обменом, вы сможете просматривать телеметрию других пользователей, которые также включили эту функцию."""
-
-    ttk.Label(
-        shared_telemetry_section,
-        text=bot_instruction_text,
-        font=("Segoe UI", 10),
-        wraplength=500,
-        justify="left",
-    ).pack(anchor="w", pady=(0, 10))
-
-    # Ссылка на бота
-    bot_link_frame = ttk.Frame(shared_telemetry_section)
-    bot_link_frame.pack(fill="x", pady=(0, 10))
-    
-    ttk.Label(
-        bot_link_frame,
-        text="Telegram бот:",
-        font=("Segoe UI", 10, "bold"),
-    ).pack(side="left", padx=(0, 5))
-    
-    def open_bot():
-        import webbrowser
-        webbrowser.open("https://t.me/Extreme_tweaker_bot")
-    
-    ttk.Button(
-        bot_link_frame,
-        text="Extreme Telemetry",
-        bootstyle="info-outline",
-        command=open_bot,
-    ).pack(side="left")
-
-    # Фрейм для списка телеметрии
-    telemetry_list_frame = ttk.Frame(shared_telemetry_section)
-    telemetry_list_frame.pack(fill="both", expand=True, pady=(0, 10))
-
-    # Создаем Treeview для отображения списка телеметрии
-    telemetry_columns = ("username", "file_name", "date", "file_size")
-    telemetry_tree = ttk.Treeview(
-        telemetry_list_frame,
-        columns=telemetry_columns,
-        show="headings",
-        height=10,
-    )
-    
-    # Настройка колонок
-    telemetry_tree.heading("username", text="Пользователь")
-    telemetry_tree.heading("file_name", text="Файл")
-    telemetry_tree.heading("date", text="Дата")
-    telemetry_tree.heading("file_size", text="Размер")
-    
-    telemetry_tree.column("username", width=150)
-    telemetry_tree.column("file_name", width=250)
-    telemetry_tree.column("date", width=150)
-    telemetry_tree.column("file_size", width=100)
-
-    # Скроллбар для списка
-    telemetry_scrollbar = ttk.Scrollbar(telemetry_list_frame, orient="vertical", command=telemetry_tree.yview)
-    telemetry_tree.configure(yscrollcommand=telemetry_scrollbar.set)
-    
-    telemetry_tree.pack(side="left", fill="both", expand=True)
-    telemetry_scrollbar.pack(side="right", fill="y")
-
-    # Функция для обновления списка телеметрии
-    def refresh_shared_telemetry():
-        try:
-            from telemetry.telemetry_manager import TelemetryManager
-            manager = TelemetryManager()
-            
-            # Очищаем текущий список
-            for item in telemetry_tree.get_children():
-                telemetry_tree.delete(item)
-            
-            # Получаем телеметрию других пользователей
-            telemetry_list = manager.get_shared_telemetry(limit=50)
-            
-            if not telemetry_list:
-                telemetry_tree.insert("", "end", values=("Нет данных", "Включите обмен телеметрией и отправьте телеметрию", "", ""))
-            else:
-                for telemetry in telemetry_list:
-                    file_size_str = f"{telemetry['file_size'] / 1024:.1f} KB" if telemetry['file_size'] else "N/A"
-                    telemetry_tree.insert("", "end", values=(
-                        telemetry['username'],
-                        telemetry['file_name'],
-                        telemetry['date'],
-                        file_size_str
-                    ))
-        except Exception as e:
-            print(f"Ошибка при обновлении списка телеметрии: {str(e)}")
-            messagebox.showerror("Ошибка", f"Не удалось загрузить телеметрию других пользователей:\n{str(e)}")
-
-    # Кнопка обновления
-    refresh_button = ttk.Button(
-        shared_telemetry_section,
-        text="Обновить список",
-        bootstyle="primary-outline",
-        command=refresh_shared_telemetry,
-    )
-    refresh_button.pack(pady=5)
-
 
 # Функция для открытия окна настроек колонок
 def open_columns_settings_window():
@@ -6709,271 +6816,272 @@ def open_columns_settings_window():
 
 
 def switch_to_gpt():
-    """Переключает на вкладку Антон AI"""
-    # Удаляем все существующие вкладки
-    for tab in tab_control.tabs():
-        tab_control.forget(tab)
+    pass
+    # """Переключает на вкладку Антон AI"""
+    # # Удаляем все существующие вкладки
+    # for tab in tab_control.tabs():
+    #     tab_control.forget(tab)
 
-    # Создаем новую вкладку для чата
-    gpt_tab = ttk.Frame(tab_control)
-    tab_control.add(gpt_tab, text="Антон AI")
+    # # Создаем новую вкладку для чата
+    # gpt_tab = ttk.Frame(tab_control)
+    # tab_control.add(gpt_tab, text="Антон AI")
 
-    # Создаем новую вкладку для сохраненных файлов
-    saved_code_tab = ttk.Frame(tab_control)
-    tab_control.add(saved_code_tab, text="Сохраненные файлы")
+#     # Создаем новую вкладку для сохраненных файлов
+#     saved_code_tab = ttk.Frame(tab_control)
+#     tab_control.add(saved_code_tab, text="Сохраненные файлы")
 
-    # Создаем основной контейнер для чата
-    main_container = ttk.Frame(gpt_tab)
-    main_container.pack(fill="both", expand=True, padx=10, pady=10)
+#     # Создаем основной контейнер для чата
+#     main_container = ttk.Frame(gpt_tab)
+#     main_container.pack(fill="both", expand=True, padx=10, pady=10)
 
-    # Создаем текстовое поле для вывода сообщений
-    chat_display = tk.Text(
-        main_container, wrap=tk.WORD, height=20, font=("Segoe UI", 10)
-    )
-    chat_display.pack(fill="both", expand=True, pady=(0, 10))
+#     # Создаем текстовое поле для вывода сообщений
+#     chat_display = tk.Text(
+#         main_container, wrap=tk.WORD, height=20, font=("Segoe UI", 10)
+#     )
+#     chat_display.pack(fill="both", expand=True, pady=(0, 10))
 
-    # Добавляем скроллбар
-    scrollbar = ttk.Scrollbar(chat_display, command=chat_display.yview)
-    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-    chat_display.config(yscrollcommand=scrollbar.set)
+#     # Добавляем скроллбар
+#     scrollbar = ttk.Scrollbar(chat_display, command=chat_display.yview)
+#     scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+#     chat_display.config(yscrollcommand=scrollbar.set)
 
-    # Создаем фрейм для ввода
-    input_frame = ttk.Frame(main_container)
-    input_frame.pack(fill="x")
+#     # Создаем фрейм для ввода
+#     input_frame = ttk.Frame(main_container)
+#     input_frame.pack(fill="x")
 
-    # Создаем поле ввода
-    input_field = ttk.Entry(input_frame, font=("Segoe UI", 10))
-    input_field.pack(side="left", fill="x", expand=True, padx=(0, 5))
+#     # Создаем поле ввода
+#     input_field = ttk.Entry(input_frame, font=("Segoe UI", 10))
+#     input_field.pack(side="left", fill="x", expand=True, padx=(0, 5))
 
-    # Создаем кнопку отправки
-    send_button = ttk.Button(input_frame, text="Отправить", bootstyle="success-outline")
-    send_button.pack(side="right")
+#     # Создаем кнопку отправки
+#     send_button = ttk.Button(input_frame, text="Отправить", bootstyle="success-outline")
+#     send_button.pack(side="right")
 
-    # Создаем контейнер для сохраненных файлов
-    saved_code_container = ttk.Frame(saved_code_tab)
-    saved_code_container.pack(fill="both", expand=True, padx=10, pady=10)
+#     # Создаем контейнер для сохраненных файлов
+#     saved_code_container = ttk.Frame(saved_code_tab)
+#     saved_code_container.pack(fill="both", expand=True, padx=10, pady=10)
 
-    # Создаем список файлов
-    file_listbox = tk.Listbox(saved_code_container, font=("Segoe UI", 10))
-    file_listbox.pack(side="left", fill="both", expand=True)
+#     # Создаем список файлов
+#     file_listbox = tk.Listbox(saved_code_container, font=("Segoe UI", 10))
+#     file_listbox.pack(side="left", fill="both", expand=True)
 
-    # Добавляем скроллбар для списка файлов
-    file_scrollbar = ttk.Scrollbar(saved_code_container, command=file_listbox.yview)
-    file_scrollbar.pack(side="right", fill="y")
-    file_listbox.config(yscrollcommand=file_scrollbar.set)
+#     # Добавляем скроллбар для списка файлов
+#     file_scrollbar = ttk.Scrollbar(saved_code_container, command=file_listbox.yview)
+#     file_scrollbar.pack(side="right", fill="y")
+#     file_listbox.config(yscrollcommand=file_scrollbar.set)
 
-    # Создаем текстовое поле для просмотра содержимого файла
-    file_content = tk.Text(saved_code_container, wrap=tk.WORD, font=("Segoe UI", 10))
-    file_content.pack(fill="both", expand=True, pady=(10, 0))
+#     # Создаем текстовое поле для просмотра содержимого файла
+#     file_content = tk.Text(saved_code_container, wrap=tk.WORD, font=("Segoe UI", 10))
+#     file_content.pack(fill="both", expand=True, pady=(10, 0))
 
-    def update_file_list():
-        """Обновляет список сохраненных файлов"""
-        file_listbox.delete(0, tk.END)
-        code_dir = Path("user_data/saved_code")
-        if code_dir.exists():
-            for file in sorted(code_dir.glob("*.bat"), reverse=True):
-                file_listbox.insert(tk.END, file.name)
+#     def update_file_list():
+#         """Обновляет список сохраненных файлов"""
+#         file_listbox.delete(0, tk.END)
+#         code_dir = Path("user_data/saved_code")
+#         if code_dir.exists():
+#             for file in sorted(code_dir.glob("*.bat"), reverse=True):
+#                 file_listbox.insert(tk.END, file.name)
 
-    def show_file_content(event):
-        """Показывает содержимое выбранного файла"""
-        selection = file_listbox.curselection()
-        if selection:
-            filename = file_listbox.get(selection[0])
-            file_path = Path("user_data/saved_code") / filename
-            try:
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()
-                file_content.delete("1.0", tk.END)
-                file_content.insert("1.0", content)
-            except Exception as e:
-                file_content.delete("1.0", tk.END)
-                file_content.insert("1.0", f"Ошибка чтения файла: {str(e)}")
+#     def show_file_content(event):
+#         """Показывает содержимое выбранного файла"""
+#         selection = file_listbox.curselection()
+#         if selection:
+#             filename = file_listbox.get(selection[0])
+#             file_path = Path("user_data/saved_code") / filename
+#             try:
+#                 with open(file_path, "r", encoding="utf-8") as f:
+#                     content = f.read()
+#                 file_content.delete("1.0", tk.END)
+#                 file_content.insert("1.0", content)
+#             except Exception as e:
+#                 file_content.delete("1.0", tk.END)
+#                 file_content.insert("1.0", f"Ошибка чтения файла: {str(e)}")
 
-    # Привязываем обработчик выбора файла
-    file_listbox.bind("<<ListboxSelect>>", show_file_content)
+#     # Привязываем обработчик выбора файла
+#     file_listbox.bind("<<ListboxSelect>>", show_file_content)
 
-    # Обновляем список файлов при открытии вкладки
-    update_file_list()
+#     # Обновляем список файлов при открытии вкладки
+#     update_file_list()
 
-    # Инициализируем GPT клиент
-    gpt_client = GPTClient()
+#     # Инициализируем GPT клиент
+#     gpt_client = GPTClient()
 
-    # Устанавливаем системный промпт
-    gpt_client.system_prompt = """Ты - профессиональный программист на языке Python и Assembly, 
-    ты хорошо разбираешься и в других языках программирования, а также отлично понимаешь как работает компьютер, 
-    еще ты профессиональный геймер, и хорошо разбираешься в компьютерных играх. 
-    Ты очень хорошо разбираешься в оптимизации Windows, знаешь весь Windows реестр наизусть.
-    Ты всегда отвечаешь на русском языке.
-    Ты всегда помогаешь пользователю с его задачами.
-    Ты всегда даешь подробные и понятные объяснения.
-    Ты всегда предлагаешь несколько вариантов решения проблемы.
-    Ты всегда проверяешь код на ошибки перед отправкой.
-    Ты всегда используешь современные практики программирования.
-    Ты всегда следуешь принципам безопасности при работе с системой."""
+#     # Устанавливаем системный промпт
+#     gpt_client.system_prompt = """Ты - профессиональный программист на языке Python и Assembly, 
+#     ты хорошо разбираешься и в других языках программирования, а также отлично понимаешь как работает компьютер, 
+#     еще ты профессиональный геймер, и хорошо разбираешься в компьютерных играх. 
+#     Ты очень хорошо разбираешься в оптимизации Windows, знаешь весь Windows реестр наизусть.
+#     Ты всегда отвечаешь на русском языке.
+#     Ты всегда помогаешь пользователю с его задачами.
+#     Ты всегда даешь подробные и понятные объяснения.
+#     Ты всегда предлагаешь несколько вариантов решения проблемы.
+#     Ты всегда проверяешь код на ошибки перед отправкой.
+#     Ты всегда используешь современные практики программирования.
+#     Ты всегда следуешь принципам безопасности при работе с системой."""
 
-    # Загружаем историю чата из файла
-    memory_file = Path("user_data/chat_memory.json")
-    if memory_file.exists():
-        try:
-            with open(memory_file, "r", encoding="utf-8") as f:
-                gpt_client.memory = json.load(f)
-                # Восстанавливаем историю в чате
-                for msg in gpt_client.memory:
-                    role = msg["role"]
-                    content = msg["content"]
-                    if role == "user":
-                        chat_display.insert(tk.END, f"Вы: {content}\n", "user")
-                    elif role == "assistant":
-                        chat_display.insert(tk.END, f"GPT: {content}\n\n", "gpt")
-        except Exception as e:
-            chat_display.insert(
-                tk.END, f"Ошибка загрузки истории: {str(e)}\n\n", "error"
-            )
+#     # Загружаем историю чата из файла
+#     memory_file = Path("user_data/chat_memory.json")
+#     if memory_file.exists():
+#         try:
+#             with open(memory_file, "r", encoding="utf-8") as f:
+#                 gpt_client.memory = json.load(f)
+#                 # Восстанавливаем историю в чате
+#                 for msg in gpt_client.memory:
+#                     role = msg["role"]
+#                     content = msg["content"]
+#                     if role == "user":
+#                         chat_display.insert(tk.END, f"Вы: {content}\n", "user")
+#                     elif role == "assistant":
+#                         chat_display.insert(tk.END, f"GPT: {content}\n\n", "gpt")
+#         except Exception as e:
+#             chat_display.insert(
+#                 tk.END, f"Ошибка загрузки истории: {str(e)}\n\n", "error"
+#             )
 
-    def save_memory():
-        """Сохраняет историю чата в файл"""
-        try:
-            memory_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(memory_file, "w", encoding="utf-8") as f:
-                json.dump(gpt_client.memory, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            chat_display.insert(
-                tk.END, f"Ошибка сохранения истории: {str(e)}\n\n", "error"
-            )
+#     def save_memory():
+#         """Сохраняет историю чата в файл"""
+#         try:
+#             memory_file.parent.mkdir(parents=True, exist_ok=True)
+#             with open(memory_file, "w", encoding="utf-8") as f:
+#                 json.dump(gpt_client.memory, f, ensure_ascii=False, indent=2)
+#         except Exception as e:
+#             chat_display.insert(
+#                 tk.END, f"Ошибка сохранения истории: {str(e)}\n\n", "error"
+#             )
 
-    def process_command(message):
-        """Обрабатывает специальные команды"""
-        if message.lower() == "exit":
-            save_memory()  # Сохраняем историю перед выходом
-            root.destroy()
-            return True
+#     def process_command(message):
+#         """Обрабатывает специальные команды"""
+#         if message.lower() == "exit":
+#             save_memory()  # Сохраняем историю перед выходом
+#             root.destroy()
+#             return True
 
-        elif message.startswith("cmd "):
-            command = message[4:]
-            try:
-                result = gpt_client.execute_command(command)
-                chat_display.insert(
-                    tk.END, f"Выполнение команды: {command}\n", "system"
-                )
-                chat_display.insert(tk.END, f"Результат:\n{result}\n\n", "system")
-            except Exception as e:
-                chat_display.insert(
-                    tk.END, f"Ошибка выполнения команды: {str(e)}\n\n", "error"
-                )
-            return True
+#         elif message.startswith("cmd "):
+#             command = message[4:]
+#             try:
+#                 result = gpt_client.execute_command(command)
+#                 chat_display.insert(
+#                     tk.END, f"Выполнение команды: {command}\n", "system"
+#                 )
+#                 chat_display.insert(tk.END, f"Результат:\n{result}\n\n", "system")
+#             except Exception as e:
+#                 chat_display.insert(
+#                     tk.END, f"Ошибка выполнения команды: {str(e)}\n\n", "error"
+#                 )
+#             return True
 
-        elif message.lower() == "save_code":
-            if hasattr(gpt_client, "last_code"):
-                try:
-                    # Создаем директорию для сохранения кода
-                    code_dir = Path("user_data/saved_code")
-                    code_dir.mkdir(parents=True, exist_ok=True)
+#         elif message.lower() == "save_code":
+#             if hasattr(gpt_client, "last_code"):
+#                 try:
+#                     # Создаем директорию для сохранения кода
+#                     code_dir = Path("user_data/saved_code")
+#                     code_dir.mkdir(parents=True, exist_ok=True)
 
-                    # Генерируем имя файла с текущей датой и временем
-                    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-                    filename = code_dir / f"code_{timestamp}.bat"
+#                     # Генерируем имя файла с текущей датой и временем
+#                     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+#                     filename = code_dir / f"code_{timestamp}.bat"
 
-                    # Удаляем первую строку из кода
-                    code_lines = gpt_client.last_code.split("\n")
-                    if len(code_lines) > 1:
-                        code_without_first_line = "\n".join(code_lines[1:])
-                    else:
-                        code_without_first_line = gpt_client.last_code
+#                     # Удаляем первую строку из кода
+#                     code_lines = gpt_client.last_code.split("\n")
+#                     if len(code_lines) > 1:
+#                         code_without_first_line = "\n".join(code_lines[1:])
+#                     else:
+#                         code_without_first_line = gpt_client.last_code
 
-                    # Сохраняем код
-                    with open(filename, "w", encoding="utf-8") as f:
-                        f.write(code_without_first_line)
+#                     # Сохраняем код
+#                     with open(filename, "w", encoding="utf-8") as f:
+#                         f.write(code_without_first_line)
 
-                    chat_display.insert(
-                        tk.END, f"Код сохранен в файл: {filename}\n\n", "system"
-                    )
-                    # Обновляем список файлов
-                    update_file_list()
-                except Exception as e:
-                    chat_display.insert(
-                        tk.END, f"Ошибка сохранения кода: {str(e)}\n\n", "error"
-                    )
-            else:
-                chat_display.insert(tk.END, "Нет кода для сохранения\n\n", "error")
-            return True
+#                     chat_display.insert(
+#                         tk.END, f"Код сохранен в файл: {filename}\n\n", "system"
+#                     )
+#                     # Обновляем список файлов
+#                     update_file_list()
+#                 except Exception as e:
+#                     chat_display.insert(
+#                         tk.END, f"Ошибка сохранения кода: {str(e)}\n\n", "error"
+#                     )
+#             else:
+#                 chat_display.insert(tk.END, "Нет кода для сохранения\n\n", "error")
+#             return True
 
-        return False
+#         return False
 
-    def send_message(event=None):
-        """Отправляет сообщение и получает ответ"""
-        message = input_field.get().strip()
-        if not message:
-            return
+#     def send_message(event=None):
+#         """Отправляет сообщение и получает ответ"""
+#         message = input_field.get().strip()
+#         if not message:
+#             return
 
-        # Очищаем поле ввода
-        input_field.delete(0, tk.END)
+#         # Очищаем поле ввода
+#         input_field.delete(0, tk.END)
 
-        # Добавляем сообщение пользователя в чат
-        chat_display.insert(tk.END, f"Вы: {message}\n", "user")
-        chat_display.tag_configure("user", foreground="blue")
+#         # Добавляем сообщение пользователя в чат
+#         chat_display.insert(tk.END, f"Вы: {message}\n", "user")
+#         chat_display.tag_configure("user", foreground="blue")
 
-        # Проверяем, является ли сообщение командой
-        if process_command(message):
-            chat_display.see(tk.END)
-            return
+#         # Проверяем, является ли сообщение командой
+#         if process_command(message):
+#             chat_display.see(tk.END)
+#             return
 
-        # Получаем ответ от GPT
-        try:
-            response = gpt_client.get_response(message)
-            chat_display.insert(tk.END, f"GPT: {response}\n\n", "gpt")
-            chat_display.tag_configure("gpt", foreground="green")
+#         # Получаем ответ от GPT
+#         try:
+#             response = gpt_client.get_response(message)
+#             chat_display.insert(tk.END, f"GPT: {response}\n\n", "gpt")
+#             chat_display.tag_configure("gpt", foreground="green")
 
-            # Если в ответе есть код, предлагаем сохранить
-            # if "```bat" in response:
-            if "```" in response:
-                code_blocks = response.split("```")
-                for i in range(1, len(code_blocks), 2):
-                    code = code_blocks[i].strip()
-                    if code:
-                        gpt_client.last_code = code
-                        chat_display.insert(
-                            tk.END,
-                            "В ответе обнаружен код. Используйте команду 'save_code' для его сохранения.\n",
-                            "system",
-                        )
-                        break
+#             # Если в ответе есть код, предлагаем сохранить
+#             # if "```bat" in response:
+#             if "```" in response:
+#                 code_blocks = response.split("```")
+#                 for i in range(1, len(code_blocks), 2):
+#                     code = code_blocks[i].strip()
+#                     if code:
+#                         gpt_client.last_code = code
+#                         chat_display.insert(
+#                             tk.END,
+#                             "В ответе обнаружен код. Используйте команду 'save_code' для его сохранения.\n",
+#                             "system",
+#                         )
+#                         break
 
-            # Сохраняем историю после каждого сообщения
-            save_memory()
+#             # Сохраняем историю после каждого сообщения
+#             save_memory()
 
-        except Exception as e:
-            chat_display.insert(tk.END, f"Ошибка: {str(e)}\n\n", "error")
-            chat_display.tag_configure("error", foreground="red")
+#         except Exception as e:
+#             chat_display.insert(tk.END, f"Ошибка: {str(e)}\n\n", "error")
+#             chat_display.tag_configure("error", foreground="red")
 
-        # Прокручиваем чат вниз
-        chat_display.see(tk.END)
+#         # Прокручиваем чат вниз
+#         chat_display.see(tk.END)
 
-    # Привязываем отправку к кнопке и Enter
-    send_button.config(command=send_message)
-    input_field.bind("<Return>", send_message)
+#     # Привязываем отправку к кнопке и Enter
+#     send_button.config(command=send_message)
+#     input_field.bind("<Return>", send_message)
 
-    # Фокусируемся на поле ввода
-    input_field.focus()
+#     # Фокусируемся на поле ввода
+#     input_field.focus()
 
-    # Добавляем приветственное сообщение
-    chat_display.insert(tk.END, "Добро пожаловать в Антон AI от Extreme Tweaker!\n\n", "system")
-    chat_display.tag_configure("system", foreground="gray")
+#     # Добавляем приветственное сообщение
+#     chat_display.insert(tk.END, "Добро пожаловать в Антон AI от Extreme Tweaker!\n\n", "system")
+#     chat_display.tag_configure("system", foreground="gray")
 
-    # Добавляем информацию о командах
-    commands_info = """Доступные команды:
-- exit - выход из программы
-- cmd <команда> - выполнить команду в cmd
-- save_code - сохранить последний код
+#     # Добавляем информацию о командах
+#     commands_info = """Доступные команды:
+# - exit - выход из программы
+# - cmd <команда> - выполнить команду в cmd
+# - save_code - сохранить последний код
 
-Начните диалог, введя сообщение ниже.\n\n"""
-    chat_display.insert(tk.END, commands_info, "system")
+# Начните диалог, введя сообщение ниже.\n\n"""
+#     chat_display.insert(tk.END, commands_info, "system")
 
-    # Сохраняем историю при закрытии окна
-    def on_closing():
-        save_memory()
-        root.destroy()
+#     # Сохраняем историю при закрытии окна
+#     def on_closing():
+#         save_memory()
+#         root.destroy()
 
-    root.protocol("WM_DELETE_WINDOW", on_closing)
+#     root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Определяем функции-обертки перед списком quick_buttons
 def switch_to_main_wrapper():
@@ -7198,7 +7306,7 @@ def get_quick_buttons_list():
         ("Очистка", switch_to_clean_wrapper, "☠️"),
         ("Настройки", switch_to_settings_wrapper, "⚙️"),
         ("Исправления", switch_to_fixes_wrapper, "⚜️"),
-        ("Антон AI", switch_to_gpt_wrapper, "👻"),
+        # ("Антон AI", switch_to_gpt_wrapper, "👻"),
         ("Создать конфиг", lambda: create_batch_file([name for name, var in checkboxes.items() if var.get()]),"📝",),
     ]
     if developer_mode:
@@ -7219,7 +7327,7 @@ icon_variants = {
     "Очистка": ["☠️", "🧹", "🧸"],
     "Настройки": ["⚙️", "⚙️", "⚙️"],
     "Исправления": ["⚜️", "🔧", "🧷"],
-    "Антон AI": ["👻", "👽", "👾"],
+    # "Антон AI": ["👻", "👽", "👾"],
     "Создать конфиг": ["📝", "📝", "📝"],
 }
 
@@ -7260,30 +7368,29 @@ icon_variants_for_quick_buttons = {
 # Создание контроллера вкладок с новым стилем
 tab_style = ttk.Style()
 tab_style.configure("Custom.TNotebook", padding=5)
-tab_style.configure("Custom.TNotebook.Tab", padding=(10, 5), font=("Segoe UI", 10))
+tab_style.configure("Custom.TNotebook.Tab", padding=(10, 5))  # Шрифт будет установлен через update_font_style
 
-# Настраиваем стили для чекбоксов и других элементов
+# Настраиваем стили для чекбоксов и других элементов (без шрифтов, они будут установлены через update_font_style)
 style = ttk.Style()
-style.configure("Custom.TCheckbutton", font=("Segoe UI", 10), padding=5)
-style.configure("Custom.TButton", font=("Segoe UI", 10), padding=5)
-style.configure("Custom.TLabel", font=("Segoe UI", 10), padding=5)
+style.configure("Custom.TCheckbutton", padding=5)  # Шрифт будет установлен через update_font_style
+style.configure("Custom.TButton", padding=5)  # Шрифт уже настроен выше, но будет обновлен через update_font_style
+style.configure("Custom.TLabel", padding=5)  # Шрифт будет установлен через update_font_style
 style.configure("Custom.TEntry", padding=5)
 
 # Настраиваем стили для категорий
 style.configure("Category.TFrame", background="#1a1a1a", relief="solid", borderwidth=1)
 style.configure(
     "Category.TButton",
-    font=("Segoe UI", 12, "bold"),
-    padding=10,
+    padding=10,  # Шрифт будет установлен через update_font_style
     background="#1a1a1a",
     foreground="white",
     justify="center",
     wraplength=200,
 )
-style.configure("Category.TLabel", background="#1a1a1a", padding=10)
+style.configure("Category.TLabel", background="#1a1a1a", padding=10)  # Шрифт будет установлен через update_font_style
 
 # Настраиваем стиль для иконок без текста
-style.configure("Icon.TButton", font=("Segoe UI", 16), padding=10, width=3)
+style.configure("Icon.TButton", font=get_icon_button_font(), padding=10, width=3)
 
 # Глобальная переменная для хранения текущей ширины кнопок
 button_width = 2
@@ -7952,7 +8059,7 @@ if initial_tab_func:
         initial_tab_func()
 
 # Вызываем функцию для установки начального стиля компонентов интерфейса
-update_font_style()
+update_font_style(update_window=False)  # Не обновляем окно при начальной загрузке для ускорения
 
 # Список темных тем
 dark_themes = [
@@ -7979,6 +8086,9 @@ if not show_sidebar:
 
 # при нажатии кнопки F5, вызываем функцию reload_program
 root.bind("<F5>", reload_program)
+
+# Вызываем open_random_site после создания окна (неблокирующий вызов)
+root.after(1000, lambda: open_random_site(5))  # Задержка 1 секунда после запуска
 
 # Запуск главного цикла приложения для отображения окна
 logger.log_program_start()  # Логируем запуск программы

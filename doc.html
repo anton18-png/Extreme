@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extreme Tweaker - Полная документация</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Nord Color Palette */
+            --nord0: #2E3440;
+            --nord1: #3B4252;
+            --nord2: #434C5E;
+            --nord3: #4C566A;
+            --nord4: #D8DEE9;
+            --nord5: #E5E9F0;
+            --nord6: #ECEFF4;
+            --nord7: #8FBCBB;
+            --nord8: #88C0D0;
+            --nord9: #81A1C1;
+            --nord10: #5E81AC;
+            --nord11: #BF616A;
+            --nord12: #D08770;
+            --nord13: #EBCB8B;
+            --nord14: #A3BE8C;
+            --nord15: #B48EAD;
+            
+            /* Theme Colors */
+            --dark-bg: var(--nord0);
+            --darker-bg: #1e2229;
+            --card-bg: rgba(59, 66, 82, 0.85);
+            --glass-bg: rgba(216, 222, 233, 0.08);
+            --text-primary: var(--nord6);
+            --text-secondary: var(--nord4);
+            --accent-primary: var(--nord8);
+            --accent-secondary: var(--nord7);
+            --accent-warm: var(--nord13);
+            --gradient-primary: linear-gradient(135deg, var(--nord8), var(--nord7));
+            --gradient-accent: linear-gradient(135deg, var(--nord10), var(--nord9));
+            --gradient-winter: linear-gradient(135deg, var(--nord8), var(--nord7), var(--nord9));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, var(--nord0) 0%, var(--nord1) 50%, var(--nord0) 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+            line-height: 1.7;
+            background-image: 
+                url('keyboard.png');
+        }
+
+        /* Background Effects */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(136, 192, 208, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(143, 188, 187, 0.04) 0%, transparent 40%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Nord Grid Background */
+        .nord-grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(136, 192, 208, 0.02) 1px, transparent 1px),
+                linear-gradient(rgba(136, 192, 208, 0.02) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .navbar {
+            background: rgba(46, 52, 64, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--nord8);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(46, 52, 64, 0.5);
+        }
+
+        .navbar-scrolled {
+            background: rgba(30, 34, 41, 0.98);
+            border-bottom: 2px solid var(--nord7);
+            box-shadow: 0 5px 30px rgba(136, 192, 208, 0.2);
+        }
+
+        .navbar-brand {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            background: var(--gradient-primary);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(136, 192, 208, 0.3);
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .navbar-brand::before {
+            content: '📚';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--nord8);
+            animation: sparkle 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { 
+                opacity: 1;
+                transform: translateY(-50%) scale(1);
+            }
+            50% { 
+                opacity: 0.6;
+                transform: translateY(-50%) scale(1.1);
+            }
+        }
+
+        .nav-link {
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
+            color: var(--text-secondary) !important;
+            margin: 0 10px;
+            padding: 8px 16px !important;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .nav-link:hover::before,
+        .nav-link.active::before {
+            width: 100%;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--nord8) !important;
+        }
+
+        /* Documentation Specific Styles */
+        .doc-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 20px 40px;
+        }
+
+        .doc-header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 3rem 0;
+            border-bottom: 3px solid var(--nord8);
+        }
+
+        .doc-title {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            background: var(--gradient-winter);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 50px rgba(136, 192, 208, 0.3);
+        }
+
+        .doc-subtitle {
+            font-size: 1.3rem;
+            color: var(--nord8);
+            margin-bottom: 2rem;
+        }
+
+        .doc-version {
+            display: inline-block;
+            background: rgba(136, 192, 208, 0.15);
+            border: 2px solid var(--nord8);
+            padding: 10px 24px;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--nord8);
+            margin-top: 1rem;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: rgba(59, 66, 82, 0.7);
+            border: 2px solid var(--nord8);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.4);
+        }
+
+        .toc-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: var(--nord8);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .toc-list li {
+            margin: 0.8rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .toc-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--nord8);
+            font-weight: bold;
+        }
+
+        .toc-list a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: block;
+            padding: 5px 0;
+        }
+
+        .toc-list a:hover {
+            color: var(--nord8);
+            transform: translateX(5px);
+        }
+
+        .toc-list li.toc-level-2 {
+            padding-left: 2.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Content Sections */
+        .doc-section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 100px;
+        }
+
+        .section-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            color: var(--nord8);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--nord8);
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: var(--gradient-winter);
+        }
+
+        .subsection-header {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.8rem;
+            color: var(--nord7);
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .subsubsection-header {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.4rem;
+            color: var(--nord9);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: rgba(59, 66, 82, 0.6);
+            border: 2px solid var(--nord3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.3);
+        }
+
+        .content-card:hover {
+            border-color: var(--nord8);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(136, 192, 208, 0.2);
+            background: rgba(67, 76, 94, 0.7);
+        }
+
+        .feature-card {
+            background: rgba(59, 66, 82, 0.7);
+            border: 2px solid var(--nord3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--gradient-winter);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleY(1);
+        }
+
+        .feature-card:hover {
+            border-color: var(--nord8);
+            transform: translateX(5px);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--nord8);
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            color: var(--nord8);
+            margin-bottom: 0.8rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 1rem 0;
+            padding-left: 2rem;
+        }
+
+        li {
+            margin: 0.5rem 0;
+            line-height: 1.8;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            background: rgba(30, 34, 41, 0.9);
+            border: 2px solid var(--nord8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '📝';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            opacity: 0.5;
+        }
+
+        code {
+            background: rgba(136, 192, 208, 0.15);
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--nord8);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            margin: 0;
+            color: var(--nord8);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            background: rgba(59, 66, 82, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--nord3);
+        }
+
+        th {
+            background: rgba(136, 192, 208, 0.2);
+            color: var(--nord8);
+            font-weight: 700;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        tr:hover {
+            background: rgba(136, 192, 208, 0.1);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin: 0 5px;
+        }
+
+        .badge-primary {
+            background: rgba(136, 192, 208, 0.2);
+            color: var(--nord8);
+            border: 1px solid var(--nord8);
+        }
+
+        .badge-success {
+            background: rgba(163, 190, 140, 0.2);
+            color: var(--nord14);
+            border: 1px solid var(--nord14);
+        }
+
+        .badge-warning {
+            background: rgba(235, 203, 139, 0.2);
+            color: var(--nord13);
+            border: 1px solid var(--nord13);
+        }
+
+        /* Links */
+        a {
+            color: var(--nord8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid transparent;
+        }
+
+        a:hover {
+            color: var(--nord7);
+            border-bottom-color: var(--nord7);
+        }
+
+        /* Horizontal Rule */
+        hr {
+            border: none;
+            height: 2px;
+            background: var(--gradient-winter);
+            margin: 3rem 0;
+            border-radius: 2px;
+        }
+
+        /* Blockquotes */
+        blockquote {
+            border-left: 4px solid var(--nord8);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--text-secondary);
+            font-style: italic;
+            background: rgba(136, 192, 208, 0.05);
+            padding: 1rem 1.5rem;
+            border-radius: 5px;
+        }
+
+        /* Highlight Boxes */
+        .info-box {
+            background: rgba(136, 192, 208, 0.1);
+            border: 2px solid var(--nord8);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning-box {
+            background: rgba(235, 203, 139, 0.1);
+            border: 2px solid var(--nord13);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .success-box {
+            background: rgba(163, 190, 140, 0.1);
+            border: 2px solid var(--nord14);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--nord0);
+            padding: 3rem 0 2rem;
+            border-top: 3px solid var(--nord8);
+            margin-top: 4rem;
+            box-shadow: 0 -5px 30px rgba(46, 52, 64, 0.5);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border: 2px solid var(--nord8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nord8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            background: rgba(136, 192, 208, 0.1);
+        }
+
+        .social-link:hover {
+            color: var(--nord0);
+            background: var(--nord8);
+            border-color: var(--nord7);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(136, 192, 208, 0.4);
+        }
+
+        /* Scroll to top button */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-winter);
+            border: 2px solid var(--nord8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nord0);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+            box-shadow: 0 5px 20px rgba(136, 192, 208, 0.3);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(136, 192, 208, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .doc-title {
+                font-size: 2.5rem;
+            }
+            
+            .section-header {
+                font-size: 2rem;
+            }
+            
+            .doc-container {
+                padding: 100px 15px 30px;
+            }
+
+            .toc {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Smooth scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Print styles */
+        @media print {
+            .navbar, .footer, .scroll-top {
+                display: none;
+            }
+            
+            .doc-container {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Elements -->
+    <div class="nord-grid-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-book me-2"></i>EXTREME TWEAKER DOCS
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">ГЛАВНАЯ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="doc.html">ДОКУМЕНТАЦИЯ</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Documentation Container -->
+    <div class="doc-container">
+        <!-- Header -->
+        <div class="doc-header">
+            <h1 class="doc-title">EXTREME TWEAKER</h1>
+            <p class="doc-subtitle">Полная документация</p>
+            <div class="doc-version">
+                <i class="fas fa-code-branch me-2"></i>Версия документации: 1.0 | Версия программы: v0.3.7.2 Pro
+            </div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2 class="toc-title">📋 Содержание</h2>
+            <ul class="toc-list">
+                <li><a href="#введение">1. Введение</a></li>
+                <li><a href="#основные-возможности">2. Основные возможности</a></li>
+                <li><a href="#интерфейс-и-режимы-работы">3. Интерфейс и режимы работы</a></li>
+                <li><a href="#вкладки-и-категории">4. Вкладки и категории</a></li>
+                <li><a href="#режимы-отображения-чекбоксов">5. Режимы отображения чекбоксов</a></li>
+                <li><a href="#настройки-программы">6. Настройки программы</a></li>
+                <li><a href="#конфигурации-и-пресеты">7. Конфигурации и пресеты</a></li>
+                <li><a href="#режимы-выполнения-твиков">8. Режимы выполнения твиков</a></li>
+                <li><a href="#безопасность-и-бэкапы">9. Безопасность и бэкапы</a></li>
+                <li><a href="#телеметрия-и-логирование">10. Телеметрия и логирование</a></li>
+                <li><a href="#расширенные-функции">11. Расширенные функции</a></li>
+                <li><a href="#технические-детали">12. Технические детали</a></li>
+            </ul>
+        </div>
+
+        <!-- Introduction Section -->
+        <section id="введение" class="doc-section">
+            <h2 class="section-header">Введение</h2>
+            
+            <div class="content-card">
+                <p><strong>Extreme Tweaker</strong> - это мощная программа для глубокой оптимизации и настройки операционной системы Windows. Программа предоставляет пользователям широкий набор инструментов для улучшения производительности, приватности, безопасности и кастомизации системы.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📌</div>
+                <h3 class="feature-title">Версия</h3>
+                <p><strong>Текущая версия</strong>: v0.3.7.2 Pro</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Основные цели программы</h3>
+                <ul>
+                    <li>⚡ Максимальная оптимизация производительности Windows</li>
+                    <li>🔒 Улучшение приватности и безопасности</li>
+                    <li>🎨 Кастомизация внешнего вида системы</li>
+                    <li>🛠️ Управление службами и компонентами Windows</li>
+                    <li>🧹 Очистка системы от мусора</li>
+                    <li>🔧 Исправление проблем и откат изменений</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Main Features Section -->
+        <section id="основные-возможности" class="doc-section">
+            <h2 class="section-header">Основные возможности</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">1. Оптимизация системы</h3>
+                <ul>
+                    <li><strong>Базовые оптимизации</strong>: Безопасные твики для начинающих пользователей</li>
+                    <li><strong>Основные оптимизации</strong>: Расширенный набор для большинства пользователей</li>
+                    <li><strong>Углубленные оптимизации</strong>: Продвинутые настройки для опытных пользователей</li>
+                    <li><strong>Максимальные оптимизации</strong>: Экстремальные настройки для максимальной производительности</li>
+                    <li><strong>Хардкор оптимизации</strong>: Агрессивные настройки, которые могут повлиять на стабильность</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎮</div>
+                <h3 class="feature-title">2. Оптимизация для игр</h3>
+                <ul>
+                    <li>Уменьшение задержки ввода (input lag)</li>
+                    <li>Оптимизация приоритетов процессов</li>
+                    <li>Настройки DirectX и OpenGL</li>
+                    <li>Оптимизация мыши и клавиатуры</li>
+                    <li>Настройки звука для игр</li>
+                    <li>Оптимизация сетевых параметров для снижения пинга</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <h3 class="feature-title">3. Оптимизация компонентов</h3>
+                <ul>
+                    <li><strong>Процессоры</strong>: Специальные настройки для AMD и Intel</li>
+                    <li><strong>Видеокарты</strong>: Оптимизация NVIDIA</li>
+                    <li><strong>Память</strong>: Настройки управления RAM</li>
+                    <li><strong>Сеть</strong>: Оптимизация TCP/IP и сетевых драйверов</li>
+                    <li><strong>Диски</strong>: Оптимизация работы с накопителями</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">4. Приватность и безопасность</h3>
+                <ul>
+                    <li>Отключение телеметрии Windows</li>
+                    <li>Блокировка слежки Microsoft</li>
+                    <li>Управление сбором данных</li>
+                    <li>Настройки приватности</li>
+                    <li>Управление брандмауэром Windows</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3 class="feature-title">5. Управление службами</h3>
+                <ul>
+                    <li>Отключение ненужных служб Windows</li>
+                    <li>Оптимизация автозагрузки</li>
+                    <li>Управление планировщиком задач</li>
+                    <li>Контроль обновлений Windows</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🧹</div>
+                <h3 class="feature-title">6. Очистка системы</h3>
+                <ul>
+                    <li>Удаление временных файлов</li>
+                    <li>Очистка кэша</li>
+                    <li>Удаление логов</li>
+                    <li>Удаление встроенных UWP-приложений</li>
+                    <li>Очистка реестра</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3 class="feature-title">7. Кастомизация</h3>
+                <ul>
+                    <li>Изменение внешнего вида Windows</li>
+                    <li>Настройка цветов и тем</li>
+                    <li>Изменение иконок</li>
+                    <li>Кастомизация интерфейса</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔋</div>
+                <h3 class="feature-title">8. Электропитание</h3>
+                <ul>
+                    <li>Готовые схемы электропитания</li>
+                    <li>Специальные схемы для AMD и Intel</li>
+                    <li>Экстремальные режимы производительности</li>
+                    <li>Оптимизация энергопотребления</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Interface and Modes Section -->
+        <section id="интерфейс-и-режимы-работы" class="doc-section">
+            <h2 class="section-header">Интерфейс и режимы работы</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">💻</div>
+                <h3 class="feature-title">Минималистичный режим (Lite)</h3>
+                <p>При первом запуске программа открывается в минималистичном режиме с:</p>
+                <ul>
+                    <li>Центрированным заголовком "Extreme Tweaker Lite"</li>
+                    <li>Выпадающим списком для быстрого доступа к конфигурациям и вкладкам</li>
+                    <li>Кнопкой настроек в правом нижнем углу</li>
+                    <li>Клик по заголовку открывает полную версию</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🖥️</div>
+                <h3 class="feature-title">Полный режим</h3>
+                <p>Полный режим включает:</p>
+                <ul>
+                    <li>Верхнюю панель с кнопками быстрого доступа</li>
+                    <li>Боковое меню (сайдбар) с навигацией</li>
+                    <li>Основную область с вкладками</li>
+                    <li>Поиск по твикам</li>
+                    <li>Фильтрацию чекбоксов</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👶</div>
+                <h3 class="feature-title">Режим новичка</h3>
+                <p>Специальный безопасный режим для начинающих пользователей:</p>
+                <ul>
+                    <li>Показывает только проверенные и безопасные твики</li>
+                    <li>Скрывает опасные и экспериментальные функции</li>
+                    <li>Упрощенный интерфейс настроек</li>
+                    <li>Предупреждения перед применением изменений</li>
+                    <li>Рекомендации по использованию</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👨‍💻</div>
+                <h3 class="feature-title">Режим разработчика</h3>
+                <p>Расширенный режим для опытных пользователей:</p>
+                <ul>
+                    <li>Доступ ко всем функциям программы</li>
+                    <li>Опасные вкладки (Анонимность, Приватность)</li>
+                    <li>Дополнительные инструменты</li>
+                    <li>Расширенные настройки</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Tabs and Categories Section -->
+        <section id="вкладки-и-категории" class="doc-section">
+            <h2 class="section-header">Вкладки и категории</h2>
+
+            <h3 class="subsection-header">Главная вкладка</h3>
+            <div class="content-card">
+                <p>Содержит готовые конфигурации оптимизации:</p>
+                <ul>
+                    <li><strong>Базовая оптимизация</strong>: Для начинающих</li>
+                    <li><strong>Основная оптимизация</strong>: Для большинства пользователей</li>
+                    <li><strong>Углубленная оптимизация</strong>: Для опытных пользователей</li>
+                    <li><strong>Максимальная оптимизация</strong>: Экстремальные настройки</li>
+                    <li><strong>Радикальная оптимизация</strong>: Максимальные настройки</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-star me-2"></i>Оптимизации от авторов</h4>
+                <ul>
+                    <li>Оптимизация от Скидончика</li>
+                    <li>Оптимизация от Антона</li>
+                    <li>Оптимизация от Олега AMPR</li>
+                    <li>Оптимизация от Хауди Хо</li>
+                    <li>Оптимизация от Марка Аддерли</li>
+                    <li>Оптимизация от MartyFiles</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-fire me-2"></i>Твики из популярных твикеров</h4>
+                <ul>
+                    <li>Лучшие твики из BoosterX</li>
+                    <li>Лучшие твики из Hone</li>
+                    <li>Лучшие твики из Win10Tweaker</li>
+                    <li>Лучшие твики из Optimizer</li>
+                    <li>Лучшие твики из WinClick</li>
+                    <li>Лучшие твики из WinClean</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-user me-2"></i>Пользовательские конфиги</h4>
+                <ul>
+                    <li>Отображение содержимого конфигов с прокруткой</li>
+                    <li>Быстрый запуск пользовательских скриптов</li>
+                    <li>Управление конфигами из папки <code>user_data/Configs</code></li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Вкладка "После установки"</h3>
+            <div class="content-card">
+                <p>Специальная вкладка для настройки системы после установки Windows:</p>
+                
+                <h4 class="subsubsection-header">Основные модификации</h4>
+                <ul>
+                    <li>ReviOS</li>
+                    <li>AtlasOS</li>
+                    <li>MakuOS</li>
+                </ul>
+
+                <h4 class="subsubsection-header">Основные настройки</h4>
+                <ul>
+                    <li>Ancel Tweaker</li>
+                    <li>Igromanoff Tweak</li>
+                    <li>WinClean</li>
+                    <li>WinClick</li>
+                    <li>BoosterX Pro</li>
+                </ul>
+
+                <h4 class="subsubsection-header">Установка приложений</h4>
+                <ul>
+                    <li><strong>Браузеры</strong>: Google Chrome, Mozilla Firefox, Opera GX, Brave</li>
+                    <li><strong>Другой софт</strong>: Telegram, Discord, Vesktop, Steam, Hydra Launcher</li>
+                    <li><strong>Программы для оптимщиков</strong>: Dism++, Aida64</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Вкладка "Оптимизация"</h3>
+            <div class="content-card">
+                <p>Основные категории оптимизации:</p>
+                <ul>
+                    <li><strong>Оптимизация MartyFiles</strong> - Базовые безопасные настройки</li>
+                    <li><strong>Безопасная оптимизация</strong> - Оптимизация с акцентом на безопасность</li>
+                    <li><strong>Основная оптимизация</strong> - Основные настройки для повышения производительности</li>
+                    <li><strong>Углубленная оптимизация</strong> - Продвинутые настройки для опытных пользователей</li>
+                    <li><strong>Максимальная оптимизация</strong> - Экстремальная оптимизация для максимальной производительности</li>
+                    <li><strong>Меньшая задержка ввода и более плавный игровой процесс</strong> - Настройки приоритетов процессов для игр</li>
+                    <li><strong>Настройка от de3nake</strong> - Продвинутые настройки от эксперта de3nake</li>
+                    <li><strong>Оптимизация программ</strong> - Оптимизация конкретных программ и игр (CS2, Fortnite, Valorant)</li>
+                    <li><strong>Остальное</strong> - Дополнительные твики и настройки</li>
+                    <li><strong>Службы</strong> - Управление службами Windows</li>
+                    <li><strong>Хардкор оптимизация</strong> - Экстремальная оптимизация для опытных пользователей</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Другие вкладки</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Драйверы</strong> - Управление драйверами системы (только в режиме разработчика)</li>
+                    <li><strong>Электропитание</strong> - Управление схемами электропитания</li>
+                    <li><strong>Исправления</strong> - Инструменты для исправления проблем</li>
+                    <li><strong>Очистка</strong> - Инструменты очистки системы</li>
+                    <li><strong>Другое</strong> - Дополнительные функции</li>
+                    <li><strong>QQNWR</strong> - Специальная вкладка с дополнительными функциями</li>
+                    <li><strong>Настройки</strong> - Полный набор настроек программы</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Checkbox Display Modes Section -->
+        <section id="режимы-отображения-чекбоксов" class="doc-section">
+            <h2 class="section-header">Режимы отображения чекбоксов</h2>
+
+            <div class="content-card">
+                <p>Программа поддерживает 4 режима отображения чекбоксов:</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3 class="feature-title">1. All Tweaker (regular)</h3>
+                <ul>
+                    <li>Стандартный режим отображения</li>
+                    <li>Обычные чекбоксы в сетке</li>
+                    <li>Компактное отображение</li>
+                    <li>Подходит для просмотра большого количества твиков</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔲</div>
+                <h3 class="feature-title">2. Hone (rectangle)</h3>
+                <ul>
+                    <li>Чекбоксы в виде прямоугольных карточек</li>
+                    <li>Более наглядное отображение</li>
+                    <li>Удобно для выбора конкретных твиков</li>
+                    <li>Занимает больше места</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📄</div>
+                <h3 class="feature-title">3. BoosterX (expandable)</h3>
+                <ul>
+                    <li>Широкие прямоугольные чекбоксы на всю ширину</li>
+                    <li>Раскрывающееся описание по клику на кнопку "➕"</li>
+                    <li>Кнопка "▶ Запустить" для быстрого запуска</li>
+                    <li>Удобно для детального изучения твиков</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💎</div>
+                <h3 class="feature-title">4. Sapphire (sapphire)</h3>
+                <ul>
+                    <li>Аналогично BoosterX, но в два столбца</li>
+                    <li>Более компактное отображение</li>
+                    <li>Сохраняет все функции BoosterX</li>
+                    <li>Оптимально для широких экранов</li>
+                </ul>
+            </div>
+
+            <div class="info-box">
+                <p><strong>Смена режима</strong>: Настройки → Дополнительно → Режим отображения чекбоксов</p>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="настройки-программы" class="doc-section">
+            <h2 class="section-header">Настройки программы</h2>
+
+            <h3 class="subsection-header">Внешний вид</h3>
+            <div class="content-card">
+                <h4 class="subsubsection-header">Тема оформления</h4>
+                <p>Доступные темы из библиотеки ttkbootstrap:</p>
+                <ul>
+                    <li>nord (по умолчанию)</li>
+                    <li>newhone</li>
+                    <li>И другие темы ttkbootstrap</li>
+                </ul>
+
+                <h4 class="subsubsection-header">Шрифт</h4>
+                <ul>
+                    <li><strong>Семейство шрифта</strong>: Terminal (по умолчанию), Segoe UI и другие</li>
+                    <li><strong>Размер шрифта</strong>: 12 (по умолчанию)</li>
+                    <li><strong>Размер шрифта чекбоксов</strong>: 12 (по умолчанию)</li>
+                    <li><strong>Размер шрифта кнопок быстрого доступа</strong>: 17 (по умолчанию)</li>
+                </ul>
+
+                <h4 class="subsubsection-header">Полноэкранный режим</h4>
+                <p>Включение/выключение полноэкранного режима окна</p>
+            </div>
+
+            <h3 class="subsection-header">Поведение</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Всплывающие подсказки (Tooltips)</strong> - Включение/выключение всплывающих подсказок при наведении на чекбоксы</li>
+                    <li><strong>Подтверждение переключения вкладок</strong> - Предупреждение при переключении вкладок с несохраненными изменениями</li>
+                    <li><strong>Предложение создания бэкапа</strong> - Автоматическое предложение создания бэкапа перед применением изменений</li>
+                    <li><strong>Режим новичка</strong> - Включение безопасного режима для начинающих пользователей</li>
+                    <li><strong>Режим разработчика</strong> - Включение расширенного режима с доступом ко всем функциям</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Выполнение</h3>
+            <div class="content-card">
+                <h4 class="subsubsection-header">Режим выполнения твиков</h4>
+                <ul>
+                    <li><strong>default</strong> - Стандартный режим</li>
+                    <li><strong>no_launcher</strong> - Без лаунчера</li>
+                    <li><strong>launcher</strong> - С лаунчером</li>
+                    <li><strong>powerrun</strong> - С PowerRun</li>
+                    <li><strong>cmd</strong> - Через командную строку</li>
+                    <li><strong>create_config_and_run</strong> - Создание конфига и запуск (по умолчанию)</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Интерфейс</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Показывать верхнюю панель</strong> - Включение/выключение верхней панели с кнопками быстрого доступа</li>
+                    <li><strong>Показывать боковое меню</strong> - Включение/выключение бокового меню (сайдбара)</li>
+                    <li><strong>Начальная вкладка</strong> - Выбор вкладки, которая открывается при запуске программы</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Дополнительно</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Режим отображения чекбоксов</strong> - Выбор режима отображения</li>
+                    <li><strong>Количество колонок</strong> - Настройка количества колонок для отображения чекбоксов (по умолчанию 2)</li>
+                    <li><strong>Автообновление</strong> - Включение/выключение автоматической проверки обновлений</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Телеметрия</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Отправка логов при закрытии</strong> - Автоматическая отправка логов при закрытии программы</li>
+                    <li><strong>Обмен телеметрией</strong> - Разрешение на обмен телеметрией с другими пользователями</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Обратная связь</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Отправка сообщения разработчику</strong> - Текстовое поле для сообщения, прикрепление файлов и изображений, отправка через Telegram</li>
+                    <li><strong>Блокировка/разрешение доступа в интернет</strong> - Управление доступом программы в интернет через Windows Firewall</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Configurations Section -->
+        <section id="конфигурации-и-пресеты" class="doc-section">
+            <h2 class="section-header">Конфигурации и пресеты</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">📁</div>
+                <h3 class="feature-title">Стандартные конфигурации</h3>
+                <p>Готовые наборы оптимизаций, расположенные в папке <code>Configs/</code>:</p>
+                <ul>
+                    <li>Быстрый запуск через главную вкладку</li>
+                    <li>Автоматическое обнаружение .bat файлов</li>
+                    <li>Отображение в выпадающем списке минималистичного режима</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👤</div>
+                <h3 class="feature-title">Пользовательские конфиги</h3>
+                <p>Создание собственных конфигураций:</p>
+                <ul>
+                    <li>Размещение .bat файлов в <code>user_data/Configs/</code></li>
+                    <li>Автоматическое обнаружение и отображение</li>
+                    <li>Просмотр содержимого конфига с прокруткой</li>
+                    <li>Быстрый запуск</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3 class="feature-title">Создание конфигураций</h3>
+                <p>Программа может создавать конфигурационные файлы:</p>
+                <ul>
+                    <li>Выбор чекбоксов для включения в конфиг</li>
+                    <li>Автоматическое создание .bat файла</li>
+                    <li>Сохранение в <code>user_data/Configs/</code></li>
+                    <li>Уникальные имена с датой и временем</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Экспорт/Импорт настроек</h3>
+                <ul>
+                    <li><strong>Экспорт</strong>: Сохранение всех настроек программы в файл</li>
+                    <li><strong>Импорт</strong>: Загрузка настроек из файла</li>
+                    <li>Удобно для переноса настроек между установками</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Execution Modes Section -->
+        <section id="режимы-выполнения-твиков" class="doc-section">
+            <h2 class="section-header">Режимы выполнения твиков</h2>
+
+            <div class="content-card">
+                <h3 class="subsection-header">default</h3>
+                <p>Стандартный режим выполнения скриптов</p>
+
+                <h3 class="subsection-header">no_launcher</h3>
+                <p>Выполнение без использования лаунчера</p>
+
+                <h3 class="subsection-header">launcher</h3>
+                <p>Выполнение с использованием лаунчера</p>
+
+                <h3 class="subsection-header">powerrun</h3>
+                <p>Выполнение с повышенными правами через PowerRun</p>
+
+                <h3 class="subsection-header">cmd</h3>
+                <p>Выполнение через командную строку</p>
+
+                <h3 class="subsection-header">create_config_and_run (по умолчанию)</h3>
+                <p>Процесс выполнения:</p>
+                <ol>
+                    <li>Создание временного конфигурационного файла</li>
+                    <li>Включение всех выбранных твиков</li>
+                    <li>Запуск конфигурации</li>
+                    <li>Автоматическая очистка временных файлов</li>
+                </ol>
+                
+                <div class="success-box">
+                    <h4><i class="fas fa-check-circle me-2"></i>Преимущества:</h4>
+                    <ul>
+                        <li>Единый запуск всех твиков</li>
+                        <li>Логирование всех действий</li>
+                        <li>Возможность отмены через вкладку "Исправления"</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Section -->
+        <section id="безопасность-и-бэкапы" class="doc-section">
+            <h2 class="section-header">Безопасность и бэкапы</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">💾</div>
+                <h3 class="feature-title">Создание бэкапов</h3>
+                <p>Программа предлагает создание бэкапов перед применением изменений:</p>
+                <ul>
+                    <li>Бэкап реестра</li>
+                    <li>Бэкап системных файлов</li>
+                    <li>Точки восстановления Windows</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">↩️</div>
+                <h3 class="feature-title">Восстановление</h3>
+                <p>Вкладка "Исправления" позволяет:</p>
+                <ul>
+                    <li>Отменить примененные твики</li>
+                    <li>Восстановить настройки по умолчанию</li>
+                    <li>Исправить проблемы после оптимизации</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Режим новичка</h3>
+                <p>Дополнительная защита для начинающих:</p>
+                <ul>
+                    <li>Только безопасные твики</li>
+                    <li>Предупреждения перед опасными действиями</li>
+                    <li>Рекомендации по использованию</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4><i class="fas fa-exclamation-triangle me-2"></i>Предупреждения</h4>
+                <p>Программа показывает предупреждения для:</p>
+                <ul>
+                    <li>Опасных твиков</li>
+                    <li>Изменений, которые могут повлиять на стабильность</li>
+                    <li>Действий, требующих перезагрузки</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Telemetry Section -->
+        <section id="телеметрия-и-логирование" class="doc-section">
+            <h2 class="section-header">Телеметрия и логирование</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3 class="feature-title">Логирование</h3>
+                <p>Программа ведет подробные логи всех действий:</p>
+                <ul>
+                    <li>Запуск скриптов</li>
+                    <li>Ошибки выполнения</li>
+                    <li>Изменения настроек</li>
+                    <li>Пользовательские действия</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Телеметрия</h3>
+                <p>Сбор анонимной статистики (опционально):</p>
+                <ul>
+                    <li>Версия программы</li>
+                    <li>Используемые функции</li>
+                    <li>Ошибки (для улучшения программы)</li>
+                    <li>Анонимная информация о системе</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📤</div>
+                <h3 class="feature-title">Отправка логов</h3>
+                <ul>
+                    <li>При закрытии программы (если включено)</li>
+                    <li>При ошибках</li>
+                    <li>По запросу пользователя</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💬</div>
+                <h3 class="feature-title">Обратная связь</h3>
+                <p>Отправка сообщений разработчику:</p>
+                <ul>
+                    <li>Через встроенную форму</li>
+                    <li>С прикреплением файлов и изображений</li>
+                    <li>Через Telegram</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Advanced Features Section -->
+        <section id="расширенные-функции" class="doc-section">
+            <h2 class="section-header">Расширенные функции</h2>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3 class="feature-title">Поиск и фильтрация</h3>
+                <ul>
+                    <li>Поиск твиков по названию</li>
+                    <li>Фильтрация в реальном времени</li>
+                    <li>Поддержка всех режимов отображения</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">✅</div>
+                <h3 class="feature-title">Выделение всех</h3>
+                <ul>
+                    <li>Быстрое выделение всех чекбоксов на вкладке</li>
+                    <li>Удобно для массового применения твиков</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Динамическая загрузка вкладок</h3>
+                <ul>
+                    <li>Вкладки загружаются только при открытии</li>
+                    <li>Улучшает производительность при большом количестве вкладок</li>
+                    <li>Показ индикатора загрузки</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔧</div>
+                <h3 class="feature-title">Пользовательские вкладки</h3>
+                <p>Возможность добавления собственных вкладок через:</p>
+                <ul>
+                    <li>Модификацию файлов <code>tabs_beta.py</code></li>
+                    <li>Создание собственных скриптов в папке <code>tweaks/</code></li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3 class="feature-title">Описания твиков</h3>
+                <ul>
+                    <li>Автоматическая загрузка описаний из <code>tweaks/descriptions.txt</code></li>
+                    <li>Отображение в режимах BoosterX и Sapphire</li>
+                    <li>Подсказки при наведении</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📐</div>
+                <h3 class="feature-title">Управление колонками</h3>
+                <ul>
+                    <li>Настройка количества колонок для каждой вкладки</li>
+                    <li>Отдельные настройки для разных категорий</li>
+                    <li>Сохранение в конфигурации</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Кнопки быстрого доступа</h3>
+                <ul>
+                    <li>Настраиваемые кнопки в верхней панели</li>
+                    <li>Быстрый переход к часто используемым функциям</li>
+                    <li>Настройка через интерфейс</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3 class="feature-title">Обновления</h3>
+                <ul>
+                    <li>Автоматическая проверка обновлений</li>
+                    <li>Уведомления о новых версиях</li>
+                    <li>Обновление через встроенный механизм</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Technical Details Section -->
+        <section id="технические-детали" class="doc-section">
+            <h2 class="section-header">Технические детали</h2>
+
+            <h3 class="subsection-header">Поддерживаемые форматы скриптов</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>.bat / .cmd</strong>: Batch скрипты Windows</li>
+                    <li><strong>.ps1</strong>: PowerShell скрипты</li>
+                    <li><strong>.exe</strong>: Исполняемые файлы</li>
+                    <li><strong>.reg</strong>: Файлы реестра</li>
+                    <li><strong>.pow</strong>: Схемы электропитания</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Структура папок</h3>
+            <div class="code-block">
+                <pre>Extreme Tweaker/
+├── Configs/              # Стандартные конфигурации
+├── user_data/
+│   ├── Configs/          # Пользовательские конфиги
+│   └── settings.ini      # Настройки программы
+├── tweaks/               # Скрипты твиков
+│   ├── Оптимизация/
+│   ├── Приватность/
+│   ├── Службы/
+│   └── descriptions.txt  # Описания твиков
+└── main.py               # Главный файл программы</pre>
+            </div>
+
+            <h3 class="subsection-header">Конфигурационный файл</h3>
+            <div class="content-card">
+                <p>Файл <code>user_data/settings.ini</code> содержит все настройки программы:</p>
+                <ul>
+                    <li>Секция <code>[General]</code>: Основные настройки</li>
+                    <li>Секция <code>[Window]</code>: Настройки окна</li>
+                    <li>Секция <code>[Columns]</code>: Настройки колонок</li>
+                    <li>Секция <code>[Telemetry]</code>: Настройки телеметрии</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Зависимости</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>Python 3.x</strong>: Основной язык программирования</li>
+                    <li><strong>tkinter</strong>: Графический интерфейс</li>
+                    <li><strong>ttkbootstrap</strong>: Расширенное оформление интерфейса</li>
+                    <li><strong>configparser</strong>: Работа с конфигурационными файлами</li>
+                    <li><strong>subprocess</strong>: Выполнение внешних процессов</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Системные требования</h3>
+            <div class="content-card">
+                <ul>
+                    <li><strong>ОС</strong>: Windows 10/11</li>
+                    <li><strong>Права</strong>: Администратор (для большинства функций)</li>
+                    <li><strong>Python</strong>: 3.7 или выше</li>
+                    <li><strong>RAM</strong>: Минимум 2 GB</li>
+                    <li><strong>Место на диске</strong>: ~100 MB</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Безопасность</h3>
+            <div class="success-box">
+                <ul>
+                    <li>Все скрипты выполняются локально</li>
+                    <li>Нет отправки данных без разрешения пользователя</li>
+                    <li>Возможность полного отключения телеметрии</li>
+                    <li>Управление доступом в интернет через Firewall</li>
+                </ul>
+            </div>
+
+            <h3 class="subsection-header">Производительность</h3>
+            <div class="content-card">
+                <ul>
+                    <li>Динамическая загрузка вкладок</li>
+                    <li>Ленивая загрузка содержимого</li>
+                    <li>Оптимизированный интерфейс</li>
+                    <li>Минимальное использование ресурсов</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Conclusion Section -->
+        <section class="doc-section">
+            <h2 class="section-header">Заключение</h2>
+
+            <div class="content-card">
+                <p>Extreme Tweaker - это мощный и гибкий инструмент для оптимизации Windows, предоставляющий пользователям полный контроль над системой. Программа сочетает удобный интерфейс с мощными возможностями настройки и оптимизации.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">💡</div>
+                <h3 class="feature-title">Рекомендации по использованию</h3>
+                <ol>
+                    <li><strong>Начинающим пользователям</strong>: Используйте режим новичка и базовые оптимизации</li>
+                    <li><strong>Опытным пользователям</strong>: Экспериментируйте с углубленными настройками</li>
+                    <li><strong>Всегда делайте бэкап</strong>: Перед применением серьезных изменений</li>
+                    <li><strong>Читайте описания</strong>: Изучайте описания твиков перед применением</li>
+                    <li><strong>Используйте поиск</strong>: Для быстрого нахождения нужных функций</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <h4><i class="fas fa-life-ring me-2"></i>Поддержка</h4>
+                <ul>
+                    <li>Отправка обратной связи через программу</li>
+                    <li>Логирование ошибок для улучшения программы</li>
+                    <li>Регулярные обновления с новыми функциями</li>
+                </ul>
+            </div>
+        </section>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <div class="scroll-top" id="scrollTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-4 text-center text-lg-start">
+                    <h3 class="mb-3">
+                        <span class="text-success">❯</span> Extreme Tweaker Docs
+                    </h3>
+                    <p class="text-secondary">Полная документация программы оптимизации Windows</p>
+                </div>
+                
+                <div class="col-lg-4 text-center">
+                    <div class="social-links">
+                        <a href="https://github.com/anton18-png" class="social-link" target="_blank">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="https://t.me/all_tweaker" class="social-link" target="_blank">
+                            <i class="fab fa-telegram"></i>
+                        </a>
+                        <a href="index.html" class="social-link">
+                            <i class="fas fa-home"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 text-center text-lg-end">
+                    <p class="text-secondary mb-2">&copy; 2026 Extreme Tweaker</p>
+                    <p class="text-secondary small">Версия документации: 1.0</p>
+                    <p class="text-secondary small">Версия программы: v0.3.7.2 Winter Wizard</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('navbar-scrolled');
+            } else {
+                navbar.classList.remove('navbar-scrolled');
+            }
+
+            // Show/hide scroll to top button
+            const scrollTop = document.getElementById('scrollTop');
+            if (window.scrollY > 300) {
+                scrollTop.classList.add('visible');
+            } else {
+                scrollTop.classList.remove('visible');
+            }
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Scroll to top function
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Highlight active section in TOC
+        const sections = document.querySelectorAll('.doc-section');
+        const tocLinks = document.querySelectorAll('.toc-list a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+

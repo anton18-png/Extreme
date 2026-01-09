@@ -1233,7 +1233,7 @@
                 <p class="text-center mb-4"><strong>🚀 Мощный релиз</strong> с новой темой Sapphire, новым режимом отображения и обновленной минималистичной вкладкой!</p>
                 
                 <div class="text-center mb-4">
-                    <img src="https://github.com/user-attachments/assets/8c9028c2-0fc3-4dd0-b786-451ae38bd793" alt="Winter Wizard Banner" class="img-fluid rounded" style="max-width: 100%; height: auto;">
+                    <img src="https://github.com/user-attachments/assets/475e6a38-548c-4b31-86f8-c3a39f259209" alt="Winter Wizard Banner" class="img-fluid rounded" style="max-width: 100%; height: auto;">
                 </div>
                 
                 <div class="row mb-4">
@@ -1635,6 +1635,128 @@
                 <li>Рекомендуется закрыть программу и добавить её в исключения</li>
                 <li>Перезапустить программу и повторить попытку</li>
             </ul>
+        </div>
+    </div>
+    
+    <!-- Windows 11 Problems Section -->
+    <div class="mt-5 p-4 border border-danger rounded-3" style="background: rgba(40, 0, 0, 0.3);">
+        <h4 class="text-danger mb-4">⚠️ ПРОБЛЕМЫ WINDOWS 11, КОТОРЫЕ ЛОМАЮТ ВАШ КОМПЬЮТЕР</h4>
+        <p class="mb-4"><strong>Да, сообщалось, что некоторые обновления Windows 11 вызывали серьезные проблемы, включая "исчезновение" SSD-дисков, потерю данных и «синие экраны смерти», особенно на дисках, заполненных более чем на 60%.</strong> Microsoft расследует эти инциденты, но не всегда подтверждает прямую связь с обновлениями. Эти ошибки могут требовать отката обновления или даже приводить к необходимости замены накопителя, так как влияют на аппаратном уровне.</p>
+        
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="p-3 border border-danger rounded-3 bg-dark">
+                    <h5 class="text-danger mb-3">💾 ПРОБЛЕМЫ С SSD-ДИСКАМИ</h5>
+                    <p class="mb-3"><strong>«Исчезновение» SSD:</strong> После установки определенных обновлений (например, связанных с KB5063878, KB5066835) SSD-диски перестают определяться в системе, что может привести к потере данных.</p>
+                    
+                    <p class="mb-3">В августе 2025 года сообщалось, что после установки обновления безопасности <strong>KB5063878</strong> для Windows 11 24H2 некоторые пользователи столкнулись с поломками SSD-накопителей.</p>
+                    
+                    <h6 class="text-warning mb-2">Симптомы проблемы:</h6>
+                    <ul class="mb-3">
+                        <li>SSD заполнен более чем на 60% и происходит единовременная запись не менее 50 ГБ данных</li>
+                        <li>Может зависать Проводник Windows</li>
+                        <li>Ошибки ввода-вывода</li>
+                        <li>В некоторых случаях диск может полностью исчезнуть, включая отображение в BIOS</li>
+                    </ul>
+                    
+                    <p class="mb-2"><strong>Особенно уязвимыми</strong> оказались накопители, использующие контроллеры от Phison.</p>
+                    <p class="mb-0"><em>Microsoft начала расследование и 3 сентября 2025 года заявила, что не обнаружила связи между обновлением KB5063878 и сбоями в работе накопителей.</em></p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="p-3 border border-warning rounded-3 bg-dark">
+                    <h5 class="text-warning mb-3">⚡ ПРОБЛЕМЫ С ПРОИЗВОДИТЕЛЬНОСТЬЮ ПРОЦЕССОРА</h5>
+                    <p class="mb-3"><strong>Windows 11 не «ломает» процессор физически</strong>, но в ней были и есть баги, которые снижают его производительность, вызывают высокую загрузку или неадекватное управление частотами (даунклокинг), что может привести к перегреву и ощущению, что система «тормозит», особенно на старых процессорах или после свежих обновлений.</p>
+                    
+                    <h6 class="text-danger mb-2">Основные проблемы:</h6>
+                    <ul class="mb-3">
+                        <li><strong>Баги в драйверах или службах:</strong> «Системные прерывания» могут нагружать процессор, вызывая перегрев и падение FPS в играх</li>
+                        <li><strong>«Агрессивный» даунклокинг:</strong> В обновлении Windows 11 24H2 обнаружен баг, который принудительно снижает частоты процессора (даже мощных Intel Ultra 9) в фоне, что замедляет работу приложений, даже в играх</li>
+                        <li><strong>Проблемы с AMD:</strong> В ранних версиях была плохая совместимость с процессорами AMD, из-за чего они работали медленнее</li>
+                        <li><strong>Служба Cross Device Service:</strong> Может потреблять до 10% ресурсов CPU, снижая общую производительность системы</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12 mb-4">
+                <div class="p-3 border border-info rounded-3 bg-dark">
+                    <h5 class="text-info mb-3">🧠 ПРОБЛЕМЫ С ОПЕРАТИВНОЙ ПАМЯТЬЮ</h5>
+                    <p class="mb-3"><strong>Windows 11 не "ломает" оперативную память физически</strong>, но может вызывать ее чрезмерное потребление или утечки из-за системных служб, таких как Delivery Optimization (DoSvc), особенно в старых сборках или после обновлений, что приводит к замедлению системы и ошибкам нехватки памяти.</p>
+                    
+                    <h6 class="text-warning mb-2">Причины высокого потребления памяти:</h6>
+                    <ul class="mb-3">
+                        <li><strong>Службы обновления:</strong> Delivery Optimization (DoSvc) может утекать память, кэшируя обновления</li>
+                        <li><strong>Службы приложений:</strong> AppX Deployment (Appxsvc) также вызывала нагрузку</li>
+                        <li><strong>Фоновые процессы и службы:</strong> Многие программы и расширения браузеров могут потреблять много памяти</li>
+                        <li><strong>Недостаток ОЗУ:</strong> 8 ГБ уже недостаточно для многих задач, Microsoft признает, что 16 ГБ — хороший минимум</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="p-4 border border-success rounded-3" style="background: rgba(0, 40, 20, 0.3);">
+                    <h5 class="text-success mb-3 text-center">🛡️ КАК EXTREME TWEAKER РЕШАЕТ ЭТИ ПРОБЛЕМЫ</h5>
+                    <p class="text-center mb-4"><strong>Наш твикер как раз отключает все ненужные функции, которые ломают компьютер!</strong></p>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center p-3 border border-success rounded">
+                                <i class="fas fa-hdd fa-2x text-success mb-2"></i>
+                                <h6 class="text-success">Защита SSD</h6>
+                                <p class="small mb-0">Отключаем службы и процессы, которые могут вызывать проблемы с накопителями</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center p-3 border border-warning rounded">
+                                <i class="fas fa-microchip fa-2x text-warning mb-2"></i>
+                                <h6 class="text-warning">Оптимизация CPU</h6>
+                                <p class="small mb-0">Отключаем Cross Device Service и другие службы, которые нагружают процессор</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="text-center p-3 border border-info rounded">
+                                <i class="fas fa-memory fa-2x text-info mb-2"></i>
+                                <h6 class="text-info">Освобождение RAM</h6>
+                                <p class="small mb-0">Отключаем Delivery Optimization и другие службы, которые утекают память</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 border border-success rounded bg-dark">
+                        <h6 class="text-success mb-3">✅ ЧТО КОНКРЕТНО ДЕЛАЕТ EXTREME TWEAKER:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-0">
+                                    <li>Отключает телеметрию и шпионские модули Microsoft</li>
+                                    <li>Останавливает ненужные службы, которые нагружают систему</li>
+                                    <li>Отключает Delivery Optimization (DoSvc)</li>
+                                    <li>Отключает Cross Device Service</li>
+                                    <li>Оптимизирует реестр для лучшей производительности</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="mb-0">
+                                    <li>Отключает автоматические обновления, которые могут сломать систему</li>
+                                    <li>Очищает временные файлы и кэш</li>
+                                    <li>Настраивает Windows под максимальную производительность</li>
+                                    <li>Защищает от проблемных обновлений</li>
+                                    <li>Оптимизирует работу с дисками</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-dark border border-warning mt-3">
+                        <h6 class="text-warning mb-2">💡 ВАЖНО ПОНИМАТЬ:</h6>
+                        <p class="mb-0">Многие проблемы Windows 11 связаны именно с теми службами и функциями, которые Extreme Tweaker отключает. Отключив ненужные службы телеметрии, обновлений и фоновых процессов, вы не только улучшаете производительность, но и защищаете свою систему от потенциальных проблем, которые могут возникнуть из-за обновлений Microsoft.</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
             

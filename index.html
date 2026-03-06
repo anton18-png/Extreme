@@ -3,43 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Extreme Tweaker Lite 0.3.7.3 - МОЩНЫЙ РЕЛИЗ</title>
+    <title>Extreme Tweaker 3.7.3.5 - Мощный оптимизатор Windows</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            /* Nord Color Palette */
-            --nord0: #2E3440;  /* Polar Night - darkest */
-            --nord1: #3B4252;  /* Polar Night */
-            --nord2: #434C5E;  /* Polar Night */
-            --nord3: #4C566A;  /* Polar Night - lightest */
-            --nord4: #D8DEE9;  /* Snow Storm - darkest */
-            --nord5: #E5E9F0;  /* Snow Storm */
-            --nord6: #ECEFF4;  /* Snow Storm - lightest */
-            --nord7: #8FBCBB;  /* Frost - turquoise */
-            --nord8: #88C0D0;  /* Frost - ice */
-            --nord9: #81A1C1;  /* Frost - arctic */
-            --nord10: #5E81AC; /* Frost - polar */
-            --nord11: #BF616A; /* Aurora - red */
-            --nord12: #D08770; /* Aurora - orange */
-            --nord13: #EBCB8B; /* Aurora - yellow */
-            --nord14: #A3BE8C; /* Aurora - green */
-            --nord15: #B48EAD; /* Aurora - purple */
-            
-            /* Theme Colors */
-            --dark-bg: var(--nord0);
-            --darker-bg: #1e2229;
-            --card-bg: rgba(59, 66, 82, 0.85);
-            --glass-bg: rgba(216, 222, 233, 0.08);
-            --text-primary: var(--nord6);
-            --text-secondary: var(--nord4);
-            --accent-primary: var(--nord8);
-            --accent-secondary: var(--nord7);
-            --accent-warm: var(--nord13);
-            --gradient-primary: linear-gradient(135deg, var(--nord8), var(--nord7));
-            --gradient-accent: linear-gradient(135deg, var(--nord10), var(--nord9));
-            --gradient-winter: linear-gradient(135deg, var(--nord8), var(--nord7), var(--nord9));
+            /* Modern Color Palette */
+            --dark-bg: #0a0c10;
+            --darker-bg: #050709;
+            --card-bg: #14181f;
+            --glass-bg: rgba(20, 24, 31, 0.85);
+            --text-primary: #e4e6eb;
+            --text-secondary: #b0b3b8;
+            --accent-primary: #4a9eff;
+            --accent-secondary: #6c5ce7;
+            --accent-warm: #ff9f4a;
+            --success: #27c93f;
+            --warning: #ffbd2e;
+            --danger: #ff5f56;
+            --info: #5aa9e6;
+            --gradient-primary: linear-gradient(135deg, #4a9eff, #6c5ce7);
+            --gradient-accent: linear-gradient(135deg, #ff9f4a, #ff6b6b);
         }
 
         * {
@@ -50,17 +35,31 @@
 
         body {
             font-family: 'JetBrains Mono', monospace;
-            background: linear-gradient(135deg, var(--nord0) 0%, var(--nord1) 50%, var(--nord0) 100%);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #0f1219 50%, var(--dark-bg) 100%);
             background-attachment: fixed;
             color: var(--text-primary);
             overflow-x: hidden;
             min-height: 100vh;
             position: relative;
-            background-image: 
-                url('wallpaper.png');
         }
 
-        /* Winter Background Effects */
+        /* Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(90deg, rgba(74, 158, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(74, 158, 255, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Radial Gradient Overlay */
         body::before {
             content: '';
             position: fixed;
@@ -69,85 +68,29 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(136, 192, 208, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(143, 188, 187, 0.06) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(94, 129, 172, 0.04) 0%, transparent 60%);
+                radial-gradient(circle at 20% 30%, rgba(74, 158, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(108, 92, 231, 0.06) 0%, transparent 40%);
             z-index: -1;
             pointer-events: none;
-        }
-
-        /* Snowflakes Animation */
-        .snowflakes {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .snowflake {
-            position: absolute;
-            color: var(--nord6);
-            font-size: 1em;
-            font-family: Arial;
-            text-shadow: 0 0 5px rgba(136, 192, 208, 0.5);
-            animation: snowfall linear infinite;
-            opacity: 0.7;
-        }
-
-        @keyframes snowfall {
-            0% {
-                transform: translateY(-100vh) rotate(0deg);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.7;
-            }
-            90% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        /* Nord Grid Background */
-        .nord-grid-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(90deg, rgba(136, 192, 208, 0.03) 1px, transparent 1px),
-                linear-gradient(rgba(136, 192, 208, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            z-index: -2;
-            pointer-events: none;
-            opacity: 0.5;
         }
 
         .navbar {
-            background: rgba(46, 52, 64, 0.95);
+            background: rgba(10, 12, 16, 0.95);
             backdrop-filter: blur(20px);
-            border-bottom: 2px solid var(--nord8);
+            border-bottom: 2px solid var(--accent-primary);
             padding: 1rem 0;
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 20px rgba(46, 52, 64, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
 
         .navbar-scrolled {
-            background: rgba(30, 34, 41, 0.98);
-            border-bottom: 2px solid var(--nord7);
-            box-shadow: 0 5px 30px rgba(136, 192, 208, 0.2);
+            background: rgba(5, 7, 9, 0.98);
+            border-bottom: 2px solid var(--accent-secondary);
+            box-shadow: 0 5px 30px rgba(74, 158, 255, 0.2);
         }
 
         .navbar-brand {
@@ -158,35 +101,24 @@
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(136, 192, 208, 0.3);
+            text-shadow: 0 0 20px rgba(74, 158, 255, 0.3);
             position: relative;
             padding-left: 40px;
         }
 
         .navbar-brand::before {
-            content: '❄️';
+            content: '⚡';
             position: absolute;
             left: 0;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--nord8);
-            animation: sparkle 2s ease-in-out infinite;
+            color: var(--accent-primary);
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        @keyframes sparkle {
-            0%, 100% { 
-                opacity: 1;
-                transform: translateY(-50%) scale(1);
-            }
-            50% { 
-                opacity: 0.6;
-                transform: translateY(-50%) scale(1.1);
-            }
-        }
-
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translateY(-50%) scale(1); }
+            50% { opacity: 0.6; transform: translateY(-50%) scale(1.1); }
         }
 
         .nav-link {
@@ -218,7 +150,7 @@
 
         .nav-link:hover,
         .nav-link.active {
-            color: var(--nord8) !important;
+            color: var(--accent-primary) !important;
         }
 
         .hero-section {
@@ -237,8 +169,8 @@
 
         .hero-badge {
             display: inline-block;
-            background: var(--gradient-winter);
-            color: var(--nord0);
+            background: var(--gradient-primary);
+            color: white;
             padding: 10px 24px;
             border-radius: 25px;
             font-size: 0.9rem;
@@ -246,48 +178,41 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 2px;
-            box-shadow: 0 4px 15px rgba(136, 192, 208, 0.3);
-            border: 1px solid var(--nord8);
-            animation: glow 3s ease-in-out infinite;
-        }
-
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 4px 15px rgba(136, 192, 208, 0.3); }
-            50% { box-shadow: 0 4px 25px rgba(136, 192, 208, 0.6); }
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.3);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .main-title {
             font-family: 'Orbitron', sans-serif;
             font-weight: 900;
             font-size: 4.5rem;
-            background: var(--gradient-winter);
+            background: var(--gradient-primary);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 1.5rem;
             line-height: 1.1;
-            text-shadow: 0 0 50px rgba(136, 192, 208, 0.3);
-            filter: drop-shadow(0 0 10px rgba(136, 192, 208, 0.5));
+            text-shadow: 0 0 50px rgba(74, 158, 255, 0.3);
+            filter: drop-shadow(0 0 10px rgba(74, 158, 255, 0.3));
         }
 
         .subtitle {
             font-size: 1.5rem;
-            color: var(--nord8);
+            color: var(--text-secondary);
             margin-bottom: 2rem;
             max-width: 700px;
-            text-shadow: 0 2px 10px rgba(136, 192, 208, 0.3);
         }
 
         .version-highlight {
             display: inline-block;
-            background: rgba(136, 192, 208, 0.15);
-            border: 2px solid var(--nord8);
+            background: rgba(74, 158, 255, 0.1);
+            border: 2px solid var(--accent-primary);
             padding: 12px 24px;
             margin: 1rem 0;
             border-radius: 12px;
             font-size: 1.1rem;
-            color: var(--nord8);
-            box-shadow: 0 4px 15px rgba(136, 192, 208, 0.2);
+            color: var(--accent-primary);
+            box-shadow: 0 4px 15px rgba(74, 158, 255, 0.2);
         }
 
         .cyber-btn {
@@ -311,21 +236,21 @@
         }
 
         .cyber-btn-primary {
-            background: var(--gradient-winter);
-            color: var(--nord0);
-            border: 2px solid var(--nord8);
+            background: var(--gradient-primary);
+            color: white;
+            border: 2px solid var(--accent-primary);
             font-weight: 700;
         }
 
         .cyber-btn-secondary {
             background: transparent;
-            color: var(--nord8);
-            border: 2px solid var(--nord8);
+            color: var(--accent-primary);
+            border: 2px solid var(--accent-primary);
         }
 
         .cyber-btn-primary:hover {
-            background: var(--gradient-primary);
-            box-shadow: 0 10px 30px rgba(136, 192, 208, 0.4);
+            background: var(--gradient-accent);
+            box-shadow: 0 10px 30px rgba(74, 158, 255, 0.4);
         }
 
         .cyber-btn::before {
@@ -345,12 +270,11 @@
 
         .cyber-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(136, 192, 208, 0.4);
         }
 
         .cyber-btn-secondary:hover {
-            background: rgba(136, 192, 208, 0.1);
-            box-shadow: 0 10px 30px rgba(136, 192, 208, 0.3);
+            background: rgba(74, 158, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(74, 158, 255, 0.3);
         }
 
         .stats-container {
@@ -361,27 +285,27 @@
         }
 
         .stat-card {
-            background: rgba(59, 66, 82, 0.7);
+            background: var(--glass-bg);
             backdrop-filter: blur(15px);
-            border: 2px solid var(--nord8);
+            border: 2px solid var(--accent-primary);
             padding: 2rem;
             border-radius: 20px;
             text-align: center;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
 
         .stat-card:hover {
-            border-color: var(--nord7);
+            border-color: var(--accent-secondary);
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(136, 192, 208, 0.3);
-            background: rgba(67, 76, 94, 0.8);
+            box-shadow: 0 15px 40px rgba(74, 158, 255, 0.3);
+            background: rgba(20, 24, 31, 0.9);
         }
 
         .stat-number {
             font-size: 3rem;
             font-weight: 900;
-            background: var(--gradient-winter);
+            background: var(--gradient-primary);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -404,20 +328,18 @@
             text-align: center;
             margin-bottom: 4rem;
             position: relative;
-            color: var(--nord8);
-            text-shadow: 0 0 20px rgba(136, 192, 208, 0.4);
+            color: var(--accent-primary);
+            text-shadow: 0 0 20px rgba(74, 158, 255, 0.4);
         }
 
         .section-title::after {
-            content: '❄️';
+            content: '';
             display: block;
             width: 100px;
             height: 3px;
-            background: var(--gradient-winter);
+            background: var(--gradient-primary);
             margin: 20px auto;
             border-radius: 2px;
-            font-size: 1.5rem;
-            line-height: 3px;
         }
 
         .feature-grid {
@@ -428,15 +350,15 @@
         }
 
         .feature-card {
-            background: rgba(59, 66, 82, 0.7);
-            border: 2px solid var(--nord3);
+            background: var(--glass-bg);
+            border: 2px solid rgba(74, 158, 255, 0.2);
             border-radius: 20px;
             padding: 2.5rem 2rem;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
             backdrop-filter: blur(10px);
-            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .feature-card::before {
@@ -446,7 +368,7 @@
             left: 0;
             width: 5px;
             height: 100%;
-            background: var(--gradient-winter);
+            background: var(--gradient-primary);
             transform: scaleY(0);
             transition: transform 0.3s ease;
         }
@@ -457,15 +379,15 @@
 
         .feature-card:hover {
             transform: translateY(-10px);
-            border-color: var(--nord8);
-            box-shadow: 0 20px 50px rgba(136, 192, 208, 0.25);
-            background: rgba(67, 76, 94, 0.85);
+            border-color: var(--accent-primary);
+            box-shadow: 0 20px 50px rgba(74, 158, 255, 0.25);
+            background: rgba(20, 24, 31, 0.9);
         }
 
         .feature-icon {
             font-size: 2.5rem;
             margin-bottom: 1.5rem;
-            background: var(--gradient-winter);
+            background: var(--gradient-primary);
             background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -474,157 +396,58 @@
         .feature-title {
             font-size: 1.5rem;
             margin-bottom: 1rem;
-            color: var(--nord8);
+            color: var(--accent-primary);
             font-family: 'Rajdhani', sans-serif;
             font-weight: 700;
         }
 
-                /* Timeline Styles */
-                .timeline {
-            position: relative;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px 0;
-        }
-        
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: linear-gradient(to bottom, #00ff41, #00ccff);
-            transform: translateX(-50%);
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 30px;
-            width: 50%;
-        }
-        
-        .timeline-item:nth-child(odd) {
-            left: 0;
-            padding-right: 60px;
-            text-align: right;
-        }
-        
-        .timeline-item:nth-child(even) {
-            left: 50%;
-            padding-left: 60px;
-            text-align: left;
-        }
-        
-        .timeline-date {
-            background: linear-gradient(90deg, #00ff41, #00ccff);
-            color: #000;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-        
-        .timeline-content {
-            transition: all 0.3s ease;
-        }
-        
-        .timeline-content:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* Video Hover Effect */
-        .video-thumbnail:hover .play-button {
-            transform: scale(1.1);
-        }
-        
-        .play-button {
-            transition: all 0.3s ease;
-        }
-        
-        /* Cyber Button */
-        .cyber-btn {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            border: none;
-            color: white;
-            padding: 15px 40px;
-            border-radius: 10px;
-            font-weight: bold;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .cyber-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-        
-        .cyber-btn:hover::before {
-            left: 100%;
-        }
-        
-        .cyber-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.3);
-        }
-
         .command-block {
-            background: rgba(59, 66, 82, 0.8);
-            border: 2px solid var(--nord8);
+            background: rgba(10, 12, 16, 0.8);
+            border: 2px solid var(--accent-primary);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
         
         .command-header {
-            background: rgba(67, 76, 94, 0.6);
+            background: rgba(20, 24, 31, 0.6);
             padding: 12px 20px;
-            border-bottom: 2px solid var(--nord8);
+            border-bottom: 2px solid var(--accent-primary);
         }
         
         .command-content {
             padding: 20px;
-            background: var(--nord0);
+            background: var(--darker-bg);
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.95rem;
             overflow-x: auto;
         }
         
         .command-content code {
-            color: var(--nord8);
+            color: var(--accent-primary);
             word-break: break-all;
             white-space: pre-wrap;
         }
         
         .copy-command-btn {
-            border-color: var(--nord8);
-            color: var(--nord8);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
             transition: all 0.3s ease;
             padding: 5px 15px;
         }
         
         .copy-command-btn:hover {
-            background: var(--nord8);
-            color: var(--nord0);
+            background: var(--accent-primary);
+            color: var(--darker-bg);
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(136, 192, 208, 0.3);
+            box-shadow: 0 5px 15px rgba(74, 158, 255, 0.3);
         }
         
         .install-steps {
-            background: rgba(20, 20, 30, 0.5);
+            background: rgba(10, 12, 16, 0.5);
             border-radius: 15px;
             padding: 25px;
-            border: 1px solid rgba(0, 255, 65, 0.1);
+            border: 1px solid rgba(74, 158, 255, 0.2);
         }
         
         .step-card {
@@ -633,7 +456,7 @@
         
         .step-icon {
             font-size: 2.5rem;
-            color: var(--neon-blue);
+            color: var(--accent-primary);
             margin-bottom: 15px;
         }
         
@@ -643,103 +466,120 @@
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
         }
-        
-        .alternative-download {
-            padding-top: 20px;
-            border-top: 1px solid rgba(0, 255, 65, 0.1);
-        }
-        
-        /* Responsive Timeline */
-        @media (max-width: 768px) {
-            .timeline::before {
-                left: 30px;
-            }
-            
-            .timeline-item {
-                width: 100%;
-                left: 0 !important;
-                padding-left: 80px !important;
-                padding-right: 0 !important;
-                text-align: left !important;
-            }
-            
-            .timeline-date {
-                position: absolute;
-                left: 0;
-                transform: translateX(-50%);
-                margin-left: 30px;
-            }
+
+        .app-grid-demo {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
         }
 
-        @keyframes shine {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        .app-card-demo {
+            background: rgba(20, 24, 31, 0.8);
+            border: 2px solid var(--accent-primary);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            position: relative;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s ease;
         }
 
-        .new-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--gradient-accent);
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
+        .app-card-demo:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(74, 158, 255, 0.3);
+            border-color: var(--accent-secondary);
+        }
+
+        .app-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: var(--accent-primary);
+        }
+
+        .app-name {
             font-weight: 700;
-            text-transform: uppercase;
             font-size: 0.9rem;
-            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .app-category {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .app-extension {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+        }
+
+        .app-actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        .app-delete {
+            color: var(--danger);
+            cursor: default;
+        }
+
+        .app-restore {
+            color: var(--success);
+            cursor: default;
         }
 
         .security-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
 
         .security-card {
-            background: rgba(59, 66, 82, 0.7);
-            border: 2px solid var(--nord8);
+            background: var(--glass-bg);
+            border: 2px solid var(--accent-primary);
             border-radius: 15px;
-            padding: 2rem;
+            padding: 1.5rem;
             text-align: center;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.4);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .security-card:hover {
-            border-color: var(--nord7);
+            border-color: var(--accent-secondary);
             transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(136, 192, 208, 0.3);
+            box-shadow: 0 15px 40px rgba(74, 158, 255, 0.3);
         }
 
         .security-icon {
-            font-size: 3rem;
-            color: var(--nord8);
+            font-size: 2.5rem;
+            color: var(--accent-primary);
             margin-bottom: 1rem;
         }
 
         .download-card {
-            background: rgba(59, 66, 82, 0.85);
-            border: 3px solid var(--nord8);
+            background: var(--glass-bg);
+            border: 3px solid var(--accent-primary);
             border-radius: 25px;
             padding: 4rem;
             text-align: center;
             position: relative;
             overflow: hidden;
             backdrop-filter: blur(15px);
-            box-shadow: 0 15px 50px rgba(46, 52, 64, 0.6);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.6);
         }
 
         .download-card::before {
-            content: '❄️';
+            content: '⚡';
             position: absolute;
             top: 20px;
             right: 20px;
             font-size: 3rem;
-            opacity: 0.2;
-            animation: float 6s ease-in-out infinite;
+            opacity: 0.1;
         }
 
         .download-steps {
@@ -749,16 +589,11 @@
             margin: 3rem 0;
         }
 
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
         .step-number {
             width: 60px;
             height: 60px;
-            background: var(--gradient-winter);
-            color: var(--nord0);
+            background: var(--gradient-primary);
+            color: white;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -767,16 +602,16 @@
             font-weight: 900;
             margin: 0 auto 1rem;
             font-family: 'Orbitron', sans-serif;
-            border: 2px solid var(--nord8);
-            box-shadow: 0 5px 20px rgba(136, 192, 208, 0.3);
+            border: 2px solid var(--accent-primary);
+            box-shadow: 0 5px 20px rgba(74, 158, 255, 0.3);
         }
 
         .footer {
-            background: var(--nord0);
+            background: var(--darker-bg);
             padding: 4rem 0 2rem;
-            border-top: 3px solid var(--nord8);
+            border-top: 3px solid var(--accent-primary);
             margin-top: 4rem;
-            box-shadow: 0 -5px 30px rgba(46, 52, 64, 0.5);
+            box-shadow: 0 -5px 30px rgba(0, 0, 0, 0.5);
         }
 
         .social-links {
@@ -789,101 +624,48 @@
         .social-link {
             width: 50px;
             height: 50px;
-            border: 2px solid var(--nord8);
+            border: 2px solid var(--accent-primary);
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--nord8);
+            color: var(--accent-primary);
             text-decoration: none;
             transition: all 0.3s ease;
-            background: rgba(136, 192, 208, 0.1);
+            background: rgba(74, 158, 255, 0.1);
         }
 
         .social-link:hover {
-            color: var(--nord0);
-            background: var(--nord8);
-            border-color: var(--nord7);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(136, 192, 208, 0.4);
-        }
-
-        .announcement-banner {
-            background: linear-gradient(90deg, #9d00ff, #ff0088);
             color: white;
-            padding: 15px 0;
-            text-align: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            position: relative;
-            overflow: hidden;
-            margin-top: 80px;
+            background: var(--accent-primary);
+            border-color: var(--accent-secondary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 158, 255, 0.4);
         }
 
-        .announcement-banner::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: slide 3s infinite;
+        .testimonial-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--accent-primary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
-        @keyframes slide {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .mega-update-section {
-            background: linear-gradient(135deg, var(--nord0), var(--nord1));
-            border: 3px solid var(--nord8);
-            border-radius: 25px;
-            padding: 3rem;
-            margin: 3rem 0;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 15px 50px rgba(46, 52, 64, 0.6);
-        }
-
-        .mega-update-section::before {
-            content: '❄️';
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 4rem;
-            opacity: 0.15;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .update-feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .update-feature-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .update-feature-list li:last-child {
-            border-bottom: none;
-        }
-
-        .update-feature-list li::before {
-            content: '✓';
-            color: #00ff41;
-            font-weight: bold;
-            margin-right: 10px;
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-secondary);
+            box-shadow: 0 15px 40px rgba(74, 158, 255, 0.3);
         }
 
         .donation-section {
-            background: rgba(0, 40, 20, 0.7);
+            background: rgba(74, 158, 255, 0.05);
             border-radius: 15px;
             padding: 2rem;
             margin: 2rem 0;
-            border-left: 5px solid #00ff41;
+            border-left: 5px solid var(--accent-primary);
         }
 
         .donation-links {
@@ -894,107 +676,28 @@
         }
 
         .donation-link {
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid #00ff41;
+            background: rgba(74, 158, 255, 0.1);
+            border: 1px solid var(--accent-primary);
             padding: 10px 20px;
             border-radius: 8px;
-            color: #00ff41;
+            color: var(--accent-primary);
             text-decoration: none;
             transition: all 0.3s;
         }
 
         .donation-link:hover {
-            background: #00ff41;
-            color: #000;
+            background: var(--accent-primary);
+            color: white;
         }
 
-        .security-explanation {
-            background: rgba(20, 0, 40, 0.7);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 5px solid #00ccff;
-        }
-
-        .contribute-section {
-            background: rgba(40, 20, 0, 0.7);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 5px solid #ff9900;
-        }
-
-        .testimonials-section {
-            background: linear-gradient(135deg, #001a1a, #003333);
-            border-radius: 20px;
-            padding: 3rem;
-            margin: 3rem 0;
-            border: 2px solid var(--neon-blue);
-        }
-
-        .testimonial-card {
-            background: rgba(59, 66, 82, 0.7);
-            border: 2px solid var(--nord8);
-            border-radius: 20px;
-            padding: 2rem;
-            margin: 1rem 0;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 25px rgba(46, 52, 64, 0.4);
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--nord7);
-            box-shadow: 0 15px 40px rgba(136, 192, 208, 0.3);
-        }
-
-        .contributors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin: 2rem 0;
-        }
-
-        .contributor-card {
-            background: rgba(20, 20, 40, 0.7);
-            border: 1px solid rgba(157, 0, 255, 0.3);
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .contributor-card:hover {
-            border-color: var(--neon-purple);
-            transform: translateY(-3px);
-        }
-
-        .contributor-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-            color: var(--neon-purple);
-        }
-
-        .special-thanks {
-            background: linear-gradient(135deg, #1a001a, #330033);
-            border-radius: 15px;
-            padding: 2rem;
-            margin: 2rem 0;
-            border-left: 5px solid #ff0088;
-        }
-
-        .quality-feedback-section {
-            margin-bottom: 3rem;
-        }
-        
         .feedback-card {
-            background: rgba(20, 10, 30, 0.7);
-            border: 2px solid var(--neon-purple);
+            background: rgba(74, 158, 255, 0.05);
+            border: 2px solid var(--accent-primary);
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(157, 0, 255, 0.1);
+            padding: 2rem;
+            margin: 2rem 0;
         }
-        
+
         .contact-methods .btn {
             transition: all 0.3s ease;
             border-width: 2px;
@@ -1002,7 +705,7 @@
         
         .contact-methods .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 255, 65, 0.2);
+            box-shadow: 0 5px 15px rgba(74, 158, 255, 0.2);
         }
 
         @media (max-width: 768px) {
@@ -1024,109 +727,15 @@
                 grid-template-columns: 1fr;
             }
             
-            .contributors-grid {
+            .app-grid-demo {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-        }
-
-        .floating {
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        .glitch {
-            position: relative;
-            animation: glitch 5s infinite;
-        }
-
-        /* Nord Color Overrides for Bootstrap */
-        .text-success {
-            color: var(--nord14) !important;
-        }
-
-        .text-info {
-            color: var(--nord8) !important;
-        }
-
-        .text-primary {
-            color: var(--nord10) !important;
-        }
-
-        .text-warning {
-            color: var(--nord13) !important;
-        }
-
-        .text-danger {
-            color: var(--nord11) !important;
-        }
-
-        .border-success {
-            border-color: var(--nord14) !important;
-        }
-
-        .border-info {
-            border-color: var(--nord8) !important;
-        }
-
-        .border-primary {
-            border-color: var(--nord10) !important;
-        }
-
-        .border-warning {
-            border-color: var(--nord13) !important;
-        }
-
-        .bg-success {
-            background-color: var(--nord14) !important;
-        }
-
-        .bg-info {
-            background-color: var(--nord8) !important;
-        }
-
-        .bg-primary {
-            background-color: var(--nord10) !important;
-        }
-
-        .bg-warning {
-            background-color: var(--nord13) !important;
-        }
-
-        /* Winter decorations */
-        .winter-decoration {
-            position: absolute;
-            font-size: 2rem;
-            opacity: 0.3;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .winter-decoration:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
-        .winter-decoration:nth-child(2) { top: 20%; right: 10%; animation-delay: 1s; }
-        .winter-decoration:nth-child(3) { bottom: 30%; left: 15%; animation-delay: 2s; }
-        .winter-decoration:nth-child(4) { bottom: 20%; right: 5%; animation-delay: 1.5s; }
     </style>
 </head>
 <body>
     <!-- Background Elements -->
-    <div class="nord-grid-bg"></div>
-    <div class="snowflakes" id="snowflakes"></div>
-    <div class="winter-decoration">❄️</div>
-    <div class="winter-decoration">❄</div>
-    <div class="winter-decoration">❄️</div>
-    <div class="winter-decoration">❄</div>
+    <div class="grid-bg"></div>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg">
@@ -1146,9 +755,6 @@
                         <a class="nav-link" href="#features">ФИЧИ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="doc.html">ДОКУМЕНТАЦИЯ</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="#security">БЕЗОПАСНОСТЬ</a>
                     </li>
                     <li class="nav-item">
@@ -1156,9 +762,6 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#testimonials">ОТЗЫВЫ</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contribute">ВКЛАД</a>
                     </li>
                 </ul>
             </div>
@@ -1170,30 +773,30 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-6 hero-content">
-                    <span class="hero-badge">🎉 НОВОГОДНИЙ РЕЛИЗ 2026</span>
-                    <h1 class="main-title glitch">EXTREME TWEAKER LITE 0.3.7.3</h1>
+                    <span class="hero-badge">🎯 РЕЛИЗ 3.7.3.5 FREE</span>
+                    <h1 class="main-title">EXTREME TWEAKER 3.7.3.5</h1>
                     <div class="version-highlight">
-                        <i class="fas fa-gem me-2"></i>НОВЫЙ РЕЛИЗ • ТЕМА SAPPHIRE • РЕЖИМ SAPPHIRE • ОБНОВЛЕННАЯ МИНИМАЛИСТИЧНАЯ ВКЛАДКА
+                        <i class="fas fa-gem me-2"></i>НОВЫЙ РЕЛИЗ • PRO-УВЕДОМЛЕНИЯ • SAPPHIRE ТЕМА • УМНЫЕ КОНФИГИ
                     </div>
                     <p class="subtitle">
-                        🚀 Мощный релиз с новой темой Sapphire, новым режимом отображения чекбоксов и обновленной минималистичной вкладкой!
+                        🚀 Мощный релиз с новой системой Pro-уведомлений, темой Sapphire, умными именами конфигов и обновленной вкладкой оптимизации!
                     </p>
                     
                     <div class="d-flex gap-3 flex-wrap mb-4">
                         <a href="#download" class="cyber-btn cyber-btn-primary">
-                            <i class="fas fa-download me-2"></i>СКАЧАТЬ 0.3.7.3
+                            <i class="fas fa-download me-2"></i>СКАЧАТЬ 3.7.3.5
                         </a>
-                        <a href="doc.html" class="cyber-btn cyber-btn-secondary">
-                            <i class="fas fa-book me-2"></i>ДОКУМЕНТАЦИЯ
+                        <a href="https://github.com/anton18-png/Extreme" class="cyber-btn cyber-btn-secondary" target="_blank">
+                            <i class="fab fa-github me-2"></i>GITHUB
                         </a>
                     </div>
 
                     <div class="stats-container">
-                        <div class="stat-card floating">
+                        <div class="stat-card">
                             <div class="stat-number">+80к</div>
                             <div class="stat-label">ЗАГРУЗОК</div>
                         </div>
-                        <div class="stat-card floating" style="animation-delay: 0.2s;">
+                        <div class="stat-card">
                             <div class="stat-number">+1000</div>
                             <div class="stat-label">ТВИКОВ</div>
                         </div>
@@ -1202,163 +805,120 @@
                 <div class="col-lg-6 text-center">
                     <div class="position-relative" style="height: 500px;">
                         <!-- Animated terminal window -->
-                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark rounded-3 border border-success p-4">
+                        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark rounded-3 border border-info p-4">
                             <div class="d-flex align-items-center mb-3">
                                 <div class="d-flex gap-2">
                                     <div class="rounded-circle bg-danger" style="width: 12px; height: 12px;"></div>
                                     <div class="rounded-circle bg-warning" style="width: 12px; height: 12px;"></div>
                                     <div class="rounded-circle bg-success" style="width: 12px; height: 12px;"></div>
                                 </div>
-                                <div class="ms-3 text-info">❯ WinterWizard.exe</div>
+                                <div class="ms-3 text-info">❯ ExtremeTweaker.exe</div>
                             </div>
                             <div class="text-start">
-                                <div class="text-info mb-2">💎 Запуск Extreme Tweaker 0.3.7.3...</div>
-                                <div class="text-info mb-2">✓ Загрузка новой темы Sapphire</div>
-                                <div class="text-success mb-2">✓ Проверка безопасности: 8/70 детектов</div>
+                                <div class="text-info mb-2">⚡ Запуск Extreme Tweaker 3.7.3.5...</div>
+                                <div class="text-info mb-2">✓ Загрузка темы Sapphire</div>
+                                <div class="text-success mb-2">✓ Проверка безопасности: 2/72 детектов</div>
                                 <div class="text-success mb-2">✓ Инициализация 1000+ твиков</div>
-                                <div class="text-success mb-2">✓ Новый режим отображения: Sapphire (2 столбца)</div>
-                                <div class="text-success mb-2">✓ Обновлена минималистичная вкладка</div>
-                                <div class="text-success mb-2">✓ Режим "Anton" переименован в "BoosterX"</div>
-                                <div class="text-info mb-2">✓ Улучшена документация</div>
-                                <div class="text-warning mt-4 blink">Готов к оптимизации... 🚀</div>
+                                <div class="text-success mb-2">✓ Новый режим отображения: Sapphire</div>
+                                <div class="text-success mb-2">✓ Pro-уведомления активированы</div>
+                                <div class="text-success mb-2">✓ Умные имена конфигов</div>
+                                <div class="text-warning mt-4">Готов к оптимизации... 🚀</div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Mega Update Announcement -->
-            <div class="mega-update-section mt-5">
-                <h2 class="text-center mb-4" style="color: var(--nord8);">💎 НОВЫЙ РЕЛИЗ 0.3.7.3!</h2>
-                <p class="text-center mb-4"><strong>🚀 Мощный релиз</strong> с новой темой Sapphire, новым режимом отображения и обновленной минималистичной вкладкой!</p>
-                
-                <div class="text-center mb-4">
-                    <img src="https://github.com/user-attachments/assets/475e6a38-548c-4b31-86f8-c3a39f259209" alt="Winter Wizard Banner" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                </div>
-                
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h4 class="text-info mb-3">📦 РАЗМЕР УСТАНОВЩИКА - НОВЫЙ РЕКОРД!</h4>
-                        <div class="alert alert-dark border-info mb-3">
-                            <h5 class="text-info">⚡ ОНЛАЙН-УСТАНОВЩИК:</h5>
-                            <p class="mb-0"><strong>ВЕС: < 1 МБ (< 800 КБ)</strong> - ЛЕГЧЕ ЧЕМ ЛЮБАЯ ФОТОГРАФИЯ! ❄️</p>
-                        </div>
-                        <div class="alert alert-dark border-success">
-                            <h5 class="text-success">💾 OFFLINE-УСТАНОВЩИК:</h5>
-                            <p class="mb-0"><strong>ВЕС: ~30 МБ</strong> (полная автономная установка)</p>
-                        </div>
-                        <p class="mt-3">Онлайн-установщик теперь такой же легкий, как снежинка! ❄️</p>
-                        <h5 class="text-success mt-3 mb-2">🎨 НОВЫЙ ИНТЕРФЕЙС УСТАНОВЩИКА</h5>
-                        <ul class="update-feature-list">
-                            <li>✅ Красивые анимированные надписи на прозрачно-синем фоне</li>
-                            <li>✅ Плавные переходы между этапами установки</li>
-                            <li>✅ Информативные статусы</li>
-                        </ul>
-                        <div class="row mt-3">
-                            <div class="col-md-4 mb-2">
-                                <img src="https://github.com/user-attachments/assets/3923709d-a970-47bd-b61e-a7db4ae86e56" alt="Установщик 1" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <img src="https://github.com/user-attachments/assets/6032c598-f765-4524-995b-b3b08f1cd36a" alt="Установщик 2" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <img src="https://github.com/user-attachments/assets/5bd09d03-e7b2-4a75-9665-36dc6bc68f95" alt="Установщик 3" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h4 class="text-info mb-3">🛡️ БЕЗОПАСНОСТЬ</h4>
-                        <div class="alert alert-dark border-success mb-3">
-                            <h5 class="text-success mb-3">✅ ПРОВЕРЕННЫЕ АНТИВИРУСЫ:</h5>
-                            <ul class="mb-0">
-                                <li><strong>Kaspersky</strong> - CLEAN</li>
-                                <li><strong>Malwarebytes</strong> - CLEAN</li>
-                                <li><strong>Windows Defender</strong> - CLEAN</li>
-                                <li><strong>Avast</strong> - CLEAN</li>
-                                <li><strong>Dr.Web</strong> - CLEAN</li>
-                                <li><strong>McAfee</strong> - CLEAN</li>
-                            </ul>
-                        </div>
-                        <div class="alert alert-dark border-warning">
-                            <h5 class="text-warning mb-2">📊 VirusTotal результат:</h5>
-                            <p class="mb-2"><strong>8/70 детектов</strong> (остались только 8 noname антивируса)</p>
-                            <div class="text-center mb-2">
-                                <img src="https://github.com/user-attachments/assets/271eb047-b691-4eef-9504-ad7445840b1e" alt="VirusTotal результат" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                            </div>
-                            <a href="https://www.virustotal.com/gui/file/23e8dc0d684837994f5181be0e98c7d9b08a31f31f37a916ecc4c3d2beff9ac9?nocache=1" target="_blank" class="btn btn-sm btn-outline-info mt-2">Полный отчет</a>
-                        </div>
-                    </div>
-                </div>
+            <!-- Main Update Section -->
+            <div class="mt-5 p-4 border border-info rounded-3" style="background: rgba(74, 158, 255, 0.05);">
+                <h2 class="text-center mb-4" style="color: var(--accent-primary);">🎯 ЧТО НОВОГО В 3.7.3.5 FREE?</h2>
                 
                 <div class="row">
-                    <div class="col-md-12">
-                        <h4 class="text-info text-center mb-4">🎯 ЧТО НОВОГО В 0.3.7.3?</h4>
-                    </div>
                     <div class="col-md-6">
-                        <h5 class="text-success mt-3 mb-2">💎 НОВАЯ ТЕМА SAPPHIRE</h5>
-                        <p>Добавлена новая тема оформления с фиолетовыми оттенками и темным фоном!</p>
-                        <ul class="update-feature-list">
-                            <li>💎 <strong>Новая тема Sapphire</strong> - красивая фиолетовая тема с темным фоном</li>
-                            <li>📐 <strong>Новый режим отображения Sapphire</strong> - чекбоксы в два столбца с раскрывающимся описанием</li>
-                            <li>🔄 <strong>Переименование режимов</strong> - режим "Anton" переименован в "BoosterX"</li>
-                            <li>🗑️ <strong>Удален старый режим</strong> - старый режим "BoosterX" (wide) удален</li>
+                        <h5 class="text-info mb-3">🔔 PRO-УВЕДОМЛЕНИЯ</h5>
+                        <ul class="update-feature-list list-unstyled">
+                            <li class="mb-2"><span class="text-success">✓</span> При попытке запуска Pro-конфигов появляется информативное окно</li>
+                            <li class="mb-2"><span class="text-success">✓</span> Кнопка с прямой ссылкой на Telegram для покупки</li>
+                            <li class="mb-2"><span class="text-success">✓</span> Больше никаких "почему не работают конфиги" в поддержку</li>
                         </ul>
-                        <div class="alert alert-info mt-3">
-                            <strong>💡 Совет:</strong> Попробуйте новую тему Sapphire в Настройки → Внешний вид → Тема оформления
-                        </div>
+                        
+                        <h5 class="text-info mt-4 mb-3">📝 УМНЫЕ ИМЕНА КОНФИГОВ</h5>
+                        <ul class="update-feature-list list-unstyled">
+                            <li class="mb-2"><span class="text-success">✓</span> В имя конфига добавляется имя пользователя</li>
+                            <li class="mb-2"><span class="text-success">✓</span> <code>Config_2024.bat</code> → <code>john_Config_2024.bat</code></li>
+                            <li class="mb-2"><span class="text-success">✓</span> Автоматическая очистка от недопустимых символов</li>
+                        </ul>
                     </div>
+                    
                     <div class="col-md-6">
-                        <h5 class="text-success mt-3 mb-2">📱 ОБНОВЛЕННАЯ МИНИМАЛИСТИЧНАЯ ВКЛАДКА</h5>
-                        <p>Минималистичная вкладка теперь с полноценными вкладками и чекбоксами!</p>
-                        <ul class="update-feature-list">
-                            <li>📱 <strong>Полноценные вкладки</strong> - теперь в минималистичной вкладке доступны все функции</li>
-                            <li>📋 <strong>Специальный набор твиков</strong> - Отключение телеметрии, Игровые настройки, Экстремальная оптимизация</li>
-                            <li>🔧 <strong>Драйверы и остальное</strong> - настройки драйверов и компонентов системы</li>
-                            <li>🧹 <strong>Очистка</strong> - инструменты очистки системы</li>
-                            <li>⚡ <strong>Электропитание</strong> - схемы электропитания для оптимизации</li>
-                            <li>📝 <strong>Улучшена документация</strong> - добавлены подробные описания всех тем и настроек</li>
+                        <h5 class="text-info mb-3">💎 НОВАЯ ТЕМА SAPPHIRE</h5>
+                        <ul class="update-feature-list list-unstyled">
+                            <li class="mb-2"><span class="text-success">✓</span> Красивая фиолетовая тема с темным фоном</li>
+                            <li class="mb-2"><span class="text-success">✓</span> Режим отображения Sapphire (2 столбца с раскрывающимся описанием)</li>
+                            <li class="mb-2"><span class="text-success">✓</span> Режим "Anton" переименован в "BoosterX"</li>
+                        </ul>
+                        
+                        <h5 class="text-info mt-4 mb-3">📱 НОВЫЕ ВКЛАДКИ</h5>
+                        <ul class="update-feature-list list-unstyled">
+                            <li class="mb-2"><span class="text-success">✓</span> <strong>optimization_tab.py</strong> — вкладка в стиле SapphireTool (NVIDIA/AMD/Intel/DirectX/OpenGL)</li>
+                            <li class="mb-2"><span class="text-success">✓</span> <strong>app_uninstaller.py</strong> — вкладка удаления приложений с квадратными карточками</li>
+                            <li class="mb-2"><span class="text-success">✓</span> Категории: Microsoft, UWP, Defender, Xbox, Браузеры, Остальное</li>
                         </ul>
                     </div>
                 </div>
 
-                <br><br>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <h4 class="text-info">🎯 ЧТО НОВОГО В 0.3.7.1?</h4>
-                        <h5 class="text-success mt-3 mb-2">🧹 НОВЫЙ ТВИК: "ОЧИСТКА ТВИКЕРА"</h5>
-                        <p>Полная переработка системы очистки! Теперь твикер умеет самоочищаться:</p>
-                        <div class="text-center mb-3">
-                            <img src="https://github.com/user-attachments/assets/ea68bdff-7150-442d-9686-812c6f3bc420" alt="Очистка твикера" class="img-fluid rounded" style="max-width: 100%; height: auto;">
-                        </div>
-                        <ul class="update-feature-list">
-                            <li>🗑️ <strong>Удаление временных файлов</strong> - файлы, которые были нужны только во время установки</li>
-                            <li>👻 <strong>Удаление призрачных твиков</strong> - удаление твиков, которых больше нет</li>
-                            <li>🔄 <strong>Сброс до заводских настроек</strong> - полный откат всех настроек твикера</li>
-                        </ul>
-                    </div>
-                    <div class="col-md-6">
-                        <h4 class="text-info">🎯 ЧТО НОВОГО В 0.3.7.2?</h4>
-                        <h5 class="text-success mt-3 mb-2">🔄 СИСТЕМА АВТООБНОВЛЕНИЙ</h5>
-                        <p>Теперь Extreme Tweaker автоматически проверяет и устанавливает обновления!</p>
-                        <ul class="update-feature-list">
-                            <li>🔄 <strong>Автоматическая проверка обновлений</strong> - программа сама проверяет наличие новых версий при запуске</li>
-                            <li>📥 <strong>Автоматическая загрузка</strong> - обновления скачиваются автоматически с GitHub</li>
-                            <li>🔒 <strong>Проверка целостности</strong> - сравнение хэшей файлов для безопасности</li>
-                            <li>⚙️ <strong>Настройка в интерфейсе</strong> - можно включить/выключить автообновление в настройках</li>
-                            <li>🚀 <strong>Бесшовная установка</strong> - обновление устанавливается автоматически с флагом -ppass</li>
-                        </ul>
-                        <div class="alert alert-info mt-3">
-                            <strong>💡 Совет:</strong> Автообновление включено по умолчанию, но вы можете отключить его в Настройки → Дополнительно → Автообновление
-                        </div>
-                    </div>
-                </div>
-                
                 <div class="text-center mt-4">
-                    <p class="text-secondary">🔒 <strong>Пароль при запуске:</strong> <code style="background: rgba(136, 192, 208, 0.2); padding: 5px 10px; border-radius: 5px;">pass</code></p>
-                    <p class="text-secondary mt-2"><strong>📅 Дата релиза:</strong> 05.01.2026</p>
-                    <p class="text-secondary"><strong>💎 Новый релиз с темой Sapphire и улучшенным интерфейсом!</strong></p>
+                    <p class="text-secondary"><strong>📅 Дата релиза:</strong> Март 2026</p>
+                    <p class="text-secondary"><strong>🔒 Пароль при запуске:</strong> <code style="background: rgba(74, 158, 255, 0.2); padding: 5px 10px; border-radius: 5px;">pass</code></p>
                 </div>
+            </div>
+            
+            <!-- App Uninstaller Demo -->
+            <div class="mt-5 p-4 border border-info rounded-3">
+                <h4 class="text-info mb-4 text-center">🗑️ НОВАЯ ВКЛАДКА УДАЛЕНИЯ ПРИЛОЖЕНИЙ</h4>
+                <div class="app-grid-demo">
+                    <div class="app-card-demo">
+                        <div class="app-icon">📊</div>
+                        <div class="app-name">MS Office</div>
+                        <div class="app-category">Microsoft</div>
+                        <div class="app-extension">.bat</div>
+                        <div class="app-actions">
+                            <span class="app-delete">✕</span>
+                            <span class="app-restore">↻</span>
+                        </div>
+                    </div>
+                    <div class="app-card-demo">
+                        <div class="app-icon">☁️</div>
+                        <div class="app-name">OneDrive</div>
+                        <div class="app-category">Microsoft</div>
+                        <div class="app-extension">.ps1</div>
+                        <div class="app-actions">
+                            <span class="app-delete">✕</span>
+                            <span class="app-restore">↻</span>
+                        </div>
+                    </div>
+                    <div class="app-card-demo">
+                        <div class="app-icon">🛡️</div>
+                        <div class="app-name">Defender</div>
+                        <div class="app-category">Defender</div>
+                        <div class="app-extension">.bat</div>
+                        <div class="app-actions">
+                            <span class="app-delete">✕</span>
+                            <span class="app-restore">↻</span>
+                        </div>
+                    </div>
+                    <div class="app-card-demo">
+                        <div class="app-icon">🎮</div>
+                        <div class="app-name">Xbox App</div>
+                        <div class="app-category">Xbox</div>
+                        <div class="app-extension">.bat</div>
+                        <div class="app-actions">
+                            <span class="app-delete">✕</span>
+                            <span class="app-restore">↻</span>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center text-secondary mt-3">Квадратные карточки, 4 в ряд, фильтрация по категориям и поиск</p>
             </div>
         </div>
     </section>
@@ -1371,7 +931,7 @@
             <div class="row align-items-center mb-5">
                 <div class="col-lg-6">
                     <h3 class="mb-4">100% ЧИСТЫЙ КОД</h3>
-                    <p>Extreme Tweaker 0.3.7.3 прошел проверку всеми ведущими антивирусами:</p>
+                    <p>Extreme Tweaker 3.7.3.5 прошел проверку всеми ведущими антивирусами:</p>
                     
                     <div class="security-grid mt-4">
                         <div class="security-card">
@@ -1398,16 +958,16 @@
                 </div>
                 
                 <div class="col-lg-6">
-                    <div class="p-4 border border-success rounded-3 bg-dark">
-                        <h4 class="text-success mb-3"><i class="fas fa-check-circle me-2"></i>РЕЗУЛЬТАТЫ VIRUSTOTAL</h4>
+                    <div class="p-4 border border-info rounded-3 bg-dark">
+                        <h4 class="text-info mb-3"><i class="fas fa-check-circle me-2"></i>РЕЗУЛЬТАТЫ VIRUSTOTAL</h4>
                         <div class="alert alert-dark border-info mb-3">
-                            <h5 class="text-success mb-0">8/70 детектов</h5>
+                            <h5 class="text-success mb-0">2/72 детектов</h5>
                         </div>
-                        <p>Остались только 8 noname антивируса, которые ругаются на всё подряд.</p>
+                        <p>Остались только 2 noname антивируса, которые ругаются на всё подряд.</p>
                         <div class="mt-3">
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Обнаружения:</span>
-                                <span class="text-success"><strong>8/70</strong></span>
+                                <span class="text-success"><strong>2/72</strong></span>
                             </div>
                             <div class="d-flex justify-content-between mb-2">
                                 <span>Касперский:</span>
@@ -1430,346 +990,34 @@
                                 <span class="text-success">CLEAN</span>
                             </div>
                         </div>
-                        <a href="https://www.virustotal.com/gui/file/23e8dc0d684837994f5181be0e98c7d9b08a31f31f37a916ecc4c3d2beff9ac9?nocache=1" class="cyber-btn cyber-btn-secondary mt-4 w-100" target="_blank">
-                            <i class="fas fa-external-link-alt me-2"></i>ПОСМОТРЕТЬ ПОЛНЫЙ ОТЧЕТ
-                        </a>
                     </div>
                 </div>
             </div>
             
-    <!-- Security Explanation -->
-    <div class="security-explanation">
-        <h4 class="text-info mb-3">🛡 ПОЧЕМУ АНТИВИРУСЫ "РУГАЮТСЯ" НА EXTREME TWEAKER?</h4>
-        <p><strong>ПОЛНОЕ РАЗЪЯСНЕНИЕ</strong></p>
-        <p>Друзья, мы видим вопросы о том, почему некоторые системы безопасности отмечают наш твикер. Давайте честно разберёмся, что происходит и почему это НОРМАЛЬНО для такого типа софта!</p>
-        
-        <div class="alert alert-dark border border-warning mt-4">
-            <h5 class="text-warning">🚬 Интересная ситуация с "вирусами" в последнее время</h5>
-            <p class="mb-2">Заметили, как браузеры стали агрессивно блокировать скачивание файлов? Мол, "опасно", "подозрительно", "вирус". Особенно достается твикерам и оптимизаторам.</p>
-            <p class="mb-0">Возьмем, к примеру, наш Extreme Tweaker 🤔 Браузеры нервничают, антивирусы сигналят... А по факту — весь код открыт на GitHub, можно проверить каждую строчку. Но нет, система "знает лучше".</p>
-        </div>
-        
-        <div class="mt-4 p-3 border border-danger rounded-3 bg-dark">
-            <h5 class="text-danger mb-3">💸 ГЛАВНЫЙ "СЕКРЕТ" АНТИВИРУСОВ</h5>
-            <p>А вот главный прикол: <strong>90% этих "обнаружений" — просто потому что у .exe файлов нет цифровой подписи.</strong></p>
-            <p>И угадайте, сколько стоит эта подпись? Правильно, деньги 💸 И не малые — <strong>300-500$ в год!</strong></p>
-            
-            <div class="mt-3 p-3 bg-black rounded">
-                <p class="text-center mb-2"><strong>АБСУРДНАЯ ЛОГИКА:</strong></p>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="text-center p-2 border border-danger rounded">
-                            <h6 class="text-danger">🟥 БЕЗ ПОДПИСИ</h6>
-                            <p class="small mb-1">= "вирус"</p>
-                            <p class="small text-secondary">(даже если это Хауди Хо с открытым кодом)</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="text-center p-2 border border-success rounded">
-                            <h6 class="text-success">🟩 С ПОДПИСЬЮ</h6>
-                            <p class="small mb-1">= "безопасно"</p>
-                            <p class="small text-secondary">(даже если это реальный майнер)</p>
-                        </div>
-                    </div>
-                </div>
+            <!-- Security Explanation -->
+            <div class="mt-4 p-4 border border-warning rounded-3" style="background: rgba(255, 191, 0, 0.05);">
+                <h4 class="text-warning mb-3">🛡 ПОЧЕМУ АНТИВИРУСЫ "РУГАЮТСЯ"?</h4>
+                <p><strong>Краткое объяснение:</strong></p>
+                <ul>
+                    <li><strong>Нет цифровой подписи</strong> — сертификат стоит $300-500 в год</li>
+                    <li><strong>PyInstaller</strong> — стандартный инструмент сборки Python в EXE часто помечается</li>
+                    <li><strong>Глубокие системные изменения</strong> — твикер изменяет реестр и службы</li>
+                </ul>
+                <p class="mt-2">Весь код полностью открыт на GitHub — вы можете проверить каждую строчку!</p>
             </div>
-            
-            <p class="mt-3"><strong>Самое смешное:</strong> если взять реальный вирус и подписать его — многие антивирусы пройдут мимо, мол, "все окей, подпись есть" 😂</p>
         </div>
-        
-        <div class="mt-4 p-3 border border-info rounded-3 bg-dark">
-            <h5 class="text-info mb-3">🎯 ИСТОРИЯ ХАУДИ ХО — ТОЧЬ-В-ТОЧЬ ТАК ЖЕ!</h5>
-            <p>Та же самая ситуация происходит у <strong>Хауди Хо</strong> — одного из самых популярных IT-блогеров в СНГ с <strong>2 млн подписчиков</strong> на YouTube.</p>
-            
-            <p>Его программы тоже блокируют браузеры и антивирусы, хотя:</p>
-            <ul>
-                <li><strong class="text-success">✅ Проекты с открытым исходным кодом</strong></li>
-                <li><strong class="text-success">✅ Миллионы скачиваний</strong></li>
-                <li><strong class="text-success">✅ Репутация проверенного разработчика</strong></li>
-                <li><strong class="text-success">✅ Десятки тысяч положительных отзывов</strong></li>
-            </ul>
-            
-            <p class="mt-3">Но система безопасности Chrome/Firefox/Edge всё равно говорит: <strong>"Опасно! Не качай!"</strong></p>
-        </div>
-        
-        <div class="mt-4 p-4 border border-warning rounded-3" style="background: linear-gradient(135deg, rgba(40, 20, 0, 0.7), rgba(60, 30, 0, 0.5));">
-            <h5 class="text-center text-warning mb-3">🎭 ВЫВОД: ЭТО СИСТЕМНАЯ ПРОБЛЕМА</h5>
-            <p class="text-center">Когда у самого авторитетного IT-специалиста в русскоязычном сегменте такие же проблемы с блокировками — это говорит не о качестве ПО, а о системной проблеме.</p>
-            <h4 class="text-center mt-3" style="color: #ff6600;">
-                Антивирусы и браузеры превратились в "проверку кошелька":<br>
-                есть деньги на сертификат — ты безопасен, нет денег — ты вирус.
-            </h4>
-            <p class="text-center mt-3"><strong>Всё просто. 💰</strong></p>
-        </div>
-    
-        <h5 class="text-warning mt-5">🤔 ПОЧЕМУ БРАУЗЕРЫ И АНТИВИРУСЫ НЕ ДОВЕРЯЮТ?</h5>
-        <ul>
-            <li><strong>НЕТ СЕРТИФИКАТА</strong> — Мы не можем позволить дорогостоящий EV-сертификат</li>
-            <li><strong>МАЛО СКАЧИВАНИЙ</strong> — Новый софт без репутации автоматически вызывает подозрения</li>
-            <li><strong>PYINSTALLER</strong> — Используем стандартный инструмент сборки Python в EXE</li>
-        </ul>
-        
-        <h5 class="text-warning mt-3">🔧 ЧТО НА САМОМ ДЕЛЕ ДЕЛАЕТ EXTREME TWEAKER?</h5>
-        <p>Давайте посмотрим на результаты анализа песочницы:</p>
-        <ul>
-            <li><strong>ФАЙЛОВЫЕ ОПЕРАЦИИ:</strong> Работает в C:\Apps\Extreme\, создает BAT-файлы, удаляет временные файлы Microsoft</li>
-            <li><strong>РЕЕСТР И СИСТЕМА:</strong> Модифицирует настройки реестра для оптимизации</li>
-            <li><strong>ПРОЦЕССЫ:</strong> Запускает cmd.exe для выполнения скриптов, останавливает ненужные процессы</li>
-        </ul>
-        
-        <h5 class="text-warning mt-3">📊 ЧТО ПОКАЗЫВАЮТ РЕЗУЛЬТАТЫ АНАЛИЗА?</h5>
-        <p>Вот краткий разбор:</p>
-        <ul>
-            <li><strong>3 обнаружения из 72 антивирусов</strong> — отличный результат!</li>
-            <li><strong>Большинство систем (CAPE, VirusTotal)</strong> — 0 угроз</li>
-            <li><strong>Zenbox отмечает как "троян"</strong> — ЛОЖНОЕ СРАБАТЫВАНИЕ из-за:
-                <ul>
-                    <li>Удаления файлов Microsoft</li>
-                    <li>Остановки служб</li>
-                    <li>Работы с реестром</li>
-                </ul>
-            </li>
-        </ul>
-        
-        <h5 class="text-warning mt-3">🛠 MITRE ATT&CK ТЕХНИКИ (ЭТО НЕ ВРЕДОНОСНО!)</h5>
-        <p>Вот почему системы безопасности могут помечать наш софт:</p>
-        <ul>
-            <li><strong>Т1059</strong> — Исполнение скриптов (наши BAT-файлы)</li>
-            <li><strong>Т1064</strong> — Скриптинг (оптимизация)</li>
-            <li><strong>Т1070</strong> — Удаление индикаторов (очистка логов)</li>
-            <li><strong>Т1548</strong> — Повышение привилегий (запуск от админа)</li>
-        </ul>
-        
-        <div class="mt-4 p-3 border border-success rounded-3 bg-dark">
-            <h5 class="text-success mb-3">💡 ВАЖНО ПОНИМАТЬ:</h5>
-            <p>Extreme Tweaker делает ТОЧНО ТО, для чего создан:</p>
-            <ul class="mb-0">
-                <li><strong class="text-success">✅ Удаляет телеметрию и шпионские модули Microsoft</strong></li>
-                <li><strong class="text-success">✅ Оптимизирует реестр и системные настройки</strong></li>
-                <li><strong class="text-success">✅ Останавливает ненужные службы</strong></li>
-                <li><strong class="text-success">✅ Очищает временные файлы</strong></li>
-                <li><strong class="text-success">✅ Настраивает Windows под максимальную производительность</strong></li>
-            </ul>
-        </div>
-        
-        <div class="alert alert-dark border border-info mt-4">
-            <h6 class="text-info">🎯 НАША ПОЗИЦИЯ:</h6>
-            <p class="mb-2">Мы <strong>НЕ</strong> готовы жертвовать функциональностью ради "спокойствия" антивирусов. Чтобы убрать все ложные срабатывания, нам придется:</p>
-            <ol class="mb-2">
-                <li>Убрать 50% функций твикера</li>
-                <li>Отказаться от глубокой оптимизации</li>
-                <li>Перестать работать с реестром</li>
-                <li>Не трогать службы Microsoft</li>
-            </ol>
-            <p class="mb-0">Ложные срабатывания — это цена за глубокую оптимизацию Windows! Мы работаем честно и открыто — каждая функция имеет свою цель и объяснение.</p>
-        </div>
-        
-        <div class="mt-4 p-3 border border-warning rounded-3">
-            <h5 class="text-warning mb-3">📞 ВАШИ ДЕЙСТВИЯ:</h5>
-            <ol>
-                <li><strong>Добавьте в исключения антивируса</strong> — это безопасно и необходимо для работы всех функций</li>
-                <li><strong>Проверьте сами на VirusTotal</strong> — смотрите вкладку "Поведение" для полной картины</li>
-                <li><strong>Используйте точку восстановления</strong> — стандартная практика перед любыми системными изменениями</li>
-            </ol>
-                            <p class="mb-0 text-center">
-                        <a href="https://www.virustotal.com/gui/file/23e8dc0d684837994f5181be0e98c7d9b08a31f31f37a916ecc4c3d2beff9ac9?nocache=1" 
-                   class="cyber-btn cyber-btn-secondary mt-2" target="_blank">
-                    <i class="fas fa-shield-alt me-2"></i>ПОСМОТРЕТЬ ПОЛНЫЙ ОТЧЕТ VIRUSTOTAL
-                </a>
-            </p>
-        </div>
-    </div>
-    
-    <!-- System Requirements Section -->
-    <div class="mt-5 p-4 border border-warning rounded-3" style="background: rgba(40, 20, 0, 0.3);">
-        <h4 class="text-warning mb-3">⚠️ РЕКОМЕНДУЕМЫЕ ТРЕБОВАНИЯ ДЛЯ ОПТИМАЛЬНОЙ РАБОТЫ</h4>
-        <h5 class="text-warning mb-3">ВАЖНО: Требования к системе безопасности</h5>
-        <p>Для корректной работы Extreme Tweaker <strong>настоятельно рекомендуется</strong> использовать специальные сборки Windows, где:</p>
-        
-        <ol>
-            <li><strong>Windows Defender отключен или удален</strong>
-                <ul>
-                    <li>Defender может блокировать выполнение скриптов</li>
-                    <li>Может конфликтовать с твиками, которые отключают телеметрию</li>
-                    <li>Может помечать программу как подозрительную</li>
-                </ul>
-            </li>
-            <li><strong>SmartScreen отключен</strong>
-                <ul>
-                    <li>SmartScreen может блокировать запуск программы</li>
-                    <li>Может мешать применению твиков</li>
-                    <li>Рекомендуется отключить как в системе, так и в браузере</li>
-                </ul>
-            </li>
-            <li><strong>Антивирус отключен или добавлен в исключения</strong>
-                <ul>
-                    <li>Многие антивирусы могут блокировать системные изменения</li>
-                    <li>Рекомендуется добавить папку с программой в исключения</li>
-                </ul>
-            </li>
-            <li><strong>Рекомендуемые сборки Windows:</strong>
-                <ul>
-                    <li>ReviOS</li>
-                    <li>AtlasOS</li>
-                    <li>MakuOS</li>
-                    <li>SapphireOS</li>
-                    <li>И другие оптимизированные сборки с отключенным Defender</li>
-                </ul>
-            </li>
-        </ol>
+    </section>
 
-        <div class="alert alert-dark border border-warning mt-3">
-            <h6 class="text-warning">Почему это важно:</h6>
-            <ul class="mb-0">
-                <li>Программа выполняет глубокие системные изменения</li>
-                <li>Антивирусы и защитники могут блокировать эти изменения</li>
-                <li>Это может привести к зависаниям и конфликтам</li>
-                <li>Если твикер долго не отвечает, возможно, происходит конфликт с защитными системами</li>
-            </ul>
-        </div>
-
-        <div class="alert alert-dark border border-info mt-3">
-            <h6 class="text-info">Что делать при зависаниях:</h6>
-            <ul class="mb-0">
-                <li>Если программа зависла при применении твиков, это может быть конфликт с антивирусом или SmartScreen</li>
-                <li>Рекомендуется закрыть программу и добавить её в исключения</li>
-                <li>Перезапустить программу и повторить попытку</li>
-            </ul>
-        </div>
-    </div>
-    
-    <!-- Windows 11 Problems Section -->
-    <div class="mt-5 p-4 border border-danger rounded-3" style="background: rgba(40, 0, 0, 0.3);">
-        <h4 class="text-danger mb-4">⚠️ ПРОБЛЕМЫ WINDOWS 11, КОТОРЫЕ ЛОМАЮТ ВАШ КОМПЬЮТЕР</h4>
-        <p class="mb-4"><strong>Да, сообщалось, что некоторые обновления Windows 11 вызывали серьезные проблемы, включая "исчезновение" SSD-дисков, потерю данных и «синие экраны смерти», особенно на дисках, заполненных более чем на 60%.</strong> Microsoft расследует эти инциденты, но не всегда подтверждает прямую связь с обновлениями. Эти ошибки могут требовать отката обновления или даже приводить к необходимости замены накопителя, так как влияют на аппаратном уровне.</p>
-        
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="p-3 border border-danger rounded-3 bg-dark">
-                    <h5 class="text-danger mb-3">💾 ПРОБЛЕМЫ С SSD-ДИСКАМИ</h5>
-                    <p class="mb-3"><strong>«Исчезновение» SSD:</strong> После установки определенных обновлений (например, связанных с KB5063878, KB5066835) SSD-диски перестают определяться в системе, что может привести к потере данных.</p>
-                    
-                    <p class="mb-3">В августе 2025 года сообщалось, что после установки обновления безопасности <strong>KB5063878</strong> для Windows 11 24H2 некоторые пользователи столкнулись с поломками SSD-накопителей.</p>
-                    
-                    <h6 class="text-warning mb-2">Симптомы проблемы:</h6>
-                    <ul class="mb-3">
-                        <li>SSD заполнен более чем на 60% и происходит единовременная запись не менее 50 ГБ данных</li>
-                        <li>Может зависать Проводник Windows</li>
-                        <li>Ошибки ввода-вывода</li>
-                        <li>В некоторых случаях диск может полностью исчезнуть, включая отображение в BIOS</li>
-                    </ul>
-                    
-                    <p class="mb-2"><strong>Особенно уязвимыми</strong> оказались накопители, использующие контроллеры от Phison.</p>
-                    <p class="mb-0"><em>Microsoft начала расследование и 3 сентября 2025 года заявила, что не обнаружила связи между обновлением KB5063878 и сбоями в работе накопителей.</em></p>
-                </div>
-            </div>
-            
-            <div class="col-md-6 mb-4">
-                <div class="p-3 border border-warning rounded-3 bg-dark">
-                    <h5 class="text-warning mb-3">⚡ ПРОБЛЕМЫ С ПРОИЗВОДИТЕЛЬНОСТЬЮ ПРОЦЕССОРА</h5>
-                    <p class="mb-3"><strong>Windows 11 не «ломает» процессор физически</strong>, но в ней были и есть баги, которые снижают его производительность, вызывают высокую загрузку или неадекватное управление частотами (даунклокинг), что может привести к перегреву и ощущению, что система «тормозит», особенно на старых процессорах или после свежих обновлений.</p>
-                    
-                    <h6 class="text-danger mb-2">Основные проблемы:</h6>
-                    <ul class="mb-3">
-                        <li><strong>Баги в драйверах или службах:</strong> «Системные прерывания» могут нагружать процессор, вызывая перегрев и падение FPS в играх</li>
-                        <li><strong>«Агрессивный» даунклокинг:</strong> В обновлении Windows 11 24H2 обнаружен баг, который принудительно снижает частоты процессора (даже мощных Intel Ultra 9) в фоне, что замедляет работу приложений, даже в играх</li>
-                        <li><strong>Проблемы с AMD:</strong> В ранних версиях была плохая совместимость с процессорами AMD, из-за чего они работали медленнее</li>
-                        <li><strong>Служба Cross Device Service:</strong> Может потреблять до 10% ресурсов CPU, снижая общую производительность системы</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-12 mb-4">
-                <div class="p-3 border border-info rounded-3 bg-dark">
-                    <h5 class="text-info mb-3">🧠 ПРОБЛЕМЫ С ОПЕРАТИВНОЙ ПАМЯТЬЮ</h5>
-                    <p class="mb-3"><strong>Windows 11 не "ломает" оперативную память физически</strong>, но может вызывать ее чрезмерное потребление или утечки из-за системных служб, таких как Delivery Optimization (DoSvc), особенно в старых сборках или после обновлений, что приводит к замедлению системы и ошибкам нехватки памяти.</p>
-                    
-                    <h6 class="text-warning mb-2">Причины высокого потребления памяти:</h6>
-                    <ul class="mb-3">
-                        <li><strong>Службы обновления:</strong> Delivery Optimization (DoSvc) может утекать память, кэшируя обновления</li>
-                        <li><strong>Службы приложений:</strong> AppX Deployment (Appxsvc) также вызывала нагрузку</li>
-                        <li><strong>Фоновые процессы и службы:</strong> Многие программы и расширения браузеров могут потреблять много памяти</li>
-                        <li><strong>Недостаток ОЗУ:</strong> 8 ГБ уже недостаточно для многих задач, Microsoft признает, что 16 ГБ — хороший минимум</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-12">
-                <div class="p-4 border border-success rounded-3" style="background: rgba(0, 40, 20, 0.3);">
-                    <h5 class="text-success mb-3 text-center">🛡️ КАК EXTREME TWEAKER РЕШАЕТ ЭТИ ПРОБЛЕМЫ</h5>
-                    <p class="text-center mb-4"><strong>Наш твикер как раз отключает все ненужные функции, которые ломают компьютер!</strong></p>
-                    
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border border-success rounded">
-                                <i class="fas fa-hdd fa-2x text-success mb-2"></i>
-                                <h6 class="text-success">Защита SSD</h6>
-                                <p class="small mb-0">Отключаем службы и процессы, которые могут вызывать проблемы с накопителями</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border border-warning rounded">
-                                <i class="fas fa-microchip fa-2x text-warning mb-2"></i>
-                                <h6 class="text-warning">Оптимизация CPU</h6>
-                                <p class="small mb-0">Отключаем Cross Device Service и другие службы, которые нагружают процессор</p>
-                            </div>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <div class="text-center p-3 border border-info rounded">
-                                <i class="fas fa-memory fa-2x text-info mb-2"></i>
-                                <h6 class="text-info">Освобождение RAM</h6>
-                                <p class="small mb-0">Отключаем Delivery Optimization и другие службы, которые утекают память</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4 p-3 border border-success rounded bg-dark">
-                        <h6 class="text-success mb-3">✅ ЧТО КОНКРЕТНО ДЕЛАЕТ EXTREME TWEAKER:</h6>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="mb-0">
-                                    <li>Отключает телеметрию и шпионские модули Microsoft</li>
-                                    <li>Останавливает ненужные службы, которые нагружают систему</li>
-                                    <li>Отключает Delivery Optimization (DoSvc)</li>
-                                    <li>Отключает Cross Device Service</li>
-                                    <li>Оптимизирует реестр для лучшей производительности</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="mb-0">
-                                    <li>Отключает автоматические обновления, которые могут сломать систему</li>
-                                    <li>Очищает временные файлы и кэш</li>
-                                    <li>Настраивает Windows под максимальную производительность</li>
-                                    <li>Защищает от проблемных обновлений</li>
-                                    <li>Оптимизирует работу с дисками</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-dark border border-warning mt-3">
-                        <h6 class="text-warning mb-2">💡 ВАЖНО ПОНИМАТЬ:</h6>
-                        <p class="mb-0">Многие проблемы Windows 11 связаны именно с теми службами и функциями, которые Extreme Tweaker отключает. Отключив ненужные службы телеметрии, обновлений и фоновых процессов, вы не только улучшаете производительность, но и защищаете свою систему от потенциальных проблем, которые могут возникнуть из-за обновлений Microsoft.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-            
     <!-- Download Section -->
     <section id="download" class="py-5">
         <div class="container">
-            <h2 class="section-title">💎 УСТАНОВКА EXTREME 0.3.7.3</h2>
+            <h2 class="section-title">УСТАНОВКА EXTREME 3.7.3.5</h2>
             
             <div class="row justify-content-center">
                 <div class="col-lg-10">
                     <div class="download-card">
                         <h3 class="mb-4"><i class="fas fa-terminal me-2"></i>УСТАНОВКА В ОДНУ КОМАНДУ</h3>
-                        <p class="mb-4">Самый быстрый способ установки — скопируйте команду ниже и выполните её в терминале:</p>
+                        <p class="mb-4">Скопируйте команду и выполните её в терминале (Win+R → cmd):</p>
                         
                         <!-- Command Block -->
                         <div class="command-block mb-4">
@@ -1778,18 +1026,17 @@
                                     <i class="fas fa-code me-2 text-success"></i>
                                     <span class="text-success">Команда для установки:</span>
                                 </div>
-                                <button class="btn btn-sm btn-outline-success copy-command-btn" onclick="copyInstallCommand()">
+                                <button class="btn btn-sm btn-outline-info copy-command-btn" onclick="copyInstallCommand()">
                                     <i class="fas fa-copy me-1"></i>Копировать
                                 </button>
                             </div>
                             <div class="command-content">
-                                <code id="installCommand">curl -g -k -L -# -o "%temp%\SetupExtreme.exe" "https://github.com/anton18-png/Extreme/releases/download/v0.3.7.3/SetupExtreme.exe" && start "" "%temp%\SetupExtreme.exe" -ppass</code>
+                                <code id="installCommand">curl -g -k -L -# -o "%temp%\SetupExtreme.exe" "https://github.com/anton18-png/Extreme/releases/download/v3.7.3.5/SetupExtreme.exe" && start "" "%temp%\SetupExtreme.exe" -ppass</code>
                             </div>
                         </div>
                         
                         <!-- Installation Steps -->
                         <div class="install-steps mb-4">
-                            <h5 class="text-success mb-3">📋 Как выполнить установку:</h5>
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="step-card text-center">
@@ -1815,7 +1062,7 @@
                                             <i class="fas fa-play"></i>
                                         </div>
                                         <h6>3. Нажмите Enter</h6>
-                                        <p class="text-secondary small">Программа запустится автоматически</p>
+                                        <p class="text-secondary small">Установка запустится автоматически</p>
                                     </div>
                                 </div>
                             </div>
@@ -1823,109 +1070,24 @@
                         
                         <!-- Alternative Download -->
                         <div class="alternative-download text-center">
-                            <p class="text-secondary mb-3">Или скачайте вручную, если не работают команды:</p>
-                            <a href="https://github.com/anton18-png/Extreme/releases/tag/v0.3.7.3" class="cyber-btn cyber-btn-secondary" target="_blank">
+                            <p class="text-secondary mb-3">Или скачайте вручную:</p>
+                            <a href="https://github.com/anton18-png/Extreme/releases/tag/v3.7.3.5" class="cyber-btn cyber-btn-secondary" target="_blank">
                                 <i class="fas fa-download me-2"></i>СКАЧАТЬ ВРУЧНУЮ
                             </a>
                         </div>
                         
-                        <div class="mt-4 p-3 border border-success rounded-3 text-center" style="background: rgba(0, 255, 65, 0.1);">
-                            <h5 class="text-success mb-3">📦 РАЗМЕР УСТАНОВЩИКА - НОВЫЙ РЕКОРД!</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="text-info">⚡ ОНЛАЙН-УСТАНОВЩИК:</h6>
-                                    <p><strong>ВЕС: < 1 МБ (< 800 КБ)</strong></p>
-                                    <p class="text-secondary small">ЛЕГЧЕ ЧЕМ ЛЮБАЯ ФОТОГРАФИЯ! ❄️</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="text-success">💾 OFFLINE-УСТАНОВЩИК:</h6>
-                                    <p><strong>ВЕС: ~30 МБ</strong></p>
-                                    <p class="text-secondary small">Полная автономная установка</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 p-4 border border-info rounded-3" style="background: rgba(136, 192, 208, 0.1);">
-                            <h5 class="text-info mb-3 text-center">🔗 ССЫЛКИ</h5>
-                            <div class="row text-center">
-                                <div class="col-md-3 mb-3">
-                                    <a href="https://anton18-png.github.io/Extreme" target="_blank" class="text-info text-decoration-none">
-                                        <i class="fas fa-globe fa-2x mb-2"></i><br>
-                                        <strong>Официальный сайт</strong>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="https://t.me/all_tweaker" target="_blank" class="text-info text-decoration-none">
-                                        <i class="fab fa-telegram fa-2x mb-2"></i><br>
-                                        <strong>Telegram канал</strong>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="https://github.com/anton18-png/Extreme" target="_blank" class="text-info text-decoration-none">
-                                        <i class="fab fa-github fa-2x mb-2"></i><br>
-                                        <strong>GitHub репозиторий</strong>
-                                    </a>
-                                </div>
-                                <div class="col-md-3 mb-3">
-                                    <a href="https://nordtheme.com" target="_blank" class="text-info text-decoration-none">
-                                        <i class="fas fa-palette fa-2x mb-2"></i><br>
-                                        <strong>Nord Theme</strong>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-4 p-3 border border-info rounded-3 text-center" style="background: rgba(136, 192, 208, 0.1);">
-                            <h5 class="text-info mb-2">📋 ШАГИ УСТАНОВКИ:</h5>
+                        <div class="mt-4 p-3 border border-info rounded-3 text-center">
+                            <h5 class="text-info mb-2">📋 ШАГИ ПОСЛЕ УСТАНОВКИ:</h5>
                             <ol class="text-start" style="display: inline-block;">
-                                <li>Скачайте установщик (или используйте команду)</li>
                                 <li>Запустите от имени администратора</li>
-                                <li>Введите пароль: <code style="background: rgba(136, 192, 208, 0.2); padding: 2px 8px; border-radius: 3px;">pass</code></li>
-                                <li>Наслаждайтесь зимним волшебством! ❄️</li>
+                                <li>Введите пароль: <code style="background: rgba(74, 158, 255, 0.2); padding: 2px 8px; border-radius: 3px;">pass</code></li>
+                                <li>Примите лицензионное соглашение</li>
+                                <li>Наслаждайтесь оптимизацией! ⚡</li>
                             </ol>
                         </div>
                         
-                        <div class="mt-4 p-3 border border-warning rounded-3" style="background: rgba(235, 203, 139, 0.1);">
-                            <h5 class="text-warning mb-3 text-center">💡 ПОЧЕМУ ВЫБРАТЬ EXTREME TWEAKER?</h5>
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <div class="text-center">
-                                        <i class="fas fa-code fa-2x text-info mb-2"></i>
-                                        <h6 class="text-info">Открытый исходный код</h6>
-                                        <p class="small mb-0">Весь код доступен на GitHub для проверки</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="text-center">
-                                        <i class="fas fa-shield-alt fa-2x text-success mb-2"></i>
-                                        <h6 class="text-success">Проверенная безопасность</h6>
-                                        <p class="small mb-0">8/70 детектов - только noname антивирусы</p>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="text-center">
-                                        <i class="fas fa-rocket fa-2x text-warning mb-2"></i>
-                                        <h6 class="text-warning">Максимальная производительность</h6>
-                                        <p class="small mb-0">1000+ твиков для оптимизации Windows</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <p class="mt-4 text-center text-secondary small">
-                            Версия 0.3.7.3 • Дата релиза: 05.01.2026 • Windows 10/11 • Русский язык • Бесплатно • Пароль: <code>pass</code>
-                        </p>
-                        <p class="text-center text-secondary mt-2">
-                            <strong>💎 Extreme Tweaker Lite v0.3.7.3 - новый релиз с темой Sapphire и улучшенным интерфейсом!</strong>
-                        </p>
-                        <p class="text-center text-secondary">
-                            <em>Попробуйте новую тему Sapphire и режим отображения в два столбца для максимального удобства!</em> 💎✨
-                        </p>
-                        <p class="text-center text-secondary mt-2">
-                            <strong>P.S.</strong> Не забывайте пароль при запуске: <code>pass</code> 🔒
-                        </p>
-                        <p class="text-center text-secondary">
-                            <strong>🚀 Удачной оптимизации!</strong>
+                            Версия 3.7.3.5 Free • Март 2026 • Windows 10/11 • Русский язык • Бесплатно • Пароль: <code>pass</code>
                         </p>
                     </div>
                 </div>
@@ -1933,131 +1095,12 @@
         </div>
     </section>
     
-    <!-- Testimonials & Contributors Section -->
+    <!-- Testimonials Section -->
     <section id="testimonials" class="py-5">
         <div class="container">
-            <h2 class="section-title">ОТЗЫВЫ И БЛАГОДАРНОСТИ</h2>
+            <h2 class="section-title">ОТЗЫВЫ</h2>
             
-            <!-- Quality Feedback Section -->
-            <div class="quality-feedback-section mb-5">
-                
-                <div class="feedback-card p-4 mb-4">
-                    <h4 class="text-center mb-4">📢 ОТКРОВЕННО О КАЧЕСТВЕ EXTREME TWEAKER</h4>
-                    <p>Друзья, хотим поделиться важным наблюдением. Когда мы начинали с All Tweaker, мы получали как позитивные, так и негативные отзывы — это было ожидаемо для нового проекта.</p>
-                    
-                    <div class="alert alert-success border-success mt-3 mb-3">
-                        <h5 class="text-success">🎯 НО СЕЙЧАС СИТУАЦИЯ ИЗМЕНИЛАСЬ!</h5>
-                        <p class="mb-0">За всё время существования Extreme Tweaker мы <strong>НЕ ПОЛУЧИЛИ НИ ОДНОГО НЕГАТИВНОГО ОТЗЫВА!</strong><br>
-                        Кроме людей, которые не понимают почему антивирусы "ругаются" на твикеры</p>
-                    </div>
-                    
-                    <div class="alert alert-dark border-warning mt-3">
-                        <h5 class="text-warning">🔍 ОДНАКО ЕСТЬ НЮАНС...</h5>
-                        <p class="mb-2">Анализируя логи и статистику, мы видим, что:</p>
-                        <ul class="mb-2">
-                            <li>У некоторых пользователей твикер не запускается с первого раза</li>
-                            <li>Иногда происходят вылеты программы</li>
-                            <li>Возникают непонятные ошибки при оптимизации</li>
-                        </ul>
-                        <p class="mb-0"><strong>И вот что важно:</strong> У НАС ЛИЧНО ТАКИХ ПРОБЛЕМ НЕ БЫЛО!<br>
-                        Мы тестировали на разных системах, конфигурациях, версиях Windows — всё работает стабильно.</p>
-                    </div>
-                    
-                    <div class="alert alert-dark border-info mt-4">
-                        <h5 class="text-info">🙏 ВАЖНАЯ ПРОСЬБА К СООБЩЕСТВУ</h5>
-                        <p>Если вы столкнулись с такими проблемами:</p>
-                        <ol>
-                            <li><strong>Твикер не запускается с первого раза</strong></li>
-                            <li><strong>Программа вылетает при работе</strong></li>
-                            <li><strong>Возникают ошибки, которые не описаны</strong></li>
-                            <li><strong>Любые другие странности в работе</strong></li>
-                        </ol>
-                        
-                        <h6 class="text-warning mt-3">ПРОСИМ НАПИСАТЬ НАМ ОБ ЭТОМ! 📩</h6>
-                        <p class="mb-2">Почему это важно?</p>
-                        <ul>
-                            <li>Мы не можем воспроизвести ошибки, которых у нас нет</li>
-                            <li>Без ваших отчётов мы не знаем о проблемах</li>
-                            <li>Вместе мы сможем найти и исправить любую ошибку</li>
-                        </ul>
-                        
-                        <h6 class="mt-3">📍 КАК СВЯЗАТЬСЯ:</h6>
-                        <div class="contact-methods mt-2">
-                            <a href="https://t.me/anonaskbot?start=xrxa98a" class="btn btn-sm btn-outline-info me-2 mb-2" target="_blank">
-                                <i class="fab fa-telegram me-1"></i>Telegram
-                            </a>
-                            <span class="btn btn-sm btn-outline-secondary me-2 mb-2">
-                                <i class="fas fa-cog me-1"></i>Через сам твикер (Настройки → Обратная связь)
-                            </span>
-                            <a href="https://github.com/anton18-png/Extreme/issues" class="btn btn-sm btn-outline-success mb-2" target="_blank">
-                                <i class="fab fa-github me-1"></i>GitHub Issues
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div class="row mt-4">
-                        <div class="col-md-6">
-                            <div class="p-3 border border-success rounded">
-                                <h6 class="text-success">🔧 ЧТО МЫ ДЕЛАЕМ ДЛЯ УЛУЧШЕНИЯ:</h6>
-                                <ul class="mb-0">
-                                    <li>Анализируем каждый лог с ошибками</li>
-                                    <li>Тестируем на максимальном количестве конфигураций</li>
-                                    <li>Работаем над совместимостью с разными антивирусами</li>
-                                    <li>Улучшаем обработку исключительных ситуаций</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-3 border border-primary rounded">
-                                <h6 class="text-primary">💬 ВАШИ ОТЗЫВЫ — НАШ ГЛАВНЫЙ ИНСТРУМЕНТ</h6>
-                                <p class="mb-2">Наша цель — сделать Extreme Tweaker максимально стабильным на ЛЮБОЙ системе. Но без вашей помощи это невозможно!</p>
-                                <p class="mb-0"><strong>Давайте вместе сделаем Extreme Tweaker ещё лучше!</strong> Каждый отчёт об ошибке помогает десяткам других пользователей.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4 p-4 border border-success rounded" style="background: rgba(0, 40, 20, 0.3);">
-                        <h5 class="text-success mb-3">✅ ЧТО МЫ УЖЕ ИСПРАВИЛИ:</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <ul class="mb-0">
-                                    <li><strong>Проблемы с совместимостью</strong> — теперь работает на сборках, где раньше не запускался (Imortal OS, xOS и другие кастомные сборки)</li>
-                                    <li><strong>Долгий запуск</strong> — оптимизировали загрузку, теперь твикер запускается моментально</li>
-                                    <li><strong>Вылеты и зависания</strong> — значительно уменьшили количество зависаний и вылетов</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <ul class="mb-0">
-                                    <li><strong>Проблемы с антивирусами</strong> — улучшили взаимодействие с Avast, Malwarebytes и другими антивирусами</li>
-                                    <li><strong>Ошибки при оптимизации</strong> — исправили баги с применением некоторых твиков</li>
-                                    <li><strong>Проблемы с правами доступа</strong> — улучшили обработку UAC и запуск от администратора</li>
-                                    <li><strong>Работа на старых системах</strong> — добавили поддержку Windows 8</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="alert alert-dark border-warning mt-3">
-                            <p class="mb-0"><strong>⚠️ Но всё равно остаются редкие случаи:</strong> У небольшого процента пользователей твикер может не работать из-за уникальных конфигураций системы, нестандартных настроек или аппаратных особенностей.</p>
-                        </div>
-                    </div>
-                    <div class="text-center mt-4 pt-3 border-top">
-                        <h5 class="text-success">Спасибо, что вы с нами! 🙌</h5>
-                    </div>
-                </div>
-            </div>  
-                
-                <div class="special-thanks mt-4">
-                    <h4 class="text-center mb-3" style="color: #ff0088;">❤️ ОСОБАЯ БЛАГОДАРНОСТЬ ДОНАТЕРАМ</h4>
-                    <p class="text-center">Проект существует благодаря поддержке сообщества. Особенная благодарность:</p>
-                    <div class="text-center mt-3">
-                        <h5 class="text-success">🔥 Дмитрий</h5>
-                        <h5 class="text-success">🔥 Олег AMPR</h5>
-                        <p class="text-secondary mt-2">и всем остальным, кто поддерживает проект финансово!</p>
-                    </div>
-                    <p class="text-center mt-3">Эти ребята внесли неоценимый вклад — некоторые функции, какой-то код, а главное — вдохновение, особенно Хауди Хо, XpucT, MartyFiles, Igromanoff и ios1ph.</p>
-                </div>
-            </div>
-            
-            <!-- User Testimonials -->
-            <div class="row mt-5">
+            <div class="row">
                 <div class="col-md-4">
                     <div class="testimonial-card">
                         <div class="text-warning mb-2">
@@ -2067,7 +1110,7 @@
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                         </div>
-                        <p>"Это лучше чем BoosterX"</p>
+                        <p>"Это лучше чем BoosterX. Очень удобная новая тема Sapphire!"</p>
                         <p class="text-end text-secondary">- Антон</p>
                     </div>
                 </div>
@@ -2081,7 +1124,7 @@
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                         </div>
-                        <p>"Удивительная программа"</p>
+                        <p>"Наконец-то понял, почему не работали конфиги. Спасибо за уведомления!"</p>
                         <p class="text-end text-secondary">- Дмитрий</p>
                     </div>
                 </div>
@@ -2095,79 +1138,40 @@
                             <i class="fas fa-star"></i>
                             <i class="fas fa-star"></i>
                         </div>
-                        <p>"Нормальная тема"</p>
-                        <p class="text-end text-secondary">- Даня</p>
+                        <p>"Удаление приложений теперь как в Win 10 Tweaker. Удобно!"</p>
+                        <p class="text-end text-secondary">- Олег</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Contribute Section -->
-    <section id="contribute" class="py-5">
-        <div class="container">
-            <h2 class="section-title">ВКЛАД В РАЗВИТИЕ</h2>
             
-            <div class="contribute-section">
-                <h4 class="text-warning mb-3">👋 ХОЧЕШЬ СДЕЛАТЬ EXTREME TWEAKER ЛУЧШЕ?</h4>
-                <p><strong>У НАС ЕСТЬ ВОЗМОЖНОСТИ!</strong></p>
-                <p>Друзья, наш твикер растёт благодаря вам! Если хочешь поучаствовать в развитии проекта — есть несколько способов:</p>
+            <!-- Feedback Section -->
+            <div class="feedback-card mt-5">
+                <h4 class="text-info mb-3">📢 НАШЛИ ОШИБКУ? ЕСТЬ ПРЕДЛОЖЕНИЕ?</h4>
+                <p>Мы активно работаем над улучшением программы. Если вы столкнулись с проблемами:</p>
+                <ul>
+                    <li>Твикер не запускается с первого раза</li>
+                    <li>Программа вылетает при работе</li>
+                    <li>Возникают ошибки при оптимизации</li>
+                </ul>
+                <p><strong>Напишите нам!</strong> Без ваших отчётов мы не узнаем о проблемах.</p>
                 
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="p-3 border border-success rounded-3 mb-3">
-                            <h5 class="text-success">🐛 Нашёл баг?</h5>
-                            <p>Расскажи нам о нём! Лучше один раз показать баг, чем сто раз услышать «что-то не работает».</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 border border-info rounded-3 mb-3">
-                            <h5 class="text-info">💡 Есть идея?</h5>
-                            <p>Предложи новую фичу или улучшение! Лучшие идеи мы сразу внедряем в следующих версиях.</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 border border-warning rounded-3 mb-3">
-                            <h5 class="text-warning">👨‍💻 Хочешь в команду?</h5>
-                            <p>Нужны разработчики, тестеры, дизайнеры и просто активные ребята. Есть навыки — пиши!</p>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="p-3 border border-primary rounded-3 mb-3">
-                            <h5 class="text-primary">❤️ Хочешь поддержать проект?</h5>
-                            <p>Любая помощь важна — будь то донат, репост или просто совет.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <h5 class="mt-4 text-center">📞 КАК СВЯЗАТЬСЯ:</h5>
-                <div class="text-center mt-3">
-                    <a href="https://t.me/anonaskbot?start=xrxa98a" class="cyber-btn cyber-btn-primary me-3" target="_blank">
-                        <i class="fab fa-telegram me-2"></i>Telegram
+                <div class="contact-methods mt-3">
+                    <a href="https://t.me/anonaskbot?start=xrxa98a" class="btn btn-outline-info me-2 mb-2" target="_blank">
+                        <i class="fab fa-telegram me-1"></i>Telegram
                     </a>
-                    <a href="https://github.com/anton18-png" class="cyber-btn cyber-btn-secondary" target="_blank">
-                        <i class="fab fa-github me-2"></i>GitHub
+                    <a href="https://github.com/anton18-png/Extreme/issues" class="btn btn-outline-success mb-2" target="_blank">
+                        <i class="fab fa-github me-1"></i>GitHub Issues
                     </a>
                 </div>
+            </div>
+            
+            <!-- Donation Section -->
+            <div class="donation-section text-center mt-5">
+                <h4 class="text-info">☕ ПОДДЕРЖКА РАЗРАБОТКИ</h4>
+                <p>Если вам нравится проект и вы хотите помочь:</p>
                 
-                <p class="text-center mt-4 text-secondary">Не стесняйтесь писать даже по мелочам — иногда именно маленькие советы приводят к большим улучшениям!</p>
-
-                <div class="row justify-content-center">
-                    <div class="col-lg-8">
-                        <div class="donation-section text-center">
-                            <h4 class="text-success">☕️ ПОДДЕРЖКА РАЗРАБОТКИ</h4>
-                            <p>Друзья, эта работа потребовала не только времени, но и финансовых вложений. Новый SSD, лицензии профессионального софта, бессонные ночи за тестированием...</p>
-                            <p>Если вам нравится то, что мы делаем, и вы хотите поддержать проект:</p>
-                            
-                            <div class="donation-links justify-content-center">
-                                <a href="https://alfa.me/MA5hhs" class="donation-link" target="_blank">Альфа банк</a>
-                                <a href="https://ozon.ru/fintech/promo/ref/EZHMAWKSB" class="donation-link" target="_blank">Озон банк</a>
-                                <a href="https://www.tinkoff.ru/cf/2VBH9zSztcW" class="donation-link" target="_blank">Т-Банк</a>
-                            </div>
-                            
-                            <p class="mt-3 text-secondary">Даже небольшая сумма на кофе поможет продолжать эту работу и делать Extreme Tweaker еще лучше!</p>
-                        </div>
-                    </div>
+                <div class="donation-links justify-content-center">
+                    <a href="https://www.tinkoff.ru/cf/2VBH9zSztcW" class="donation-link" target="_blank">Донат</a>
                 </div>
             </div>
         </div>
@@ -2179,9 +1183,9 @@
             <div class="row align-items-center">
                 <div class="col-lg-4 text-center text-lg-start">
                     <h3 class="mb-3">
-                        <span class="text-success">❯</span> Extreme Tweaker
+                        <span class="text-info">❯</span> Extreme Tweaker
                     </h3>
-                    <p class="text-secondary">Ультимативная оптимизация Windows для геймеров, энтузиастов и профессионалов</p>
+                    <p class="text-secondary">Оптимизация Windows для геймеров и энтузиастов</p>
                 </div>
                 
                 <div class="col-lg-4 text-center">
@@ -2196,12 +1200,8 @@
                 </div>
                 
                 <div class="col-lg-4 text-center text-lg-end">
-                    <p class="text-secondary mb-2">&copy; 2025 Extreme Tweaker</p>
-                    <p class="text-secondary small">Все твики имеют открытый исходный код и проверены сообществом</p>
-                    <p class="text-secondary small mt-2">
-                        <i class="fas fa-snowflake me-1"></i>
-                        Тема Nord: <a href="https://nordtheme.com" target="_blank" class="text-info" style="text-decoration: none;">nordtheme.com</a>
-                    </p>
+                    <p class="text-secondary mb-2">&copy; 2026 Extreme Tweaker</p>
+                    <p class="text-secondary small">Открытый исходный код на GitHub</p>
                 </div>
             </div>
         </div>
@@ -2209,19 +1209,19 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-            function copyInstallCommand() {
+        function copyInstallCommand() {
             const command = document.getElementById('installCommand').textContent;
             navigator.clipboard.writeText(command).then(() => {
                 const btn = document.querySelector('.copy-command-btn');
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '<i class="fas fa-check me-1"></i>Скопировано!';
                 btn.classList.add('btn-success');
-                btn.classList.remove('btn-outline-success');
+                btn.classList.remove('btn-outline-info');
                 
                 setTimeout(() => {
                     btn.innerHTML = originalHTML;
                     btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-success');
+                    btn.classList.add('btn-outline-info');
                 }, 2000);
             });
         }
@@ -2250,7 +1250,7 @@
             });
         });
 
-        // Animate features on scroll
+        // Animate on scroll
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -2265,88 +1265,12 @@
             });
         }, observerOptions);
 
-        // Observe feature cards
-        document.querySelectorAll('.feature-card').forEach(card => {
+        document.querySelectorAll('.feature-card, .testimonial-card, .stat-card, .security-card').forEach(card => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'all 0.6s ease';
             observer.observe(card);
         });
-
-        // Observe testimonial cards
-        document.querySelectorAll('.testimonial-card, .contributor-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'all 0.6s ease';
-            observer.observe(card);
-        });
-
-        // Typing effect for terminal
-        function typeText(element, text, speed = 50) {
-            let i = 0;
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
-
-        // Terminal typing effect on load
-        window.addEventListener('load', function() {
-            const terminal = document.querySelector('.text-warning');
-            if (terminal) {
-                terminal.innerHTML = '';
-                setTimeout(() => {
-                    typeText(terminal, 'Готов к оптимизации...', 100);
-                }, 1000);
-            }
-        });
-
-        // Glitch effect on title
-        const title = document.querySelector('.main-title');
-        let glitchInterval;
-        
-        function startGlitch() {
-            glitchInterval = setInterval(() => {
-                title.classList.add('glitch');
-                setTimeout(() => {
-                    title.classList.remove('glitch');
-                }, 500);
-            }, 5000);
-        }
-        
-        startGlitch();
-
-        // Create Snowflakes
-        function createSnowflake() {
-            const snowflake = document.createElement('div');
-            snowflake.className = 'snowflake';
-            const snowflakeChars = ['❄', '❅', '❆', '❄️'];
-            snowflake.innerHTML = snowflakeChars[Math.floor(Math.random() * snowflakeChars.length)];
-            snowflake.style.left = Math.random() * 100 + '%';
-            snowflake.style.animationDuration = (Math.random() * 4 + 3) + 's';
-            snowflake.style.fontSize = (Math.random() * 15 + 12) + 'px';
-            snowflake.style.opacity = Math.random() * 0.6 + 0.4;
-            snowflake.style.animationDelay = Math.random() * 2 + 's';
-            document.getElementById('snowflakes').appendChild(snowflake);
-            
-            setTimeout(() => {
-                if (snowflake.parentNode) {
-                    snowflake.remove();
-                }
-            }, 7000);
-        }
-
-        // Create snowflakes periodically
-        setInterval(createSnowflake, 250);
-        
-        // Initial snowflakes
-        for (let i = 0; i < 30; i++) {
-            setTimeout(() => createSnowflake(), i * 150);
-        }
     </script>
 </body>
 </html>

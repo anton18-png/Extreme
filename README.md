@@ -1,8 +1,6 @@
-# ⚡ Extreme Tweaker v3.7.3.5
+# ⚡ Extreme Tweaker 3.7.3.5 Free — Сравнение версий
 
 <img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/33a94afa-7ddb-48ae-9d90-86c7f4c07de3" />
-
-# 🚀 Extreme Tweaker 3.7.3.5 Free — Сравнение версий
 
 ## 🎯 Общая информация
 

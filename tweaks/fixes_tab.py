@@ -10,8 +10,7 @@ main_module = sys.modules.get('__main__')
 if main_module and hasattr(main_module, 'logger'):
     logger = main_module.logger
 else:
-    # Fallback: создаем новый logger только если main не доступен
-    from telemetry.logger import Logger
+    from logger import Logger
     logger = Logger()
 
 # Импортируем классы чекбоксов из main.py

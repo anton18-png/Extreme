@@ -13,7 +13,7 @@ class OptimizationTab:
         self.config = config
         
         # Базовый путь к tweaks
-        self.tweaks_path = r"C:\Apps\Extreme\tweaks"
+        self.tweaks_path = r"tweaks"
         
         # Пути к папкам
         self.nvidia_path = os.path.join(self.tweaks_path, "Драйверы", "Оптимизация Nvidia")

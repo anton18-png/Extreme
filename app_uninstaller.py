@@ -16,7 +16,7 @@ class AppUninstallerTab:
         self.selected_apps = set()
         
         # Указываем путь к папке со скриптами
-        self.scripts_path = r"C:\Apps\Extreme\tweaks\Очистка\Удалить приложения"
+        self.scripts_path = r"tweaks\Очистка\Удалить приложения"
         
         # Проверяем существование папки
         if not os.path.exists(self.scripts_path):

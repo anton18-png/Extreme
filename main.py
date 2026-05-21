@@ -12,14 +12,14 @@ from datetime import (
 import configparser  # Модуль для работы с конфигурационными файлами, здесь для чтения и записи настроек
 import json  # Для работы с JSON файлами
 import shutil  # Для копирования файлов
-from telemetry.logger import Logger  # Импортируем класс Logger
+from logger import Logger
 import tkinter.messagebox as messagebox  # Добавляем модуль для вывода сообщений
 # from gpt import GPTClient  # Импортируем GPTClient
 from pathlib import Path
-from windows_vote import WindowsVoteWindow
+# from windows_vote import WindowsVoteWindow
+# from services_manager import create_services_tab
 import random
-import hashlib  # Для вычисления хэшей файлов
-import threading  # Для неблокирующей проверки обновлений
+import threading
 import webbrowser
 
 # Получаем имя текущего пользователя системы
@@ -35,7 +35,7 @@ def open_random_site(numder_open_random_site):
     pass
 
 # Версия программы
-version = "v3.7.3.5 Free"
+version = "v4 Beta"
 
 # Импортируем путь для доступа к модулям
 # Этот код добавляет папку tweaks в путь поиска модулей, чтобы импортировать скрипты из этой директории
@@ -98,31 +98,27 @@ config.read("user_data//settings.ini", encoding="cp1251")  # Чтение в ANS
 # Создаем обязательные секции с настройками по умолчанию
 required_sections = {
     "General": {
-        "theme": "newhone",   # Тема интерфейса
-        "font_family": "Terminal",  # Шрифт интерфейса
-        "font_size": "12",  # Размер шрифта интерфейса
-        "checkbox_font_size": "12",  # Размер шрифта чекбоксов
-        "quick_button_font_size": "16",  # Размер шрифта кнопок быстрого доступа
-        "tooltips_enabled": "True",  # Включение всплывающих подсказок
-        "checkbox_display_mode": "rectangle",  # Режим отображения чекбоксов: regular, rectangle или wide
-        "first_run_completed": "False",  # Флаг первого запуска
-        "ad_enabled": "False",  # Включение рекламы
-        "offer_backup_enabled": "False",  # Предложение создания бэкапа
-        "confirm_switch_tab_enabled": "False",  # Подтверждение переключения вкладок
-        "developer_mode": "True",  # Режим разработчика
-        "novice_mode": "False",  # Режим новичка
-        "initial_tab": "switch_to_main", # Вкладка по умолчанию
-        "show_top_panel": "True",  # Показывать верхнее меню
-        "show_sidebar": "True",  # Показывать боковое меню
-        "tweak_execution_mode": "create_config_and_run",  # Способ запуска твиков: default, no_launcher, launcher, powerrun, cmd, create_config_and_run
-        "auto_update_enabled": "True",  # Включение автообновления
+        "theme": "newhone",
+        "font_family": "Terminal",
+        "font_size": "12",
+        "checkbox_font_size": "12",
+        "quick_button_font_size": "16",
+        "tooltips_enabled": "True",
+        "checkbox_display_mode": "rectangle",
+        "first_run_completed": "False",
+        "ad_enabled": "False",
+        "offer_backup_enabled": "False",
+        "confirm_switch_tab_enabled": "False",
+        "developer_mode": "True",
+        "novice_mode": "False",
+        "initial_tab": "switch_to_main",
+        "show_top_panel": "True",
+        "show_sidebar": "True",
+        "tweak_execution_mode": "default",
+        "logging_enabled": "False",
     },
-    "Window": {"fullscreen": "True"},  # Полноэкранный режим
+    "Window": {"fullscreen": "False"},  # Полноэкранный режим
     "Columns": {"default": "3"},  # Количество колонок в окне
-    "Telemetry": {
-        "send_on_close": "True",  # Отправка логов при закрытии программы
-        "share_telemetry": "False",  # Обмен телеметрией с другими пользователями
-    },
 }
 
 # Этот код проверяет, есть ли секция в конфигурации и если нет, то добавляет её
@@ -139,14 +135,12 @@ for (
             config[section][key] = value  # Добавляем ключ и значение
             config_changed = True  # Конфиг изменился
 
-# Сохраняем обновленный конфиг только если были изменения
 if config_changed:
-    with open(
-        "user_data//settings.ini", "w", encoding="cp1251"
-    ) as configfile:  # Запись в ANSI
-        config.write(configfile)  # Записываем конфигурацию в файл
+    with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+        config.write(configfile)
 
-# Функция для получения шрифта больших меток (определена раньше, чтобы быть доступной в show_license_window)
+logger.set_enabled(config.getboolean("General", "logging_enabled", fallback=False))
+
 def get_large_label_font():
     """Возвращает шрифт для больших меток"""
     try:
@@ -363,10 +357,7 @@ Extreme Tweaker не волшебная таблетка. Это инструм�
 Extreme Tweaker даёт все три варианта. Используйте то, что подходит именно вам.
 
 Никаких сказок про +50% FPS. Только реальные цифры и честные компромиссы.
-
-А также тут есть телеметрия - отправка данных о работе программы и настроек для улучшения функциональности, внешнего вида и защиты от взлома.
-
-За взлом Extreme Pro - бан навсегда"""
+"""
     
     license_text.insert("1.0", license_content)
     license_text.config(state="disabled")
@@ -418,21 +409,18 @@ root.geometry("1280x720")  # Размер окна
 
 # Показываем лицензионное окно при первом запуске
 if not first_run_completed:
-    show_license_window()
-    # Устанавливаем флаг, что первый запуск завершен
-    config["General"]["first_run_completed"] = "True"
-    with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-        config.write(configfile)
+    # show_license_window()
+    # # Устанавливаем флаг, что первый запуск завершен
+    # config["General"]["first_run_completed"] = "True"
+    # with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+    #     config.write(configfile)
+    pass
 
-# Импортируем обработчик ошибок
-from telemetry.error_handler import (
-    handle_top_level_error,
-)  # Импортируем обработчик ошибок
+def handle_exception(exc_type, exc_value, exc_traceback):
+    import traceback
+    traceback.print_exception(exc_type, exc_value, exc_traceback)
 
-# Устанавливаем обработчик необработанных исключений
-sys.excepthook = (
-    lambda *args: handle_top_level_error()
-)  # Устанавливаем обработчик необработанных исключений
+sys.excepthook = handle_exception
 
 
 def reload_program(event=None):
@@ -441,157 +429,6 @@ def reload_program(event=None):
     import subprocess
 
     subprocess.run([sys.executable] + sys.argv)
-
-
-"""
-+------------------------------------+
-| Функция для проверки обновлений    |
-+------------------------------------+
-"""
-
-
-def calculate_file_hash(file_path):
-    """Вычисляет SHA256 хэш файла"""
-    sha256_hash = hashlib.sha256()
-    try:
-        with open(file_path, "rb") as f:
-            # Читаем файл по частям для экономии памяти
-            for byte_block in iter(lambda: f.read(4096), b""):
-                sha256_hash.update(byte_block)
-        return sha256_hash.hexdigest()
-    except FileNotFoundError:
-        return None
-    except Exception as e:
-        print(f"Ошибка при вычислении хэша файла {file_path}: {e}")
-        return None
-
-
-def check_for_updates():
-    """Проверяет наличие обновлений и запускает их установку"""
-    try:
-        # Проверяем, включено ли автообновление
-        if not config.getboolean("General", "auto_update_enabled", fallback=True):
-            print("Автообновление отключено в настройках")
-            return
-        
-        # Пути к файлам
-        # local_file = r"C:\Apps\Extreme\SetupWinterWizardPro.exe"
-        local_file = r"C:\Apps\Extreme\SetupWinterWizard.exe"
-        # github_url = "https://github.com/anton18-png/Extreme/raw/refs/heads/main/SetupWinterWizardPro.exe"
-        github_url = "https://github.com/anton18-png/Extreme/raw/refs/heads/main/SetupWinterWizard.exe"
-        temp_file = os.path.join(os.environ.get("TEMP", "."), "SetupWinterWizard_temp.exe")
-        
-        # Вычисляем хэш локального файла
-        local_hash = None
-        if os.path.exists(local_file):
-            local_hash = calculate_file_hash(local_file)
-            print(f"Локальный хэш SetupWinterWizard.exe: {local_hash}")
-        else:
-            print(f"Локальный файл {local_file} не найден")
-        
-        # Скачиваем файл с GitHub во временную папку с помощью curl
-        # print("Проверка обновлений: скачивание файла с GitHub...")
-        try:
-            # Используем curl для скачивания файла
-            curl_command = [
-                "curl",
-                "-g",
-                "-k",
-                "-L",
-                "-#",
-                "-o",
-                temp_file,
-                github_url
-            ]
-            result = subprocess.run(curl_command, capture_output=True, text=True, timeout=60)
-            if result.returncode != 0:
-                print(f"Ошибка при скачивании файла с GitHub: {result.stderr}")
-                return
-            # print("Файл успешно скачан")
-        except subprocess.TimeoutExpired:
-            print("Превышено время ожидания при скачивании файла")
-            return
-        except FileNotFoundError:
-            print("curl не найден в системе. Автообновление недоступно.")
-            return
-        except Exception as e:
-            print(f"Ошибка при скачивании файла с GitHub: {e}")
-            return
-        
-        # Вычисляем хэш скачанного файла
-        github_hash = calculate_file_hash(temp_file)
-        print(f"Хэш файла с GitHub: {github_hash}")
-        
-        # Сравниваем хэши
-        if github_hash and github_hash != local_hash:
-            print("Обнаружено обновление! Запуск установки...")
-            
-            # Скачиваем файл в нужное место с помощью curl
-            try:
-                # Создаем директорию, если её нет
-                os.makedirs(os.path.dirname(local_file), exist_ok=True)
-                
-                # Скачиваем файл напрямую в нужное место с помощью curl
-                curl_command = [
-                    "curl",
-                    "-g",
-                    "-k",
-                    "-L",
-                    "-#",
-                    "-o",
-                    local_file,
-                    github_url
-                ]
-                result = subprocess.run(curl_command, capture_output=True, text=True, timeout=60)
-                if result.returncode != 0:
-                    print(f"Ошибка при скачивании обновления: {result.stderr}")
-                    return
-                
-                print(f"Файл обновления сохранен: {local_file}")
-                
-                # Удаляем временный файл
-                try:
-                    if os.path.exists(temp_file):
-                        os.remove(temp_file)
-                except:
-                    pass
-                
-                # Закрываем программу
-                print("Закрытие программы для установки обновления...")
-                
-                # Запускаем установщик в отдельном процессе с флагом -ppass
-                subprocess.Popen([local_file, "-ppass"], shell=True)
-                
-                # Закрываем текущую программу через главный поток
-                def close_and_kill():
-                    try:
-                        subprocess.run(["taskkill", "/im", "Extreme.exe", "/f"], 
-                                      capture_output=True, timeout=5)
-                    except:
-                        pass
-                    root.destroy()
-                
-                root.after(500, close_and_kill)
-                
-            except Exception as e:
-                print(f"Ошибка при установке обновления: {e}")
-        else:
-            print("Обновления не найдены. Программа актуальна.")
-            # Удаляем временный файл
-            try:
-                if os.path.exists(temp_file):
-                    os.remove(temp_file)
-            except:
-                pass
-                
-    except Exception as e:
-        print(f"Ошибка при проверке обновлений: {e}")
-
-
-def check_for_updates_threaded():
-    """Запускает проверку обновлений в отдельном потоке"""
-    thread = threading.Thread(target=check_for_updates, daemon=True)
-    thread.start()
 
 
 # Функции для экспорта/импорта настроек
@@ -1177,84 +1014,64 @@ def execute_old():  # Функция для выполнения старых с
         ]
         
         if not activated_checkboxes:
-            messagebox.showwarning(
-                "Нет выбранных твиков",
-                "Пожалуйста, выберите хотя бы один твик для создания конфига."
-            )
+            # Молча выходим без предупреждения
             return
         
         # Создаем конфиг
         try:
             filename = create_batch_file(activated_checkboxes)
             update_config_file_list()
-            # messagebox.showinfo(
-            #     "Конфиг создан",
-            #     f"Конфиг успешно создан:\n{filename}\n\nЗапускаю твики..."
-            # )
-        except Exception as e:
-            messagebox.showerror(
-                "Ошибка",
-                f"Не удалось создать конфиг:\n{str(e)}"
-            )
-            return
+            # Убраны все сообщения
+        except Exception:
+            # Ошибка игнорируется в фоновом режиме
+            pass
+        return  # Выходим после создания конфига
     
-    for checkbox_name, checkbox_var in checkboxes.items():  # Проходим по всем чекбоксам
+    # Проходим по всем чекбоксам в фоне
+    for checkbox_name, checkbox_var in checkboxes.items():
         if checkbox_var.get():  # Если чекбокс включен
-            tab_name = get_tab_name(checkbox_name)  # Получаем имя вкладки
-
-            # Проверяем, что tab_name не None
-            if tab_name is None:  # Если имя вкладки не определено
-                logger.log_error(
-                    f"Ошибка: Не удалось определить вкладку для {checkbox_name}"
-                )  # Логируем ошибку
-                continue  # Пропускаем текущий чекбокс
-
-            # Определяем имя кнопки на основе словаря
-            button_name = get_button_name(tab_name)  # Получаем имя кнопки
-
-            # Формируем путь к скрипту
-            tweak_path = f"tweaks\\{button_name}\\{tab_name}\\{checkbox_name}"  # Получаем путь к скрипту
-
-            # Проверяем существование файла
-            if not os.path.exists(tweak_path):
-                logger.log_error(f"Файл не найден: {tweak_path}")
-                continue  # Пропускаем текущий чекбокс
-
-            print(f"{checkbox_name} - {tweak_path}")  # Выводим путь к скрипту
-            logger.log_tweak_execution(
-                checkbox_name, tweak_path
-            )  # Логируем выполнение скрипта
-
-            """
-            +----------------------------------------+
-            | Запуск скриптов различных типов        |
-            +----------------------------------------+
-            """
+            tab_name = get_tab_name(checkbox_name)
             
-            # Определяем режим запуска твика (если режим "create_config_and_run", используем "default")
+            if tab_name is None:
+                continue  # Молча пропускаем
+            
+            button_name = get_button_name(tab_name)
+            tweak_path = f"tweaks\\{button_name}\\{tab_name}\\{checkbox_name}"
+            
+            if not os.path.exists(tweak_path):
+                continue  # Молча пропускаем
+            
+            # Определяем режим запуска твика
             tweak_execution_mode = execution_mode if execution_mode != "create_config_and_run" else "default"
             
-            # Функция для запуска твика в зависимости от режима
+            # Запуск в фоне без отображения окон
             def run_tweak_by_mode(tweak_path, is_reg=False):
-                if tweak_execution_mode == "no_launcher":
-                    # Запуск без launcher
-                    subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
-                elif tweak_execution_mode == "launcher":
-                    # Запуск через launcher
-                    subprocess.call(f'Utils\\launcher.exe "{tweak_path}"', shell=True)
-                elif tweak_execution_mode == "powerrun":
-                    # Запуск через PowerRun
-                    subprocess.call(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True)
-                elif tweak_execution_mode == "cmd":
-                    # Запуск через cmd /c
-                    subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
-                else:  # default - как было по умолчанию
-                    if is_reg:
-                        subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
-                        subprocess.call(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True)
-                    else:
-                        subprocess.call(f'cmd /c "{tweak_path}"', shell=True)
-                        subprocess.call(f'Utils\\launcher.exe "{tweak_path}"', shell=True)
+                try:
+                    if tweak_execution_mode == "no_launcher":
+                        subprocess.Popen(f'cmd /c "{tweak_path}"', shell=True, 
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    elif tweak_execution_mode == "launcher":
+                        subprocess.Popen(f'Utils\\launcher.exe "{tweak_path}"', shell=True,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    elif tweak_execution_mode == "powerrun":
+                        subprocess.Popen(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    elif tweak_execution_mode == "cmd":
+                        subprocess.Popen(f'cmd /c "{tweak_path}"', shell=True,
+                                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    else:  # default
+                        if is_reg:
+                            subprocess.Popen(f'cmd /c "{tweak_path}"', shell=True,
+                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.Popen(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True,
+                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        else:
+                            subprocess.Popen(f'cmd /c "{tweak_path}"', shell=True,
+                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                            subprocess.Popen(f'Utils\\launcher.exe "{tweak_path}"', shell=True,
+                                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                except Exception:
+                    pass  # Игнорируем ошибки выполнения
 
             # Если скрипт имеет расширение .bat, .cmd или .exe
             if checkbox_name.endswith((".bat", ".cmd", ".exe")):
@@ -1262,80 +1079,55 @@ def execute_old():  # Функция для выполнения старых с
 
             # Если скрипт имеет расширение .ps1
             elif checkbox_name.endswith(".ps1"):
-                logger.log_info("использование JetBrains WinElevator")
-                
-                # Проверяем существование файла перед копированием
-                if not os.path.exists(tweak_path):
-                    logger.log_error(f"Файл не найден: {tweak_path}")
-                    continue
-                
-                # Копируем PS1 файл в текущую директорию и переименовываем в 1.ps1
-                temp_ps1_path = ".\\1.ps1"
-                
                 try:
-                    # Копируем файл
+                    if not os.path.exists(tweak_path):
+                        continue
+                    
+                    temp_ps1_path = ".\\1.ps1"
                     import shutil
                     shutil.copy2(tweak_path, temp_ps1_path)
-                    logger.log_info(f"Скрипт скопирован как {temp_ps1_path}")
                     
-                    # Запускаем через JetBrains WinElevator (для PS1 всегда через launcher)
                     if tweak_execution_mode == "no_launcher":
-                        subprocess.run([
+                        subprocess.Popen([
                             'powershell.exe', '-ExecutionPolicy', 'Bypass', '-File', temp_ps1_path
-                        ])
+                        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     else:
-                        subprocess.run([
+                        subprocess.Popen([
                             "Utils\\launcher.exe",
                             f'powershell.exe -ExecutionPolicy Bypass -File "{temp_ps1_path}"'
-                        ])
+                        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                     
-                    # Удаляем временный файл после выполнения
-                    try:
-                        os.remove(temp_ps1_path)
-                        logger.log_info("Временный файл удален")
-                    except Exception as e:
-                        logger.log_error(f"Ошибка при удалении временного файла: {e}")
-                        
-                except Exception as e:
-                    logger.log_error(f"Ошибка при копировании/запуске PS1 скрипта: {e}")
-                    # Пробуем запустить оригинальный путь как запасной вариант
-                    if execution_mode == "no_launcher":
-                        subprocess.run([
-                            'powershell.exe', '-ExecutionPolicy', 'Bypass', '-File', tweak_path
-                        ])
-                    else:
-                        subprocess.run([
-                            "Utils\\launcher.exe",
-                            f'powershell.exe -ExecutionPolicy Bypass -File "{tweak_path}"'
-                        ])
+                    # Удаляем временный файл после выполнения (с задержкой)
+                    import threading
+                    def delayed_cleanup():
+                        import time
+                        time.sleep(5)  # Даем время на выполнение
+                        try:
+                            os.remove(temp_ps1_path)
+                        except:
+                            pass
+                    threading.Thread(target=delayed_cleanup, daemon=True).start()
+                    
+                except Exception:
+                    # Запасной вариант - игнорируем ошибки
+                    pass
 
             # Если скрипт имеет расширение .reg
             elif checkbox_name.endswith(".reg"):
                 if execution_mode == "powerrun":
-                    subprocess.call(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True)
+                    subprocess.Popen(f'Utils\\PowerRun.exe "{tweak_path}"', shell=True,
+                                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 else:
                     run_tweak_by_mode(tweak_path, is_reg=True)
 
             # Если скрипт имеет расширение .pow
             elif checkbox_name.endswith(".pow"):
-                subprocess.call(f'powercfg /import "{tweak_path}"', shell=True)
+                subprocess.Popen(f'powercfg /import "{tweak_path}"', shell=True,
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 run_tweak_by_mode(tweak_path)
-                # отправка сообщения в телеграм
-                from telemetry.telemetry_manager import TelemetryManager
-                manager = TelemetryManager()
-                manager.send_message(
-                    f"✅ План питания {checkbox_name} импортирован\n\n"
-                )
 
-            # Если скрипт не имеет расширение .bat, .cmd, .exe, .ps1 или .reg
             else:
                 run_tweak_by_mode(tweak_path)
-
-            from telemetry.telemetry_manager import TelemetryManager
-            manager = TelemetryManager()
-            manager.send_message(
-                f"✅ Твик {checkbox_name} запущен\n\n"
-            )
 
 
 """
@@ -1476,13 +1268,14 @@ def execute():  # Основная функция выполнения конф�
 """
 
 
-def execute_config():  # Функция для выполнения конфигурационного файла
-    selected_file = config_file_var.get()  # Получаем выбранный файл
-    if selected_file:  # Если файл выбран
-        print(f"Start Configs\\{selected_file}")  # Выводим путь к файлу
-        subprocess.call(
-            f'Utils\\launcher.exe "Configs\\{selected_file}"', shell=True
-        )  # Выполняем файл
+def execute_config():
+    selected_file = config_file_var.get()
+    if selected_file:
+        print(f"Start Configs\\{selected_file}")
+        subprocess.Popen(
+            f'Utils\\launcher.exe "Configs\\{selected_file}"', shell=True,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+        )
 
 
 """
@@ -1555,34 +1348,8 @@ def get_tab_name(
 """
 
 
-def collect_and_send():  # Функция для сбора и отправки телеметрии
-    from telemetry.telemetry_manager import (
-        TelemetryManager,
-    )  # Импортируем класс TelemetryManager из модуля telemetry_manager
-
-    manager = TelemetryManager()  # Создаем экземпляр класса TelemetryManager
-    # logger.logger.info(
-    #     "Начало сбора и отправки телеметрии..."
-    # )  # Логируем начало сбора и отправки телеметрии
-    
-    # Проверяем, включен ли обмен телеметрией
-    share_enabled = config.getboolean("Telemetry", "share_telemetry", fallback=False)
-    
-    if manager.collect_telemetry_data(share_enabled=share_enabled):  # Если телеметрия успешно собрана
-        pass
-        # logger.logger.info(
-        #     "Телеметрия успешно собрана и отправлена"
-        # )  # Логируем успешное собрание и отправку телеметрии
-        # print(
-        #     "Телеметрия успешно собрана и отправлена"
-        # )  # Выводим сообщение о успешном собрании и отправке телеметрии
-    else:  # Если телеметрия не собрана
-        logger.logger.error(
-            "Ошибка при сборе и отправке телеметрии"
-        )  # Логируем ошибку при сборе и отправке телеметрии
-        print(
-            "Ошибка при сборе и отправке телеметрии"
-        )  # Выводим сообщение об ошибке при сборе и отправке телеметрии
+def collect_and_send():
+    pass
 
 
 def restart():  # Функция для перезапуска программы
@@ -3685,13 +3452,14 @@ def create_config_buttons(configs_list, parent_frame, columns=3, is_expert=False
                 text=cfg.get("button_text", cfg["name"]),
                 width=28,
                 bootstyle=btn_style,
-                command=lambda path=config_path: subprocess.call([path], shell=True)
+                command=lambda path=config_path: subprocess.Popen([path], shell=True,
+                                                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             )
         else:
             btn = ttk.Button(
                 button_frame,
                 text=cfg.get("button_text", cfg["name"]),
-                width=50,
+                width=28,
                 bootstyle=btn_style,
                 command=lambda c=cfg["name"]: run_config(c)
             )
@@ -3844,10 +3612,10 @@ def switch_to_main():
         }
     ]
 
-    # Оптимизации от авторов (Скидончик, Антон, Олег AMPR) и экспертов Windows
+    # Оптимизации от авторов (socde18, Антон, Олег AMPR) и экспертов Windows
     author_configs = [
         {
-            "name": "Оптимизация от Скидончика",
+            "name": "Оптимизация от socde18",
             "bootstyle": "success-outline",
             "description": """⭐ ОПТИМИЗАЦИЯ ОТ АВТОРА ⭐
 
@@ -4054,88 +3822,606 @@ def switch_to_main():
     # Лучшие твики из популярных твикеров и сборок
     tweaker_configs = [
         {
-            "name": "Оптимизация от afoni",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (low-level)\n\nНабор низкоуровневых системных твиков от пользователя afoni. Включает критические правки системы для ультра-низкой задержки.\n\n• Общая оптимизация системы\n• Оптимизация графических настроек\n• Оптимизация схем электропитания\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "name": "Оптимизация от 123",
+            "bootstyle": "warning-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: 123 ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от пользователя 123. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 6 (уникальных: 3)
+
+    Основные улучшения:
+    • Очистка системы от временных файлов
+    • Общая оптимизация системы
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
-            "username": "afoni"
+            "username": "123"
+        },
+        {
+            "name": "Оптимизация от 666",
+            "bootstyle": "danger-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: 666 ⭐
+
+    Категория: ⚠️ НИЗКОУРОВНЕВАЯ ОПТИМИЗАЦИЯ
+
+    Набор низкоуровневых системных твиков от пользователя 666. Включает критические правки системы.
+
+    Количество твиков: 22 (уникальных: 11)
+
+    Основные улучшения:
+    • Оптимизация драйверов оборудования
+    • Общая оптимизация системы
+    • Настройка реестра Windows
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+
+    ⚠️ Требует осторожности. Рекомендуется только опытным пользователям.""",
+            "is_user": True,
+            "username": "666"
+        },
+        {
+            "name": "Оптимизация от APHEC",
+            "bootstyle": "danger-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: APHEC ⭐
+
+    Категория: ⚠️ АГРЕССИВНАЯ ОПТИМИЗАЦИЯ
+
+    Агрессивный набор оптимизаций от пользователя APHEC. Включает глубокие системные правки для максимальной производительности.
+
+    Количество твиков: 20 (уникальных: 10)
+
+    Основные улучшения:
+    • Улучшение производительности в играх
+    • Снижение задержки ввода
+    • Общая оптимизация системы
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+
+    ⚠️ Требует осторожности. Рекомендуется только опытным пользователям.""",
+            "is_user": True,
+            "username": "APHEC"
+        },
+        {
+            "name": "Оптимизация от ASUS",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: ASUS ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя ASUS. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "ASUS"
+        },
+        {
+            "name": "Оптимизация от Admin",
+            "bootstyle": "danger-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Admin ⭐
+
+    Категория: ⚠️ НИЗКОУРОВНЕВАЯ ОПТИМИЗАЦИЯ
+
+    Набор низкоуровневых системных твиков от пользователя Admin. Включает критические правки системы.
+
+    Количество твиков: 12 (уникальных: 6)
+
+    Основные улучшения:
+    • Оптимизация драйверов оборудования
+    • Настройка реестра Windows
+    • Общая оптимизация системы
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+
+    ⚠️ Требует осторожности. Рекомендуется только опытным пользователям.""",
+            "is_user": True,
+            "username": "Admin"
         },
         {
             "name": "Оптимизация от Alex",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (агрессивная)\n\nАгрессивный набор оптимизаций от пользователя Alex. Включает глубокие системные правки для максимальной производительности.\n\n• Оптимизация графических настроек\n• Общая оптимизация системы\n• Оптимизация схем электропитания\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Alex ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя Alex. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "Alex"
         },
         {
             "name": "Оптимизация от Chichkanov",
             "bootstyle": "warning-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ✅ БЕЗОПАСНАЯ\n\nКомплексный набор оптимизаций от пользователя Chichkanov. Сбалансированные настройки для улучшения работы Windows.\n\n• Общая оптимизация системы\n• Отключение телеметрии и слежения\n• Оптимизация использования памяти\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nРекомендуется для всех пользователей, желающих улучшить работу системы.",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Chichkanov ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от пользователя Chichkanov. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 8 (уникальных: 4)
+
+    Основные улучшения:
+    • Настройка сетевых параметров
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "Chichkanov"
         },
         {
-            "name": "Оптимизация от hsed",
-            "bootstyle": "warning-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (агрессивная)\n\nАгрессивный набор оптимизаций от пользователя hsed. Включает глубокие системные правки для максимальной производительности.\n\n• Оптимизация схем электропитания\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n• Ускорение работы Windows\n• Оптимизация работы с файлами\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "name": "Оптимизация от Hentai",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Hentai ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя Hentai. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
-            "username": "hsed"
-        },
-        {
-            "name": "Оптимизация от lyash",
-            "bootstyle": "warning-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (low-level)\n\nНабор низкоуровневых системных твиков от пользователя lyash. Включает критические правки системы для ультра-низкой задержки.\n\n• Комплексные системные оптимизации\n• Оптимизация схем электропитания\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n• Ускорение работы Windows\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
-            "is_user": True,
-            "username": "lyash"
+            "username": "Hentai"
         },
         {
             "name": "Оптимизация от PC",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (агрессивная)\n\nАгрессивный набор оптимизаций от пользователя PC. Включает глубокие системные правки для максимальной производительности.\n\n• Оптимизация схем электропитания\n• Общая оптимизация системы\n• Оптимизация графических настроек\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "warning-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: PC ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от пользователя PC. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 13 (уникальных: 8)
+
+    Основные улучшения:
+    • Оптимизация графических настроек
+    • Настройка сетевых параметров
+    • Общая оптимизация системы
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "PC"
         },
         {
             "name": "Оптимизация от Santo",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (low-level)\n\nНабор низкоуровневых системных твиков от пользователя Santo. Включает критические правки системы для ультра-низкой задержки.\n\n• Комплексные системные оптимизации\n• Настройка реестра Windows\n• Оптимизация схем электропитания\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Santo ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя Santo. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 1 (уникальных: 1)
+
+    Основные улучшения:
+    • Оптимизация использования памяти
+    • Очистка системы от временных файлов
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "Santo"
         },
         {
-            "name": "Оптимизация от silver gloria",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (low-level)\n\nНабор низкоуровневых системных твиков от пользователя silver gloria. Включает критические правки системы для ультра-низкой задержки.\n\n• Комплексные системные оптимизации\n• Настройка реестра Windows\n• Оптимизация графических настроек\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "name": "Оптимизация от StizaR",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: StizaR ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя StizaR. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
-            "username": "silver gloria"
+            "username": "StizaR"
         },
         {
             "name": "Оптимизация от StizaR81",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (агрессивная)\n\nАгрессивный набор оптимизаций от пользователя StizaR81. Включает глубокие системные правки для максимальной производительности.\n\n• Общая оптимизация системы\n• Оптимизация графических настроек\n• Отключение телеметрии и слежения\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: StizaR81 ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя StizaR81. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "StizaR81"
         },
         {
             "name": "Оптимизация от Vlad",
-            "bootstyle": "warning-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (аппаратная)\n\nКомплексный набор оптимизаций аппаратного уровня от пользователя Vlad. Включает настройку драйверов и железа.\n\n• Общая оптимизация системы\n• Отключение телеметрии и слежения\n• Оптимизация драйверов оборудования\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Vlad ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя Vlad. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 4 (уникальных: 2)
+
+    Основные улучшения:
+    • Оптимизация схем электропитания
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "Vlad"
         },
         {
             "name": "Оптимизация от X-Files",
-            "bootstyle": "warning-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (агрессивная)\n\nАгрессивный набор оптимизаций от пользователя X-Files. Включает глубокие системные правки для максимальной производительности.\n\n• Общая оптимизация системы\n• Оптимизация графических настроек\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n• Ускорение работы Windows\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: X-Files ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя X-Files. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "X-Files"
         },
         {
+            "name": "Оптимизация от Xpanitel",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Xpanitel ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя Xpanitel. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 2 (уникальных: 1)
+
+    Основные улучшения:
+    • Оптимизация графических настроек
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "Xpanitel"
+        },
+        {
             "name": "Оптимизация от YourCat",
-            "bootstyle": "danger-outline",
-            "description": "⭐ ОПТИМИЗАЦИЯ ОТ ПОЛЬЗОВАТЕЛЯ ⭐\n\nКатегория: ⚠️ ОПАСНАЯ (low-level)\n\nНабор низкоуровневых системных твиков от пользователя YourCat. Включает критические правки системы для ультра-низкой задержки.\n\n• Комплексные системные оптимизации\n• Оптимизация драйверов оборудования\n• Улучшение отзывчивости системы\n• Оптимизация автозагрузки\n• Настройка визуальных эффектов\n• Ускорение работы Windows\n\nТребует осторожности. Рекомендуется только опытным пользователям.",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: YourCat ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя YourCat. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
             "is_user": True,
             "username": "YourCat"
+        },
+        {
+            "name": "Оптимизация от afoni",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: afoni ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя afoni. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 2 (уникальных: 1)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "afoni"
+        },
+        {
+            "name": "Оптимизация от hsed",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: hsed ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя hsed. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "hsed"
+        },
+        {
+            "name": "Оптимизация от isoro",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: isoro ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя isoro. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 2 (уникальных: 1)
+
+    Основные улучшения:
+    • Общая оптимизация системы
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "isoro"
+        },
+        {
+            "name": "Оптимизация от kalit",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: kalit ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя kalit. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "kalit"
+        },
+        {
+            "name": "Оптимизация от lyash",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: lyash ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя lyash. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "lyash"
+        },
+        {
+            "name": "Оптимизация от maxi",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: maxi ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя maxi. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 4 (уникальных: 2)
+
+    Основные улучшения:
+    • Отключение телеметрии и слежения
+    • Оптимизация схем электропитания
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "maxi"
+        },
+        {
+            "name": "Оптимизация от sergey",
+            "bootstyle": "warning-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: sergey ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от пользователя sergey. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 6 (уникальных: 3)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "sergey"
+        },
+        {
+            "name": "Оптимизация от silver gloria",
+            "bootstyle": "warning-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: silver gloria ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от пользователя silver gloria. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 10 (уникальных: 10)
+
+    Основные улучшения:
+    • Оптимизация графических настроек
+    • Настройка реестра Windows
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "silver gloria"
+        },
+        {
+            "name": "Оптимизация от sirenfy",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: sirenfy ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя sirenfy. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "sirenfy"
+        },
+        {
+            "name": "Оптимизация от wretz",
+            "bootstyle": "success-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: wretz ⭐
+
+    Категория: 🔹 БАЗОВАЯ ОПТИМИЗАЦИЯ
+
+    Минимальный набор оптимизаций от пользователя wretz. Базовые настройки для улучшения работы системы.
+
+    Количество твиков: 0 (уникальных: 0)
+
+    Основные улучшения:
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "wretz"
+        },
+        {
+            "name": "Оптимизация от Администратора",
+            "bootstyle": "danger-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Администратор ⭐
+
+    Категория: ⚠️ АГРЕССИВНАЯ ОПТИМИЗАЦИЯ
+
+    Агрессивный набор оптимизаций от пользователя Администратор. Включает глубокие системные правки для максимальной производительности.
+
+    Количество твиков: 16 (уникальных: 8)
+
+    Основные улучшения:
+    • Оптимизация драйверов оборудования
+    • Оптимизация графических настроек
+    • Оптимизация использования памяти
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+
+    ⚠️ Требует осторожности. Рекомендуется только опытным пользователям.""",
+            "is_user": True,
+            "username": "Администратор"
+        },
+        {
+            "name": "Оптимизация от Чебоксарского",
+            "bootstyle": "warning-outline",
+            "description": """⭐ ОПТИМИЗАЦИЯ: Чебоксарский ⭐
+
+    Категория: ⚖️ СБАЛАНСИРОВАННАЯ ОПТИМИЗАЦИЯ
+
+    Комплексный набор оптимизаций от Чебоксарского пользователя. Сбалансированные настройки для улучшения работы Windows.
+
+    Количество твиков: 8 (уникальных: 4)
+
+    Основные улучшения:
+    • Настройка сетевых параметров
+    • Улучшение отзывчивости системы
+    • Настройка визуальных эффектов
+    • Ускорение работы Windows
+    • Оптимизация системных служб
+
+    ✅ Рекомендуется для всех пользователей, желающих улучшить работу системы.""",
+            "is_user": True,
+            "username": "Чебоксарский"
         }
     ]
 
@@ -4236,39 +4522,39 @@ def switch_to_main():
     canvas.pack(side="left", fill="both", expand=True)
     scrollbar.pack(side="right", fill="y")
 
-    # Верхний фрейм с описанием и конфигом от Скидончика (внутри скроллируемого контейнера)
-    top_info_frame = ttk.Frame(scrollable_frame)
-    top_info_frame.pack(fill="x", pady=(0, 20), padx=10)
+    # # Верхний фрейм с описанием и конфигом от socde18а (внутри скроллируемого контейнера)
+    # top_info_frame = ttk.Frame(scrollable_frame)
+    # top_info_frame.pack(fill="x", pady=(0, 20), padx=10)
     
-    # Настраиваем grid для равномерного распределения
-    top_info_frame.grid_columnconfigure(0, weight=3, minsize=500)
-    top_info_frame.grid_columnconfigure(1, weight=2, minsize=350)
+    # # Настраиваем grid для равномерного распределения
+    # top_info_frame.grid_columnconfigure(0, weight=3, minsize=500)
+    # top_info_frame.grid_columnconfigure(1, weight=2, minsize=350)
     
-    # Левая часть - описание твикера
-    description_frame = ttk.Labelframe(top_info_frame, text="О твикере Extreme", padding=15)
-    description_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
+#     # Левая часть - описание твикера
+#     description_frame = ttk.Labelframe(top_info_frame, text="О твикере Extreme", padding=15)
+#     description_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 10))
     
-    description_text = ttk.Label(
-        description_frame,
-        text="""Extreme - это база, которая позволяет внести в систему огромное количество глобальных твиков. Не просто "ускорить ПК", а точечно настроить под себя.
+#     description_text = ttk.Label(
+#         description_frame,
+#         text="""Extreme - это база, которая позволяет внести в систему огромное количество глобальных твиков. Не просто "ускорить ПК", а точечно настроить под себя.
 
-✅ Открытый исходный код - вы всегда можете посмотреть КОНКРЕТНО какие изменения вносятся в реестр и систему. Никаких скрытых действий!
+# ✅ Открытый исходный код - вы всегда можете посмотреть КОНКРЕТНО какие изменения вносятся в реестр и систему. Никаких скрытых действий!
 
-✅ Признание экспертов - некоторые наши твики используют такие известные личности как Igromanoff и DE3NAKE. Они проверяли, тестировали и используют наши твики.
+# ✅ Признание экспертов - некоторые наши твики используют такие известные личности как Igromanoff и DE3NAKE. Они проверяли, тестировали и используют наши твики.
 
-✅ Универсальность - собраны лучшие твики из Hone, BoosterX и других проектов. Один инструмент вместо десятка.
+# ✅ Универсальность - собраны лучшие твики из Hone, BoosterX и других проектов. Один инструмент вместо десятка.
 
-✅ Для слабых ПК - реально помогает дать вторую жизнь старому железу за счет удаления всего лишнего.
+# ✅ Для слабых ПК - реально помогает дать вторую жизнь старому железу за счет удаления всего лишнего.
 
-Можно отключить телеметрию, ненужные службы, виджеты Windows 11, убрать скрытые фоновые процессы, удалить мусорные UWP-приложения, очистить логи и восстановить Windows Store.
+# Можно отключить телеметрию, ненужные службы, виджеты Windows 11, убрать скрытые фоновые процессы, удалить мусорные UWP-приложения, очистить логи и восстановить Windows Store.
 
-⚠️ ВАЖНО: Это не "волшебная кнопка". Требует понимания что вы отключаете. Начинайте с базовых пресетов!
-""",
-        wraplength=480,
-        justify="left",
-        font=("Segoe UI", 10)
-    )
-    description_text.pack(anchor="w", fill="x")
+# ⚠️ ВАЖНО: Это не "волшебная кнопка". Требует понимания что вы отключаете. Начинайте с базовых пресетов!
+# """,
+#         wraplength=480,
+#         justify="left",
+#         font=("Segoe UI", 10)
+#     )
+#     description_text.pack(anchor="w", fill="x")
 
     # # Документация по конфигам (короткая “карта” что выбирать)
     # configs_docs_frame = ttk.Labelframe(scrollable_frame, text="📚 Документация по конфигам", padding=15)
@@ -4286,7 +4572,7 @@ def switch_to_main():
 # ✅ Безопасные (рекомендуем большинству):
 # • Марк Аддерли — глубокая, но в целом “бережная” оптимизация без экстремальных low-level правок.
 # • MartyFiles — ускоряет повседневную работу Windows (проводник/запуск/визуальные мелочи), не про FPS напрямую.
-# • Скидончик — сбалансированный набор, хороший старт и часто лучший выбор “по умолчанию”.
+# • socde18 — сбалансированный набор, хороший старт и часто лучший выбор “по умолчанию”.
 # • Олег AMPR — аккуратная оптимизация системы/реестра/служб без жёсткого “вырезания”.
 # • Хауди Хо — чистка и отключение лишнего (телеметрия/виджеты/UWP) в разумных пределах.
 
@@ -4297,7 +4583,7 @@ def switch_to_main():
 # ⭐ Лучшие (если хочешь “топ” варианты):
 # • Ancels — комплексный экспертный пакет, часто даёт заметный эффект, но может быть агрессивнее “безопасных”.
 # • Igromanoff (Игроманов) — сильный игровой набор: упор на отклик/фон/приоритеты/сеть под игры.
-# • Скидончик — лучший стартовый баланс и простой выбор без лишних рисков.
+# • socde18 — лучший стартовый баланс и простой выбор без лишних рисков.
 
 # Важно:
 # • Перед применением любых конфигов желательно создать точку восстановления или бэкап.
@@ -4309,98 +4595,98 @@ def switch_to_main():
 #     )
 #     configs_docs_text.pack(anchor="w", fill="x")
     
-    # Правая часть - конфиг от Скидончика и кнопки
-    right_action_frame = ttk.Labelframe(top_info_frame, text="⭐ Рекомендуется", padding=15)
-    right_action_frame.grid(row=0, column=1, sticky="nsew", padx=(10, 0))
+    # # Правая часть - конфиг от socde18а и кнопки
+    # right_action_frame = ttk.Labelframe(top_info_frame, text="⭐ Рекомендуется", padding=15)
+    # right_action_frame.grid(row=0, column=1, sticky="nsew", padx=(10, 0))
     
-    # Конфиг от Скидончика
-    skidonchik_config = author_configs[0]  # Первый конфиг - от Скидончика
+    # # Конфиг от socde18а
+    # skidonchik_config = author_configs[0]  # Первый конфиг - от socde18а
     
-    # Заголовок конфига
-    skidonchik_title = ttk.Label(
-        right_action_frame,
-        text="Оптимизация от Скидончика",
-        font=("Segoe UI", 10, "bold")
-    )
-    skidonchik_title.pack(pady=(0, 8))
+    # # Заголовок конфига
+    # skidonchik_title = ttk.Label(
+    #     right_action_frame,
+    #     text="Оптимизация от socde18а",
+    #     font=("Segoe UI", 10, "bold")
+    # )
+    # skidonchik_title.pack(pady=(0, 8))
     
-    skidonchik_button = ttk.Button(
-        right_action_frame,
-        text="🚀 Запустить",
-        bootstyle=skidonchik_config["bootstyle"],
-        width=25,
-        command=lambda: show_novice_warning(skidonchik_config["name"]) if novice_mode else run_config(skidonchik_config["name"])
-    )
-    skidonchik_button.pack(pady=(0, 10))
+    # skidonchik_button = ttk.Button(
+    #     right_action_frame,
+    #     text="🚀 Запустить",
+    #     bootstyle=skidonchik_config["bootstyle"],
+    #     width=25,
+    #     command=lambda: show_novice_warning(skidonchik_config["name"]) if novice_mode else run_config(skidonchik_config["name"])
+    # )
+    # skidonchik_button.pack(pady=(0, 10))
 
-    def show_novice_warning(config_name):
-        """Показать предупреждение для новичков"""
-        result = messagebox.askyesno(
-            "⚠️ Внимание! Режим новичка",
-            f"Конфигурация '{config_name}' может сломать систему!\n\n"
-            "Этот конфиг содержит агрессивные оптимизации, которые могут:\n"
-            "• Нарушить работу Windows\n"
-            "• Привести к нестабильности системы\n"
-            "• Вызвать проблемы с драйверами\n\n"
-            "Рекомендуется:\n"
-            "• Создать точку восстановления\n"
-            "• Сделать бэкап важных данных\n"
-            "• Использовать только если понимаете последствия\n\n"
-            "Вы уверены, что хотите продолжить?",
-            icon='warning'
-        )
-        if result:
-            run_config(config_name)
+    # def show_novice_warning(config_name):
+    #     """Показать предупреждение для новичков"""
+    #     result = messagebox.askyesno(
+    #         "⚠️ Внимание! Режим новичка",
+    #         f"Конфигурация '{config_name}' может сломать систему!\n\n"
+    #         "Этот конфиг содержит агрессивные оптимизации, которые могут:\n"
+    #         "• Нарушить работу Windows\n"
+    #         "• Привести к нестабильности системы\n"
+    #         "• Вызвать проблемы с драйверами\n\n"
+    #         "Рекомендуется:\n"
+    #         "• Создать точку восстановления\n"
+    #         "• Сделать бэкап важных данных\n"
+    #         "• Использовать только если понимаете последствия\n\n"
+    #         "Вы уверены, что хотите продолжить?",
+    #         icon='warning'
+    #     )
+    #     if result:
+    #         run_config(config_name)
     
-    # Краткое описание конфига
-    skidonchik_desc = ttk.Label(
-        right_action_frame,
-        text="Профессиональный набор оптимизаций от автора для улучшения работы системы.",
-        wraplength=340,
-        justify="left",
-        font=("Segoe UI", 8),
-        foreground="gray"
-    )
-    skidonchik_desc.pack(pady=(0, 15))
+    # # Краткое описание конфига
+    # skidonchik_desc = ttk.Label(
+    #     right_action_frame,
+    #     text="Профессиональный набор оптимизаций от автора для улучшения работы системы.",
+    #     wraplength=340,
+    #     justify="left",
+    #     font=("Segoe UI", 8),
+    #     foreground="gray"
+    # )
+    # skidonchik_desc.pack(pady=(0, 15))
     
-    # Разделитель
-    separator = ttk.Separator(right_action_frame, orient="horizontal")
-    separator.pack(fill="x", pady=(0, 15))
+    # # Разделитель
+    # separator = ttk.Separator(right_action_frame, orient="horizontal")
+    # separator.pack(fill="x", pady=(0, 15))
     
-    # Кнопки для перехода
-    nav_label = ttk.Label(
-        right_action_frame,
-        text="Быстрая навигация:",
-        font=("Segoe UI", 9, "bold")
-    )
-    nav_label.pack(pady=(0, 8))
+    # # Кнопки для перехода
+    # nav_label = ttk.Label(
+    #     right_action_frame,
+    #     text="Быстрая навигация:",
+    #     font=("Segoe UI", 9, "bold")
+    # )
+    # nav_label.pack(pady=(0, 8))
     
-    optimization_btn = ttk.Button(
-        right_action_frame,
-        text="⚙️ Оптимизация",
-        bootstyle="danger-outline",
-        width=25,
-        command=switch_to_optimization
-    )
-    optimization_btn.pack(pady=(0, 8))
+    # optimization_btn = ttk.Button(
+    #     right_action_frame,
+    #     text="⚙️ Оптимизация",
+    #     bootstyle="danger-outline",
+    #     width=25,
+    #     command=switch_to_optimization
+    # )
+    # optimization_btn.pack(pady=(0, 8))
     
-    settings_btn = ttk.Button(
-        right_action_frame,
-        text="🔧 Настройки",
-        bootstyle="info-outline",
-        width=25,
-        command=switch_to_settings
-    )
-    settings_btn.pack(pady=(0, 8))
+    # settings_btn = ttk.Button(
+    #     right_action_frame,
+    #     text="🔧 Настройки",
+    #     bootstyle="info-outline",
+    #     width=25,
+    #     command=switch_to_settings
+    # )
+    # settings_btn.pack(pady=(0, 8))
 
-    donat_btn = ttk.Button(
-        right_action_frame,
-        text="☕ Поддержать",
-        bootstyle="warning-outline",
-        width=25,
-        command=open_donat
-    )
-    donat_btn.pack(pady=(0, 5))
+    # donat_btn = ttk.Button(
+    #     right_action_frame,
+    #     text="☕ Поддержать",
+    #     bootstyle="warning-outline",
+    #     width=25,
+    #     command=open_donat
+    # )
+    # donat_btn.pack(pady=(0, 5))
 
     # Загружаем пользовательские конфиги из папки user_data\Configs
     user_configs = []
@@ -4455,7 +4741,8 @@ def switch_to_main():
                 text=cfg["name"],
                 width=28,
                 bootstyle=btn_style,
-                command=lambda path=config_path: subprocess.call([path], shell=True)
+                command=lambda path=config_path: subprocess.Popen([path], shell=True,
+                                                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             )
             btn.pack(pady=(10, 5), padx=10)
 
@@ -4705,6 +4992,7 @@ def switch_to_drivers():
 """
 
 from optimization_tab import create_optimization_tab
+# from services_manager import create_services_tab
 
 def switch_to_optimization():
     # Удаляем все существующие вкладки
@@ -4734,23 +5022,33 @@ def switch_to_optimization():
         # Скрываем опасные вкладки, если режим разработчика выключен
         if not novice_mode and not developer_mode and tab_name in dangerous_tabs:
             continue
+        
+        # Специальная обработка для вкладки Службы
+        if tab_name == "Службы":
+            try:
+                # services_frame = create_services_tab(tab_control, config)
+                # tab_control.add(services_frame, text=tab_name)
+                print(f"✅ Вкладка {tab_name} создана")
+            except Exception as e:
+                print(f"❌ Ошибка при создании вкладки {tab_name}: {e}")
+        else:
+            # Обычная вкладка с чекбоксами
+            tab_frame = ttk.Frame(tab_control)
+            tab_control.add(tab_frame, text=tab_name)
             
-        tab_frame = ttk.Frame(tab_control)
-        tab_control.add(tab_frame, text=tab_name)
-        
-        placeholder = ttk.Label(
-            tab_frame,
-            text="Загрузка содержимого...",
-            font=("Segoe UI", 12),
-            foreground="#32FBE2",
-        )
-        placeholder.pack(expand=True)
-        
-        tab_frame.tab_info = {
-            "name": tab_name,
-            "checkbox_names": checkbox_names,
-            "loaded": False,
-        }
+            placeholder = ttk.Label(
+                tab_frame,
+                text="Загрузка содержимого...",
+                font=("Segoe UI", 12),
+                foreground="#32FBE2",
+            )
+            placeholder.pack(expand=True)
+            
+            tab_frame.tab_info = {
+                "name": tab_name,
+                "checkbox_names": checkbox_names,
+                "loaded": False,
+            }
     
     # Выбираем первую вкладку (Оптимизация)
     if tab_control.tabs():
@@ -5373,7 +5671,8 @@ def switch_to_settings():
         theme_editor_frame,
         text="Открыть редактор",
         bootstyle="danger-outline",
-        command=lambda: subprocess.run(["python", "-m", "ttkcreator"]),
+        command=lambda: subprocess.Popen(["python", "-m", "ttkcreator"],
+                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL),
     )
     theme_editor_btn.pack(side="left")
 
@@ -5532,31 +5831,6 @@ def switch_to_settings():
 
     # show_sidebar_dropdown.bind("<<ComboboxSelected>>", update_sidebar_visibility)
 
-    # # Настройка автообновления
-    # auto_update_var = tk.StringVar(
-    #     value="Включено"
-    #     if config.getboolean("General", "auto_update_enabled", fallback=True)
-    #     else "Выключено"
-    # )
-    # ttk.Label(
-    #     additional_section, text="Автообновление:", font=("Segoe UI", 10)
-    # ).pack(anchor="w", pady=(10, 5))
-    # auto_update_dropdown = ttk.Combobox(
-    #     additional_section,
-    #     textvariable=auto_update_var,
-    #     values=["Включено", "Выключено"],
-    #     width=30,
-    # )
-    # auto_update_dropdown.pack(anchor="w", pady=(0, 10))
-
-    # def update_auto_update(event=None):
-    #     new_value = auto_update_var.get() == "Включено"
-    #     config["General"]["auto_update_enabled"] = str(new_value)
-    #     with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-    #         config.write(configfile)
-
-    # auto_update_dropdown.bind("<<ComboboxSelected>>", update_auto_update)
-
     # # Привязываем события к элементам управления
     # font_family_dropdown.bind("<<ComboboxSelected>>", update_font)
     # theme_dropdown.bind("<<ComboboxSelected>>", update_theme)
@@ -5597,8 +5871,8 @@ def switch_to_settings():
             "Другое": "switch_to_other_wrapper",
             "Очистка": "switch_to_clean_wrapper",
             "Исправления": "switch_to_fixes_wrapper",
-            "Настройки": "switch_to_settings_wrapper",
-            "Антон AI": "switch_to_gpt_wrapper",
+            # "Настройки": "switch_to_settings_wrapper",
+            # "Антон AI": "switch_to_gpt_wrapper",
         }
 
         # Получаем выбранное пользовательское название и преобразуем его в имя функции
@@ -6586,643 +6860,448 @@ def switch_to_settings():
     #             "loaded": False,
     #         }
 
-    # Добавляем вкладку телеметрии
-    telemetry_tab = ttk.Frame(tab_control)
-    tab_control.add(telemetry_tab, text="Обратная связь")
-    # tab_control.add(telemetry_tab, text="Телеметрия")
+#     # Секция управления Windows Firewall
+#     firewall_section = ttk.Labelframe(telemetry_section, text="Управление Windows Firewall", padding=15)
+#     firewall_section.pack(fill="x", pady=(15, 0))
 
-    # Создаем Canvas и Scrollbar для прокрутки всей вкладки
-    telemetry_canvas = tk.Canvas(telemetry_tab)
-    telemetry_scrollbar_main = ttk.Scrollbar(telemetry_tab, orient="vertical", command=telemetry_canvas.yview)
-    telemetry_scrollable_frame = ttk.Frame(telemetry_canvas)
-    
-    telemetry_scrollable_frame.bind(
-        "<Configure>",
-        lambda e: telemetry_canvas.configure(scrollregion=telemetry_canvas.bbox("all"))
-    )
-    
-    telemetry_canvas.create_window((0, 0), window=telemetry_scrollable_frame, anchor="nw")
-    telemetry_canvas.configure(yscrollcommand=telemetry_scrollbar_main.set)
-    
-    def on_telemetry_mousewheel(event):
-        telemetry_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-    
-    telemetry_canvas.bind_all("<MouseWheel>", on_telemetry_mousewheel)
-    
-    # Обновление размера окна canvas при изменении размера canvas
-    def configure_telemetry_scroll_region(event):
-        canvas_width = event.width
-        canvas_items = telemetry_canvas.find_all()
-        if canvas_items:
-            telemetry_canvas.itemconfig(canvas_items[0], width=canvas_width)
-        telemetry_canvas.configure(scrollregion=telemetry_canvas.bbox("all"))
-    
-    telemetry_canvas.bind('<Configure>', configure_telemetry_scroll_region)
-    
-    telemetry_canvas.pack(side="left", fill="both", expand=True)
-    telemetry_scrollbar_main.pack(side="right", fill="y")
+#     ttk.Label(
+#         firewall_section,
+#         text="Управление доступом в интернет для файлов твикера через Windows Firewall",
+#         font=("Segoe UI", 10),
+#         wraplength=500,
+#         justify="left",
+#     ).pack(anchor="w", pady=(0, 10))
 
-    # Создаем основной контейнер с отступами
-    telemetry_frame = ttk.Frame(telemetry_scrollable_frame, padding=20)
-    telemetry_frame.pack(fill="both", expand=True)
+#     # Функция для включения Windows Firewall
+#     def enable_firewall():
+#         try:
+#             result = subprocess.run(
+#                 ["netsh", "advfirewall", "set", "allprofiles", "state", "on"],
+#                 capture_output=True,
+#                 text=True,
+#                 shell=True
+#             )
+#             if result.returncode == 0:
+#                 messagebox.showinfo("Успех", "Windows Firewall включен")
+#             else:
+#                 messagebox.showerror("Ошибка", f"Не удалось включить Windows Firewall:\n{result.stderr}")
+#         except Exception as e:
+#             messagebox.showerror("Ошибка", f"Ошибка при включении Windows Firewall: {str(e)}")
 
-    # Заголовок
-    telemetry_title = ttk.Label(
-        telemetry_frame, text="Обратная связь", font=("Segoe UI", 16, "bold")
-        # telemetry_frame, text="Телеметрия и обратная связь", font=("Segoe UI", 16, "bold")
-    )
-    telemetry_title.pack(anchor="w", pady=(0, 20))
-
-    # Контейнер для двух колонок
-    columns_container = ttk.Frame(telemetry_frame)
-    columns_container.pack(fill="both", expand=True)
-
-    # Левая колонка (телеметрия)
-    left_column = ttk.Frame(columns_container)
-    left_column.pack(side="left", fill="both", expand=True, padx=(0, 15))
-
-    # Правая колонка (обратная связь)
-    right_column = ttk.Frame(columns_container)
-    right_column.pack(side="right", fill="both", expand=True)
-
-    # Секция телеметрии
-    telemetry_section = ttk.Labelframe(left_column, text="Телеметрия", padding=15)
-    telemetry_section.pack(fill="x", expand=False)
-
-    # Заголовок
-    ttk.Label(
-        telemetry_section, text="Отправка телеметрии", font=("Segoe UI", 14, "bold")
-    ).pack(anchor="w", pady=(0, 5))
-
-    # Описание
-    description_text = """Отправка данных о работе программы и настроек для улучшения функциональности и внешнего вида.
-
-Отправляемые данные:
-
-• Сообщения об успешном запуске программы
-• Сообщения об ошибках
-• Лог-файлы
-• Настройки Extreme
-• Запущенные твики
-• Время запуска
-• Имя пользователя и версия Windows
-• Список установленных программ для вкладки PostInstall"""
-
-    ttk.Label(
-        telemetry_section,
-        text=description_text,
-        font=("Segoe UI", 10),
-        wraplength=500,
-        justify="left",
-    ).pack(anchor="w", pady=(0, 10))
-
-    # Создаем переменную для хранения состояния отправки телеметрии при закрытии
-    send_telemetry_on_close_var = tk.StringVar(
-        value="Включено"
-        if config.getboolean("Telemetry", "send_on_close", fallback=True)
-        else "Выключено"
-    )
-
-    # Выпадающий список для выбора отправки телеметрии при закрытии
-    ttk.Label(
-        telemetry_section, text="Отправлять телеметрию:", font=("Segoe UI", 10)
-    ).pack(anchor="w", pady=(0, 5))
-    telemetry_on_close_dropdown = ttk.Combobox(
-        telemetry_section,
-        textvariable=send_telemetry_on_close_var,
-        values=["Включено", "Выключено"],
-        width=30,
-    )
-    telemetry_on_close_dropdown.pack(anchor="w", pady=(0, 10))
-
-    # Функция для обновления настройки отправки телеметрии при закрытии
-    def update_telemetry_on_close(event=None):
-        new_value = send_telemetry_on_close_var.get() == "Включено"
-        config["Telemetry"]["send_on_close"] = str(new_value)
-        with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-            config.write(configfile)
-
-    # Привязываем событие выбора
-    telemetry_on_close_dropdown.bind("<<ComboboxSelected>>", update_telemetry_on_close)
-
-    # Секция управления Windows Firewall
-    firewall_section = ttk.Labelframe(telemetry_section, text="Управление Windows Firewall", padding=15)
-    firewall_section.pack(fill="x", pady=(15, 0))
-
-    ttk.Label(
-        firewall_section,
-        text="Управление доступом в интернет для файлов твикера через Windows Firewall",
-        font=("Segoe UI", 10),
-        wraplength=500,
-        justify="left",
-    ).pack(anchor="w", pady=(0, 10))
-
-    # Функция для включения Windows Firewall
-    def enable_firewall():
-        try:
-            result = subprocess.run(
-                ["netsh", "advfirewall", "set", "allprofiles", "state", "on"],
-                capture_output=True,
-                text=True,
-                shell=True
-            )
-            if result.returncode == 0:
-                messagebox.showinfo("Успех", "Windows Firewall включен")
-            else:
-                messagebox.showerror("Ошибка", f"Не удалось включить Windows Firewall:\n{result.stderr}")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка при включении Windows Firewall: {str(e)}")
-
-    # Функция для блокировки доступа в интернет
-    def block_internet_access():
-        try:
-            # Включаем firewall сначала
-            enable_firewall()
+#     # Функция для блокировки доступа в интернет
+#     def block_internet_access():
+#         try:
+#             # Включаем firewall сначала
+#             enable_firewall()
             
-            # Получаем путь к исполняемым файлам
-            exe_files = []
-            if os.path.exists("Extreme.exe"):
-                exe_files.append(("Extreme.exe", os.path.abspath("Extreme.exe")))
-            if os.path.exists("Updater.exe"):
-                exe_files.append(("Updater.exe", os.path.abspath("Updater.exe")))
-            if os.path.exists("Utils/busybox.exe"):
-                exe_files.append(("busybox.exe", os.path.abspath("Utils/busybox.exe")))
+#             # Получаем путь к исполняемым файлам
+#             exe_files = []
+#             if os.path.exists("Extreme.exe"):
+#                 exe_files.append(("Extreme.exe", os.path.abspath("Extreme.exe")))
+#             if os.path.exists("Updater.exe"):
+#                 exe_files.append(("Updater.exe", os.path.abspath("Updater.exe")))
+#             if os.path.exists("Utils/busybox.exe"):
+#                 exe_files.append(("busybox.exe", os.path.abspath("Utils/busybox.exe")))
             
-            blocked_count = 0
-            for exe_name, exe_path in exe_files:
-                # Создаем правило блокировки для исходящих подключений
-                rule_name = f"Block_{exe_name}_Outbound"
-                result = subprocess.run(
-                    [
-                        "netsh", "advfirewall", "firewall", "add", "rule",
-                        f"name={rule_name}",
-                        f"dir=out",
-                        "action=block",
-                        f"program={exe_path}",
-                        "enable=yes"
-                    ],
-                    capture_output=True,
-                    text=True,
-                    shell=True
-                )
-                if result.returncode == 0:
-                    blocked_count += 1
-                else:
-                    # Если правило уже существует, обновляем его
-                    subprocess.run(
-                        [
-                            "netsh", "advfirewall", "firewall", "set", "rule",
-                            f"name={rule_name}",
-                            "new", "enable=yes", "action=block"
-                        ],
-                        capture_output=True,
-                        text=True,
-                        shell=True
-                    )
-                    blocked_count += 1
+#             blocked_count = 0
+#             for exe_name, exe_path in exe_files:
+#                 # Создаем правило блокировки для исходящих подключений
+#                 rule_name = f"Block_{exe_name}_Outbound"
+#                 result = subprocess.run(
+#                     [
+#                         "netsh", "advfirewall", "firewall", "add", "rule",
+#                         f"name={rule_name}",
+#                         f"dir=out",
+#                         "action=block",
+#                         f"program={exe_path}",
+#                         "enable=yes"
+#                     ],
+#                     capture_output=True,
+#                     text=True,
+#                     shell=True
+#                 )
+#                 if result.returncode == 0:
+#                     blocked_count += 1
+#                 else:
+#                     # Если правило уже существует, обновляем его
+#                     subprocess.run(
+#                         [
+#                             "netsh", "advfirewall", "firewall", "set", "rule",
+#                             f"name={rule_name}",
+#                             "new", "enable=yes", "action=block"
+#                         ],
+#                         capture_output=True,
+#                         text=True,
+#                         shell=True
+#                     )
+#                     blocked_count += 1
             
-            if blocked_count > 0:
-                messagebox.showinfo("Успех", f"Доступ в интернет заблокирован для {blocked_count} файл(ов)")
-            else:
-                messagebox.showwarning("Предупреждение", "Не найдено файлов для блокировки")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка при блокировке доступа: {str(e)}")
+#             if blocked_count > 0:
+#                 messagebox.showinfo("Успех", f"Доступ в интернет заблокирован для {blocked_count} файл(ов)")
+#             else:
+#                 messagebox.showwarning("Предупреждение", "Не найдено файлов для блокировки")
+#         except Exception as e:
+#             messagebox.showerror("Ошибка", f"Ошибка при блокировке доступа: {str(e)}")
 
-    # Функция для разрешения доступа в интернет
-    def allow_internet_access():
-        try:
-            # Получаем путь к исполняемым файлам
-            exe_files = []
-            if os.path.exists("Extreme.exe"):
-                exe_files.append(("Extreme.exe", os.path.abspath("Extreme.exe")))
-            if os.path.exists("Updater.exe"):
-                exe_files.append(("Updater.exe", os.path.abspath("Updater.exe")))
-            if os.path.exists("Utils/busybox.exe"):
-                exe_files.append(("busybox.exe", os.path.abspath("Utils/busybox.exe")))
+#     # Функция для разрешения доступа в интернет
+#     def allow_internet_access():
+#         try:
+#             # Получаем путь к исполняемым файлам
+#             exe_files = []
+#             if os.path.exists("Extreme.exe"):
+#                 exe_files.append(("Extreme.exe", os.path.abspath("Extreme.exe")))
+#             if os.path.exists("Updater.exe"):
+#                 exe_files.append(("Updater.exe", os.path.abspath("Updater.exe")))
+#             if os.path.exists("Utils/busybox.exe"):
+#                 exe_files.append(("busybox.exe", os.path.abspath("Utils/busybox.exe")))
             
-            allowed_count = 0
-            for exe_name, exe_path in exe_files:
-                # Создаем правило разрешения для исходящих подключений
-                rule_name = f"Allow_{exe_name}_Outbound"
-                result = subprocess.run(
-                    [
-                        "netsh", "advfirewall", "firewall", "add", "rule",
-                        f"name={rule_name}",
-                        f"dir=out",
-                        "action=allow",
-                        f"program={exe_path}",
-                        "enable=yes"
-                    ],
-                    capture_output=True,
-                    text=True,
-                    shell=True
-                )
-                if result.returncode == 0:
-                    allowed_count += 1
-                else:
-                    # Если правило уже существует, обновляем его
-                    subprocess.run(
-                        [
-                            "netsh", "advfirewall", "firewall", "set", "rule",
-                            f"name={rule_name}",
-                            "new", "enable=yes", "action=allow"
-                        ],
-                        capture_output=True,
-                        text=True,
-                        shell=True
-                    )
-                    allowed_count += 1
+#             allowed_count = 0
+#             for exe_name, exe_path in exe_files:
+#                 # Создаем правило разрешения для исходящих подключений
+#                 rule_name = f"Allow_{exe_name}_Outbound"
+#                 result = subprocess.run(
+#                     [
+#                         "netsh", "advfirewall", "firewall", "add", "rule",
+#                         f"name={rule_name}",
+#                         f"dir=out",
+#                         "action=allow",
+#                         f"program={exe_path}",
+#                         "enable=yes"
+#                     ],
+#                     capture_output=True,
+#                     text=True,
+#                     shell=True
+#                 )
+#                 if result.returncode == 0:
+#                     allowed_count += 1
+#                 else:
+#                     # Если правило уже существует, обновляем его
+#                     subprocess.run(
+#                         [
+#                             "netsh", "advfirewall", "firewall", "set", "rule",
+#                             f"name={rule_name}",
+#                             "new", "enable=yes", "action=allow"
+#                         ],
+#                         capture_output=True,
+#                         text=True,
+#                         shell=True
+#                     )
+#                     allowed_count += 1
                 
-                # Удаляем правило блокировки, если оно существует
-                block_rule_name = f"Block_{exe_name}_Outbound"
-                subprocess.run(
-                    [
-                        "netsh", "advfirewall", "firewall", "delete", "rule",
-                        f"name={block_rule_name}"
-                    ],
-                    capture_output=True,
-                    text=True,
-                    shell=True
-                )
+#                 # Удаляем правило блокировки, если оно существует
+#                 block_rule_name = f"Block_{exe_name}_Outbound"
+#                 subprocess.run(
+#                     [
+#                         "netsh", "advfirewall", "firewall", "delete", "rule",
+#                         f"name={block_rule_name}"
+#                     ],
+#                     capture_output=True,
+#                     text=True,
+#                     shell=True
+#                 )
             
-            if allowed_count > 0:
-                messagebox.showinfo("Успех", f"Доступ в интернет разрешен для {allowed_count} файл(ов)")
-            else:
-                messagebox.showwarning("Предупреждение", "Не найдено файлов для разрешения")
-        except Exception as e:
-            messagebox.showerror("Ошибка", f"Ошибка при разрешении доступа: {str(e)}")
+#             if allowed_count > 0:
+#                 messagebox.showinfo("Успех", f"Доступ в интернет разрешен для {allowed_count} файл(ов)")
+#             else:
+#                 messagebox.showwarning("Предупреждение", "Не найдено файлов для разрешения")
+#         except Exception as e:
+#             messagebox.showerror("Ошибка", f"Ошибка при разрешении доступа: {str(e)}")
 
-    # Кнопки управления firewall
-    firewall_buttons_frame = ttk.Frame(firewall_section)
-    firewall_buttons_frame.pack(fill="x", pady=(0, 10))
+#     # Кнопки управления firewall
+#     firewall_buttons_frame = ttk.Frame(firewall_section)
+#     firewall_buttons_frame.pack(fill="x", pady=(0, 10))
 
-    ttk.Button(
-        firewall_buttons_frame,
-        text="🔒 Заблокировать доступ в интернет",
-        bootstyle="danger-outline",
-        command=block_internet_access,
-    ).pack(side="left", padx=(0, 10))
+#     ttk.Button(
+#         firewall_buttons_frame,
+#         text="🔒 Заблокировать доступ в интернет",
+#         bootstyle="danger-outline",
+#         command=block_internet_access,
+#     ).pack(side="left", padx=(0, 10))
 
-    ttk.Button(
-        firewall_buttons_frame,
-        text="✅ Разрешить доступ в интернет",
-        bootstyle="success-outline",
-        command=allow_internet_access,
-    ).pack(side="left", padx=(0, 10))
+#     ttk.Button(
+#         firewall_buttons_frame,
+#         text="✅ Разрешить доступ в интернет",
+#         bootstyle="success-outline",
+#         command=allow_internet_access,
+#     ).pack(side="left", padx=(0, 10))
 
-    ttk.Button(
-        firewall_buttons_frame,
-        text="⚙️ Включить Windows Firewall",
-        bootstyle="warning-outline",
-        command=enable_firewall,
-    ).pack(side="left")
+#     ttk.Button(
+#         firewall_buttons_frame,
+#         text="⚙️ Включить Windows Firewall",
+#         bootstyle="warning-outline",
+#         command=enable_firewall,
+#     ).pack(side="left")
 
-    # Секция обратной связи
-    feedback_section = ttk.Labelframe(left_column, text="Обратная связь", padding=15)
-    feedback_section.pack(fill="x", expand=False, pady=(15, 0))
+#     # Секция обратной связи
+#     feedback_section = ttk.Labelframe(left_column, text="Обратная связь", padding=15)
+#     feedback_section.pack(fill="x", expand=False, pady=(15, 0))
 
-    # Заголовок
-    ttk.Label(
-        feedback_section,
-        text="Отправить сообщение разработчику",
-        font=("Segoe UI", 14, "bold"),
-    ).pack(anchor="w", pady=(0, 5))
+#     # Заголовок
+#     ttk.Label(
+#         feedback_section,
+#         text="Отправить сообщение разработчику",
+#         font=("Segoe UI", 14, "bold"),
+#     ).pack(anchor="w", pady=(0, 5))
 
-    # Описание
-    ttk.Label(
-        feedback_section,
-        text="Вы можете отправить сообщение разработчику с предложениями по улучшению программы или сообщением об ошибках.",
-        font=("Segoe UI", 10),
-        wraplength=500,
-        justify="left",
-    ).pack(anchor="w", pady=(0, 10))
+#     # Описание
+#     ttk.Label(
+#         feedback_section,
+#         text="Вы можете отправить сообщение разработчику с предложениями по улучшению программы или сообщением об ошибках.",
+#         font=("Segoe UI", 10),
+#         wraplength=500,
+#         justify="left",
+#     ).pack(anchor="w", pady=(0, 10))
 
-    # Создаем текстовое поле для сообщения
-    message_text = tk.Text(feedback_section, height=5, width=50, font=("Segoe UI", 10))
-    message_text.pack(fill="x", pady=(0, 10))
+#     # Создаем текстовое поле для сообщения
+#     message_text = tk.Text(feedback_section, height=5, width=50, font=("Segoe UI", 10))
+#     message_text.pack(fill="x", pady=(0, 10))
 
-    # Создаем фрейм для кнопок загрузки файлов
-    file_buttons_frame = ttk.Frame(feedback_section)
-    file_buttons_frame.pack(fill="x", pady=(0, 10))
+#     # Создаем фрейм для кнопок загрузки файлов
+#     file_buttons_frame = ttk.Frame(feedback_section)
+#     file_buttons_frame.pack(fill="x", pady=(0, 10))
 
-    # Глобальные переменные для хранения путей к файлам
-    global attached_file, attached_image
-    attached_file = None
-    attached_image = None
+#     # Глобальные переменные для хранения путей к файлам
+#     global attached_file, attached_image
+#     attached_file = None
+#     attached_image = None
 
-    # Функция для загрузки файла
-    def attach_file():
-        global attached_file
-        file_path = filedialog.askopenfilename(
-            title="Выберите файл", filetypes=[("Все файлы", "*.*")]
-        )
-        if file_path:
-            attached_file = file_path
-            print(f"Файл прикреплен: {os.path.basename(file_path)}")
+#     # Функция для загрузки файла
+#     def attach_file():
+#         global attached_file
+#         file_path = filedialog.askopenfilename(
+#             title="Выберите файл", filetypes=[("Все файлы", "*.*")]
+#         )
+#         if file_path:
+#             attached_file = file_path
+#             print(f"Файл прикреплен: {os.path.basename(file_path)}")
 
-    # Функция для загрузки изображения
-    def attach_image():
-        global attached_image
-        image_path = filedialog.askopenfilename(
-            title="Выберите изображение",
-            filetypes=[("Изображения", "*.png *.jpg *.jpeg *.bmp *.gif")],
-        )
-        if image_path:
-            attached_image = image_path
-            print(f"Изображение прикреплено: {os.path.basename(image_path)}")
+#     # Функция для загрузки изображения
+#     def attach_image():
+#         global attached_image
+#         image_path = filedialog.askopenfilename(
+#             title="Выберите изображение",
+#             filetypes=[("Изображения", "*.png *.jpg *.jpeg *.bmp *.gif")],
+#         )
+#         if image_path:
+#             attached_image = image_path
+#             print(f"Изображение прикреплено: {os.path.basename(image_path)}")
 
-    # Кнопка для загрузки файла
-    ttk.Button(
-        file_buttons_frame,
-        text="Прикрепить файл",
-        bootstyle="info-outline",
-        command=attach_file,
-    ).pack(side="left", padx=5)
+#     # Кнопка для загрузки файла
+#     ttk.Button(
+#         file_buttons_frame,
+#         text="Прикрепить файл",
+#         bootstyle="info-outline",
+#         command=attach_file,
+#     ).pack(side="left", padx=5)
 
-    # Кнопка для загрузки изображения
-    ttk.Button(
-        file_buttons_frame,
-        text="Прикрепить изображение",
-        bootstyle="info-outline",
-        command=attach_image,
-    ).pack(side="left", padx=5)
+#     # Кнопка для загрузки изображения
+#     ttk.Button(
+#         file_buttons_frame,
+#         text="Прикрепить изображение",
+#         bootstyle="info-outline",
+#         command=attach_image,
+#     ).pack(side="left", padx=5)
 
-    # Функция для отправки сообщения
-    def send_feedback():
-        global attached_file, attached_image
-        message = message_text.get("1.0", "end-1c").strip()
-        if not message and not attached_file and not attached_image:
-            print("Предупреждение: Пожалуйста, введите сообщение или прикрепите файл")
-            return
+#     # Кнопка отправки доната
+#     ttk.Button(
+#         file_buttons_frame,
+#         text="Отправить донат",
+#         bootstyle="warning-outline",
+#         command=open_donat,
+#     ).pack(side="left", padx=5)
 
-        try:
-            from telemetry.telemetry_manager import TelemetryManager
+#     # Кнопка отправки сообщения
+#     ttk.Button(
+#         file_buttons_frame,
+#         text="Отправить сообщение",
+#         bootstyle="success-outline",
+#         command=send_feedback,
+#     ).pack(side="left", padx=5)
 
-            manager = TelemetryManager()
-
-            # Логируем начало отправки обратной связи
-            logger.logger.info("Отправка обратной связи...")
-
-            # Отправляем сообщение с префиксом "Обратная связь от пользователя:"
-            # автоматически собираем информацию о пользователе
-            try:
-                windows_username = os.getenv('USERNAME', 'unknown')
-            except Exception:
-                windows_username = 'unknown'
-            
-            user_info = (
-                f"👤 Пользователь: #{windows_username}\n"
-            )
-            user_info += (
-                f"💻 Версия Extreme: {version}\n"
-                f"🐍 Python версия: {sys.version}\n"
-            )
-
-            # объединяем информацию с сообщением от пользователя
-            full_message = f"Обратная связь от пользователя:\n{message}\n\n{user_info}"
-
-            # отправляем сообщение
-            if manager.send_message(full_message):
-                logger.logger.info("Сообщение обратной связи успешно отправлено")
-                print("Сообщение успешно отправлено!")
-
-                # Отправляем файл, если он прикреплен
-                if attached_file:
-                    if manager.send_telegram(attached_file):
-                        logger.logger.info(
-                            f"Файл {os.path.basename(attached_file)} успешно отправлен"
-                        )
-                        print("Файл успешно отправлен!")
-                    else:
-                        logger.logger.error(
-                            f"Ошибка отправки файла {os.path.basename(attached_file)}"
-                        )
-                        print("Ошибка: Не удалось отправить файл")
-
-                # Отправляем изображение, если оно прикреплено
-                if attached_image:
-                    if manager.send_telegram(attached_image):
-                        logger.logger.info(
-                            f"Изображение {os.path.basename(attached_image)} успешно отправлено"
-                        )
-                        print("Изображение успешно отправлено!")
-                    else:
-                        logger.logger.error(
-                            f"Ошибка отправки изображения {os.path.basename(attached_image)}"
-                        )
-                        print("Ошибка: Не удалось отправить изображение")
-
-                # Очищаем форму
-                message_text.delete("1.0", "end")
-                attached_file = None
-                attached_image = None
-            else:
-                logger.logger.error("Ошибка отправки сообщения обратной связи")
-                print("Ошибка: Не удалось отправить сообщение")
-        except Exception as e:
-            logger.logger.error(f"Ошибка при отправке обратной связи: {str(e)}")
-            print(f"Ошибка: Произошла ошибка при отправке: {str(e)}")
-
-    # Кнопка отправки доната
-    ttk.Button(
-        file_buttons_frame,
-        text="Отправить донат",
-        bootstyle="warning-outline",
-        command=open_donat,
-    ).pack(side="left", padx=5)
-
-    # Кнопка отправки сообщения
-    ttk.Button(
-        file_buttons_frame,
-        text="Отправить сообщение",
-        bootstyle="success-outline",
-        command=send_feedback,
-    ).pack(side="left", padx=5)
-
-    # Кнопка для выбора сборки Windows
-    ttk.Button(
-        file_buttons_frame,
-        text="Проголовать",
-        bootstyle="success-outline",
-        command=lambda: WindowsVoteWindow(root),
-    ).pack(side="left", padx=5)
+#     # Кнопка для выбора сборки Windows
+#     ttk.Button(
+#         file_buttons_frame,
+#         text="Проголовать",
+#         bootstyle="success-outline",
+#         command=lambda: WindowsVoteWindow(root),
+#     ).pack(side="left", padx=5)
 
 
-# Функция для открытия окна настроек колонок
-def open_columns_settings_window():
-    # Создаем новое окно
-    columns_window = ttk.Toplevel()
-    columns_window.title("Настройка количества колонок")
-    columns_window.geometry("600x600")
+# # Функция для открытия окна настроек колонок
+# def open_columns_settings_window():
+#     # Создаем новое окно
+#     columns_window = ttk.Toplevel()
+#     columns_window.title("Настройка количества колонок")
+#     columns_window.geometry("600x600")
 
-    # Создаем контейнер с отступами
-    columns_container = ttk.Frame(columns_window, padding=20)
-    columns_container.pack(fill="both", expand=True)
+#     # Создаем контейнер с отступами
+#     columns_container = ttk.Frame(columns_window, padding=20)
+#     columns_container.pack(fill="both", expand=True)
 
-    # Заголовок
-    ttk.Label(
-        columns_container,
-        text="Настройка количества колонок",
-        font=("Segoe UI", 14, "bold"),
-    ).pack(anchor="w", pady=(0, 5))
+#     # Заголовок
+#     ttk.Label(
+#         columns_container,
+#         text="Настройка количества колонок",
+#         font=("Segoe UI", 14, "bold"),
+#     ).pack(anchor="w", pady=(0, 5))
 
-    # Описание
-    ttk.Label(
-        columns_container,
-        text="Настройте количество колонок для каждой вкладки",
-        font=("Segoe UI", 10),
-    ).pack(anchor="w", pady=(0, 15))
+#     # Описание
+#     ttk.Label(
+#         columns_container,
+#         text="Настройте количество колонок для каждой вкладки",
+#         font=("Segoe UI", 10),
+#     ).pack(anchor="w", pady=(0, 15))
 
-    # Фрейм для добавления новых колонок
-    add_column_frame = ttk.Labelframe(
-        columns_container, text="Добавить новую вкладку", padding=10
-    )
-    add_column_frame.pack(fill="x", pady=(0, 15))
+#     # Фрейм для добавления новых колонок
+#     add_column_frame = ttk.Labelframe(
+#         columns_container, text="Добавить новую вкладку", padding=10
+#     )
+#     add_column_frame.pack(fill="x", pady=(0, 15))
 
-    # Поля для ввода новой колонки
-    ttk.Label(add_column_frame, text="Название вкладки:").pack(side="left", padx=5)
-    new_col_name = ttk.Entry(add_column_frame, width=20)
-    new_col_name.pack(side="left", padx=5)
+#     # Поля для ввода новой колонки
+#     ttk.Label(add_column_frame, text="Название вкладки:").pack(side="left", padx=5)
+#     new_col_name = ttk.Entry(add_column_frame, width=20)
+#     new_col_name.pack(side="left", padx=5)
 
-    ttk.Label(add_column_frame, text="Кол-во колонок:").pack(side="left", padx=5)
-    new_col_count = ttk.Spinbox(add_column_frame, from_=1, to=6, width=3)
-    new_col_count.set(config.get("Columns", "default", fallback=3))
-    new_col_count.pack(side="left", padx=5)
+#     ttk.Label(add_column_frame, text="Кол-во колонок:").pack(side="left", padx=5)
+#     new_col_count = ttk.Spinbox(add_column_frame, from_=1, to=6, width=3)
+#     new_col_count.set(config.get("Columns", "default", fallback=3))
+#     new_col_count.pack(side="left", padx=5)
 
-    # Создаем Treeview для отображения настроек
-    table_container = ttk.Frame(columns_container)
-    table_container.pack(fill="both", expand=True)
+#     # Создаем Treeview для отображения настроек
+#     table_container = ttk.Frame(columns_container)
+#     table_container.pack(fill="both", expand=True)
 
-    columns = ("Вкладка", "Колонок")
-    tree = ttk.Treeview(
-        table_container,
-        columns=columns,
-        show="headings",
-        selectmode="browse",
-        height=10,
-    )
+#     columns = ("Вкладка", "Колонок")
+#     tree = ttk.Treeview(
+#         table_container,
+#         columns=columns,
+#         show="headings",
+#         selectmode="browse",
+#         height=10,
+#     )
 
-    # Настраиваем колонки
-    tree.heading("Вкладка", text="Вкладка", anchor="w")
-    tree.heading("Колонок", text="Колонок", anchor="center")
-    tree.column("Вкладка", width=250, anchor="w")
-    tree.column("Колонок", width=100, anchor="center")
+#     # Настраиваем колонки
+#     tree.heading("Вкладка", text="Вкладка", anchor="w")
+#     tree.heading("Колонок", text="Колонок", anchor="center")
+#     tree.column("Вкладка", width=250, anchor="w")
+#     tree.column("Колонок", width=100, anchor="center")
 
-    # Добавляем скроллбар
-    scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=tree.yview)
-    tree.configure(yscrollcommand=scrollbar.set)
+#     # Добавляем скроллбар
+#     scrollbar = ttk.Scrollbar(table_container, orient="vertical", command=tree.yview)
+#     tree.configure(yscrollcommand=scrollbar.set)
 
-    # Упаковываем элементы
-    tree.pack(side="left", fill="both", expand=True)
-    scrollbar.pack(side="right", fill="y")
+#     # Упаковываем элементы
+#     tree.pack(side="left", fill="both", expand=True)
+#     scrollbar.pack(side="right", fill="y")
 
-    # Заполняем таблицу данными
-    for section in config["Columns"]:
-        tree.insert("", "end", values=(str(section), config["Columns"][section]))
+#     # Заполняем таблицу данными
+#     for section in config["Columns"]:
+#         tree.insert("", "end", values=(str(section), config["Columns"][section]))
 
-    def add_new_column():
-        name = new_col_name.get().strip()
-        cols = new_col_count.get()
+#     def add_new_column():
+#         name = new_col_name.get().strip()
+#         cols = new_col_count.get()
 
-        if not name:
-            tk.messagebox.showerror("Ошибка", "Введите название вкладки")
-            return
+#         if not name:
+#             tk.messagebox.showerror("Ошибка", "Введите название вкладки")
+#             return
 
-        if name in config["Columns"]:
-            tk.messagebox.showerror("Ошибка", "Вкладка с таким именем уже существует")
-            return
+#         if name in config["Columns"]:
+#             tk.messagebox.showerror("Ошибка", "Вкладка с таким именем уже существует")
+#             return
 
-        try:
-            cols = int(cols)
-            if not 1 <= cols <= 6:
-                raise ValueError
-        except ValueError:
-            tk.messagebox.showerror("Ошибка", "Введите число от 1 до 6")
-            return
+#         try:
+#             cols = int(cols)
+#             if not 1 <= cols <= 6:
+#                 raise ValueError
+#         except ValueError:
+#             tk.messagebox.showerror("Ошибка", "Введите число от 1 до 6")
+#             return
 
-        # Добавляем в конфиг и таблицу
-        config["Columns"][name] = str(cols)
-        tree.insert("", "end", values=(name, cols))
+#         # Добавляем в конфиг и таблицу
+#         config["Columns"][name] = str(cols)
+#         tree.insert("", "end", values=(name, cols))
 
-        # Очищаем поля ввода
-        new_col_name.delete(0, "end")
-        new_col_count.set(3)
+#         # Очищаем поля ввода
+#         new_col_name.delete(0, "end")
+#         new_col_count.set(3)
 
-        # Сохраняем изменения
-        with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-            config.write(configfile)
+#         # Сохраняем изменения
+#         with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+#             config.write(configfile)
 
-    ttk.Button(
-        add_column_frame,
-        text="Добавить",
-        command=add_new_column,
-        bootstyle="success-outline",
-    ).pack(side="left", padx=5)
+#     ttk.Button(
+#         add_column_frame,
+#         text="Добавить",
+#         command=add_new_column,
+#         bootstyle="success-outline",
+#     ).pack(side="left", padx=5)
 
-    # Фрейм для управления
-    control_frame = ttk.Frame(columns_container)
-    control_frame.pack(fill="x", pady=(10, 0))
+#     # Фрейм для управления
+#     control_frame = ttk.Frame(columns_container)
+#     control_frame.pack(fill="x", pady=(10, 0))
 
-    # Элементы управления
-    ttk.Label(control_frame, text="Кол-во колонок:").pack(side="left", padx=5)
-    spinbox = ttk.Spinbox(control_frame, from_=1, to=6, width=5)
-    spinbox.pack(side="left", padx=5)
+#     # Элементы управления
+#     ttk.Label(control_frame, text="Кол-во колонок:").pack(side="left", padx=5)
+#     spinbox = ttk.Spinbox(control_frame, from_=1, to=6, width=5)
+#     spinbox.pack(side="left", padx=5)
 
-    def update_selected():
-        selected = tree.selection()
-        if selected:
-            new_value = spinbox.get()
-            item = tree.item(selected[0])
-            tab_name = str(item["values"][0])
+#     def update_selected():
+#         selected = tree.selection()
+#         if selected:
+#             new_value = spinbox.get()
+#             item = tree.item(selected[0])
+#             tab_name = str(item["values"][0])
 
-            # Обновляем конфиг и дерево
-            config["Columns"][tab_name] = new_value
-            tree.item(selected[0], values=(tab_name, new_value))
+#             # Обновляем конфиг и дерево
+#             config["Columns"][tab_name] = new_value
+#             tree.item(selected[0], values=(tab_name, new_value))
 
-            # Сохраняем изменения
-            with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-                config.write(configfile)
+#             # Сохраняем изменения
+#             with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+#                 config.write(configfile)
 
-    def reset_to_default():
-        # Значения по умолчанию для колонок
-        default_columns = {
-            "default": 3,
-        }
+#     def reset_to_default():
+#         # Значения по умолчанию для колонок
+#         default_columns = {
+#             "default": 3,
+#         }
 
-        # Обновляем конфиг и очищаем дерево
-        config["Columns"] = default_columns
-        tree.delete(*tree.get_children())
+#         # Обновляем конфиг и очищаем дерево
+#         config["Columns"] = default_columns
+#         tree.delete(*tree.get_children())
 
-        # Заполняем таблицу заново
-        for section in config["Columns"]:
-            tree.insert("", "end", values=(str(section), config["Columns"][section]))
+#         # Заполняем таблицу заново
+#         for section in config["Columns"]:
+#             tree.insert("", "end", values=(str(section), config["Columns"][section]))
 
-        # Сохраняем изменения
-        with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-            config.write(configfile)
+#         # Сохраняем изменения
+#         with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+#             config.write(configfile)
 
-    # Добавляем кнопки
-    ttk.Button(
-        control_frame,
-        text="Сбросить",
-        command=reset_to_default,
-        bootstyle="danger-outline",
-    ).pack(side="left", padx=5)
+#     # Добавляем кнопки
+#     ttk.Button(
+#         control_frame,
+#         text="Сбросить",
+#         command=reset_to_default,
+#         bootstyle="danger-outline",
+#     ).pack(side="left", padx=5)
 
-    ttk.Button(
-        control_frame,
-        text="Применить",
-        command=update_selected,
-        bootstyle="success-outline",
-    ).pack(side="left", padx=5)
+#     ttk.Button(
+#         control_frame,
+#         text="Применить",
+#         command=update_selected,
+#         bootstyle="success-outline",
+#     ).pack(side="left", padx=5)
 
-    # Кнопка закрытия
-    ttk.Button(
-        control_frame,
-        text="Закрыть",
-        command=columns_window.destroy,
-        bootstyle="info-outline",
-    ).pack(side="left", padx=5)
+#     # Кнопка закрытия
+#     ttk.Button(
+#         control_frame,
+#         text="Закрыть",
+#         command=columns_window.destroy,
+#         bootstyle="info-outline",
+#     ).pack(side="left", padx=5)
 
 
 def switch_to_gpt():
@@ -7599,23 +7678,16 @@ def switch_to_clean_wrapper():
     confirm_switch_tab(switch_to_clean)
 def switch_to_other_wrapper():
     confirm_switch_tab(switch_to_other)
-def switch_to_settings_wrapper():
-    confirm_switch_tab(switch_to_settings)
-def switch_to_telemetry_wrapper():
-    # Переключаемся на настройки и выбираем вкладку "Телеметрия"
-    confirm_switch_tab(switch_to_settings)
-    # После переключения выбираем вкладку "Телеметрия"
-    if tab_control.tabs():
-        for i, tab in enumerate(tab_control.tabs()):
-            if tab_control.tab(tab, "text") == "Телеметрия":
-                tab_control.select(i)
-                break
+# def switch_to_settings_wrapper():
+#     confirm_switch_tab(switch_to_settings)
+
+#                 break
 # Функции switch_to_system_wrapper и switch_to_about_wrapper удалены для упрощения твикера
-def switch_to_gpt_wrapper():
-    confirm_switch_tab(switch_to_gpt)
-def switch_to_minimal_wrapper():
-    # Для минимальной вкладки не используем confirm_switch_tab, так как она скрывает интерфейс
-    switch_to_minimal()
+# def switch_to_gpt_wrapper():
+#     confirm_switch_tab(switch_to_gpt)
+# def switch_to_minimal_wrapper():
+#     # Для минимальной вкладки не используем confirm_switch_tab, так как она скрывает интерфейс
+#     switch_to_minimal()
 
 # Переносим список быстрых кнопок ПОСЛЕ объявления всех функций
 # Функция для создания списка кнопок с учетом режима разработчика
@@ -7625,7 +7697,7 @@ def get_quick_buttons_list():
         ("Главная", switch_to_main_wrapper, "⭐"),
         ("Оптимизация", switch_to_optimization_wrapper, "⚡"),
         ("Очистка", switch_to_clean_wrapper, "☠️"),
-        ("Настройки", switch_to_settings_wrapper, "⚙️"),
+        # ("Настройки", switch_to_settings_wrapper, "⚙️"),
         ("Исправления", switch_to_fixes_wrapper, "⚜️"),
         ("Создать конфиг", lambda: create_batch_file([name for name, var in checkboxes.items() if var.get()]),"📝",),
     ]
@@ -7646,7 +7718,7 @@ icon_variants = {
     "Электропитание": ["🔋", "🔋"],
     # "Очистка": ["☠️", "🧹", "🧸"],
     "Очистка": ["🧹"],
-    "Настройки": ["⚙️", "⚙️", "⚙️"],
+    # "Настройки": ["⚙️", "⚙️", "⚙️"],
     # "Исправления": ["⚜️", "🔧", "🧷"],
     "Исправления": ["⚜️"],
     # "Антон AI": ["👻", "👽", "👾"],
@@ -7677,8 +7749,8 @@ icon_variants_for_quick_buttons = {
     "Электропитание": ["🔋", "⚡", "💡", "🔌", "🔍", "📊", "📈", "📉", "🎯", "🎮"],
     "Другое": ["⚙️", "🔧", "🛠️", "🔨", "📦", "📥", "📤", "🔄", "🔍", "🔎"],
     "Очистка": ["🧹", "🧽", "🧼", "🧴", "🧸", "🧶", "🧵", "🧷", "🧹", "🧺", "☠️"],
-    "Настройки": ["⚙️", "🔧", "🛠️", "🔨", "📦", "📥", "📤", "🔄", "🔍", "🔎"],
-    "Телеметрия": ["📊", "👹", "☠️", "👺", "👻", "👽", "👾", "🚀", "⚡️", "🔋", "💪"],
+    # "Настройки": ["⚙️", "🔧", "🛠️", "🔨", "📦", "📥", "📤", "🔄", "🔍", "🔎"],
+    # "Телеметрия": ["📊", "👹", "☠️", "👺", "👻", "👽", "👾", "🚀", "⚡️", "🔋", "💪"],
     "Исправления": ["🔧", "🛠️", "⚙️", "🔨", "📦", "📥", "📤", "🔄", "🔍", "🔎"],
     "Обновления": ["🔄", "📥", "📤", "📦", "📨", "📩", "📪", "📫", "📬", "📭"],
     "Версия": ["📄", "📝", "📋", "📑", "🔖", "📚", "📖", "📕", "📗", "📘"],
@@ -8270,8 +8342,8 @@ def export_full_registry():
             f"FullRegistryBackup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.reg",
         )
 
-        # Export full registry
-        subprocess.run(["reg", "export", "HKLM", backup_file, "/y"], check=True)
+        subprocess.Popen(["reg", "export", "HKLM", backup_file, "/y"],
+                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
         messagebox.showinfo(
             "Успех", f"Полная резервная копия реестра создана в:\n{backup_file}"
@@ -8306,10 +8378,11 @@ def import_registry_backup(backup_list=None):
                 reg_files = [f for f in os.listdir(backup_path) if f.endswith(".reg")]
                 for reg_file in reg_files:
                     full_path = os.path.join(backup_path, reg_file)
-                    subprocess.run(["reg", "import", full_path], check=True)
+                    subprocess.Popen(["reg", "import", full_path],
+                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             else:
-                # Single file backup
-                subprocess.run(["reg", "import", backup_path], check=True)
+                subprocess.Popen(["reg", "import", backup_path],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
             messagebox.showinfo("Успех", "Бэкап успешно импортирован")
         except Exception as e:
@@ -8411,9 +8484,6 @@ root.bind("<F5>", reload_program)
 
 # Вызываем open_random_site после создания окна (неблокирующий вызов)
 root.after(1000, lambda: open_random_site(5))  # Задержка 1 секунда после запуска
-
-# Проверка обновлений после полного запуска программы (неблокирующий вызов)
-root.after(2000, check_for_updates_threaded)  # Задержка 2 секунды после запуска для проверки обновлений
 
 # Запуск главного цикла приложения для отображения окна
 logger.log_program_start()  # Логируем запуск программы

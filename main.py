@@ -12,14 +12,15 @@ from datetime import (
 import configparser  # Модуль для работы с конфигурационными файлами, здесь для чтения и записи настроек
 import json  # Для работы с JSON файлами
 import shutil  # Для копирования файлов
-from logger import Logger
+from telemetry.logger import Logger  # Импортируем класс Logger
 import tkinter.messagebox as messagebox  # Добавляем модуль для вывода сообщений
 # from gpt import GPTClient  # Импортируем GPTClient
 from pathlib import Path
 # from windows_vote import WindowsVoteWindow
 # from services_manager import create_services_tab
 import random
-import threading
+import hashlib  # Для вычисления хэшей файлов
+import threading  # Для неблокирующей проверки обновлений
 import webbrowser
 
 # Получаем имя текущего пользователя системы
@@ -98,27 +99,33 @@ config.read("user_data//settings.ini", encoding="cp1251")  # Чтение в ANS
 # Создаем обязательные секции с настройками по умолчанию
 required_sections = {
     "General": {
-        "theme": "newhone",
-        "font_family": "Terminal",
-        "font_size": "12",
-        "checkbox_font_size": "12",
-        "quick_button_font_size": "16",
-        "tooltips_enabled": "True",
-        "checkbox_display_mode": "rectangle",
-        "first_run_completed": "False",
-        "ad_enabled": "False",
-        "offer_backup_enabled": "False",
-        "confirm_switch_tab_enabled": "False",
-        "developer_mode": "True",
-        "novice_mode": "False",
-        "initial_tab": "switch_to_main",
-        "show_top_panel": "True",
-        "show_sidebar": "True",
-        "tweak_execution_mode": "default",
-        "logging_enabled": "False",
+        "theme": "boosterxvapor",   # Тема интерфейса
+        "font_family": "Terminal",  # Шрифт интерфейса
+        "font_size": "12",  # Размер шрифта интерфейса
+        "checkbox_font_size": "12",  # Размер шрифта чекбоксов
+        "quick_button_font_size": "16",  # Размер шрифта кнопок быстрого доступа
+        "tooltips_enabled": "True",  # Включение всплывающих подсказок
+        "checkbox_display_mode": "rectangle",  # Режим отображения чекбоксов: regular, rectangle или wide
+        "first_run_completed": "False",  # Флаг первого запуска
+        "ad_enabled": "False",  # Включение рекламы
+        "offer_backup_enabled": "False",  # Предложение создания бэкапа
+        "confirm_switch_tab_enabled": "False",  # Подтверждение переключения вкладок
+        "developer_mode": "True",  # Режим разработчика
+        "novice_mode": "False",  # Режим новичка
+        "initial_tab": "switch_to_main", # Вкладка по умолчанию
+        "show_top_panel": "True",  # Показывать верхнее меню
+        "show_sidebar": "True",  # Показывать боковое меню
+        "tweak_execution_mode": "default",  # Способ запуска твиков: default, no_launcher, launcher, powerrun, cmd, create_config_and_run
+        "auto_update_enabled": "False",  # Включение автообновления
+        "frames_instead_of_tabs": "True",  # Фреймы вместо вкладок
+        "show_checkbox_full_path": "True",  # Показывать полный путь чекбоксов (True) или только имя файла (False)
     },
-    "Window": {"fullscreen": "False"},  # Полноэкранный режим
+    "Window": {"fullscreen": "True"},  # Полноэкранный режим
     "Columns": {"default": "3"},  # Количество колонок в окне
+    "Telemetry": {
+        "send_on_close": "False",  # Отправка логов при закрытии программы
+        "share_telemetry": "False",  # Обмен телеметрией с другими пользователями
+    },
 }
 
 # Этот код проверяет, есть ли секция в конфигурации и если нет, то добавляет её
@@ -135,12 +142,14 @@ for (
             config[section][key] = value  # Добавляем ключ и значение
             config_changed = True  # Конфиг изменился
 
+# Сохраняем обновленный конфиг только если были изменения
 if config_changed:
-    with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-        config.write(configfile)
+    with open(
+        "user_data//settings.ini", "w", encoding="cp1251"
+    ) as configfile:  # Запись в ANSI
+        config.write(configfile)  # Записываем конфигурацию в файл
 
-logger.set_enabled(config.getboolean("General", "logging_enabled", fallback=False))
-
+# Функция для получения шрифта больших меток (определена раньше, чтобы быть доступной в show_license_window)
 def get_large_label_font():
     """Возвращает шрифт для больших меток"""
     try:
@@ -416,11 +425,15 @@ if not first_run_completed:
     #     config.write(configfile)
     pass
 
-def handle_exception(exc_type, exc_value, exc_traceback):
-    import traceback
-    traceback.print_exception(exc_type, exc_value, exc_traceback)
+# Импортируем обработчик ошибок
+from telemetry.error_handler import (
+    handle_top_level_error,
+)  # Импортируем обработчик ошибок
 
-sys.excepthook = handle_exception
+# Устанавливаем обработчик необработанных исключений
+sys.excepthook = (
+    lambda *args: handle_top_level_error()
+)  # Устанавливаем обработчик необработанных исключений
 
 
 def reload_program(event=None):
@@ -429,6 +442,157 @@ def reload_program(event=None):
     import subprocess
 
     subprocess.run([sys.executable] + sys.argv)
+
+
+"""
++------------------------------------+
+| Функция для проверки обновлений    |
++------------------------------------+
+"""
+
+
+def calculate_file_hash(file_path):
+    """Вычисляет SHA256 хэш файла"""
+    sha256_hash = hashlib.sha256()
+    try:
+        with open(file_path, "rb") as f:
+            # Читаем файл по частям для экономии памяти
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+    except FileNotFoundError:
+        return None
+    except Exception as e:
+        print(f"Ошибка при вычислении хэша файла {file_path}: {e}")
+        return None
+
+
+def check_for_updates():
+    """Проверяет наличие обновлений и запускает их установку"""
+    try:
+        # Проверяем, включено ли автообновление
+        if not config.getboolean("General", "auto_update_enabled", fallback=True):
+            print("Автообновление отключено в настройках")
+            return
+        
+        # Пути к файлам
+        # local_file = r"C:\Apps\Extreme\SetupWinterWizardPro.exe"
+        local_file = r"C:\Apps\Extreme\SetupWinterWizard.exe"
+        # github_url = "https://github.com/anton18-png/Extreme/raw/refs/heads/main/SetupWinterWizardPro.exe"
+        github_url = "https://github.com/anton18-png/Extreme/raw/refs/heads/main/SetupWinterWizard.exe"
+        temp_file = os.path.join(os.environ.get("TEMP", "."), "SetupWinterWizard_temp.exe")
+        
+        # Вычисляем хэш локального файла
+        local_hash = None
+        if os.path.exists(local_file):
+            local_hash = calculate_file_hash(local_file)
+            print(f"Локальный хэш SetupWinterWizard.exe: {local_hash}")
+        else:
+            print(f"Локальный файл {local_file} не найден")
+        
+        # Скачиваем файл с GitHub во временную папку с помощью curl
+        # print("Проверка обновлений: скачивание файла с GitHub...")
+        try:
+            # Используем curl для скачивания файла
+            curl_command = [
+                "curl",
+                "-g",
+                "-k",
+                "-L",
+                "-#",
+                "-o",
+                temp_file,
+                github_url
+            ]
+            result = subprocess.run(curl_command, capture_output=True, text=True, timeout=60)
+            if result.returncode != 0:
+                print(f"Ошибка при скачивании файла с GitHub: {result.stderr}")
+                return
+            # print("Файл успешно скачан")
+        except subprocess.TimeoutExpired:
+            print("Превышено время ожидания при скачивании файла")
+            return
+        except FileNotFoundError:
+            print("curl не найден в системе. Автообновление недоступно.")
+            return
+        except Exception as e:
+            print(f"Ошибка при скачивании файла с GitHub: {e}")
+            return
+        
+        # Вычисляем хэш скачанного файла
+        github_hash = calculate_file_hash(temp_file)
+        print(f"Хэш файла с GitHub: {github_hash}")
+        
+        # Сравниваем хэши
+        if github_hash and github_hash != local_hash:
+            print("Обнаружено обновление! Запуск установки...")
+            
+            # Скачиваем файл в нужное место с помощью curl
+            try:
+                # Создаем директорию, если её нет
+                os.makedirs(os.path.dirname(local_file), exist_ok=True)
+                
+                # Скачиваем файл напрямую в нужное место с помощью curl
+                curl_command = [
+                    "curl",
+                    "-g",
+                    "-k",
+                    "-L",
+                    "-#",
+                    "-o",
+                    local_file,
+                    github_url
+                ]
+                result = subprocess.run(curl_command, capture_output=True, text=True, timeout=60)
+                if result.returncode != 0:
+                    print(f"Ошибка при скачивании обновления: {result.stderr}")
+                    return
+                
+                print(f"Файл обновления сохранен: {local_file}")
+                
+                # Удаляем временный файл
+                try:
+                    if os.path.exists(temp_file):
+                        os.remove(temp_file)
+                except:
+                    pass
+                
+                # Закрываем программу
+                print("Закрытие программы для установки обновления...")
+                
+                # Запускаем установщик в отдельном процессе с флагом -ppass
+                subprocess.Popen([local_file, "-ppass"], shell=True)
+                
+                # Закрываем текущую программу через главный поток
+                def close_and_kill():
+                    try:
+                        subprocess.run(["taskkill", "/im", "Extreme.exe", "/f"], 
+                                      capture_output=True, timeout=5)
+                    except:
+                        pass
+                    root.destroy()
+                
+                root.after(500, close_and_kill)
+                
+            except Exception as e:
+                print(f"Ошибка при установке обновления: {e}")
+        else:
+            print("Обновления не найдены. Программа актуальна.")
+            # Удаляем временный файл
+            try:
+                if os.path.exists(temp_file):
+                    os.remove(temp_file)
+            except:
+                pass
+                
+    except Exception as e:
+        print(f"Ошибка при проверке обновлений: {e}")
+
+
+def check_for_updates_threaded():
+    """Запускает проверку обновлений в отдельном потоке"""
+    thread = threading.Thread(target=check_for_updates, daemon=True)
+    thread.start()
 
 
 # Функции для экспорта/импорта настроек
@@ -1125,9 +1289,13 @@ def execute_old():  # Функция для выполнения старых с
                 subprocess.Popen(f'powercfg /import "{tweak_path}"', shell=True,
                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
                 run_tweak_by_mode(tweak_path)
+                # Телеметрия полностью удалена
 
+            # Если скрипт не имеет расширение .bat, .cmd, .exe, .ps1 или .reg
             else:
                 run_tweak_by_mode(tweak_path)
+
+            # Вся телеметрия удалена
 
 
 """
@@ -1268,14 +1436,13 @@ def execute():  # Основная функция выполнения конф�
 """
 
 
-def execute_config():
-    selected_file = config_file_var.get()
-    if selected_file:
-        print(f"Start Configs\\{selected_file}")
-        subprocess.Popen(
-            f'Utils\\launcher.exe "Configs\\{selected_file}"', shell=True,
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
-        )
+def execute_config():  # Функция для выполнения конфигурационного файла
+    selected_file = config_file_var.get()  # Получаем выбранный файл
+    if selected_file:  # Если файл выбран
+        print(f"Start Configs\\{selected_file}")  # Выводим путь к файлу
+        subprocess.call(
+            f'Utils\\launcher.exe "Configs\\{selected_file}"', shell=True
+        )  # Выполняем файл
 
 
 """
@@ -1348,7 +1515,34 @@ def get_tab_name(
 """
 
 
-def collect_and_send():
+def collect_and_send():  # Функция для сбора и отправки телеметрии
+    # from telemetry.telemetry_manager import (
+    #     TelemetryManager,
+    # )  # Импортируем класс TelemetryManager из модуля telemetry_manager
+
+    # manager = TelemetryManager()  # Создаем экземпляр класса TelemetryManager
+    # # logger.logger.info(
+    # #     "Начало сбора и отправки телеметрии..."
+    # # )  # Логируем начало сбора и отправки телеметрии
+    
+    # # Проверяем, включен ли обмен телеметрией
+    # share_enabled = config.getboolean("Telemetry", "share_telemetry", fallback=False)
+    
+    # if manager.collect_telemetry_data(share_enabled=share_enabled):  # Если телеметрия успешно собрана
+    #     pass
+    #     # logger.logger.info(
+    #     #     "Телеметрия успешно собрана и отправлена"
+    #     # )  # Логируем успешное собрание и отправку телеметрии
+    #     # print(
+    #     #     "Телеметрия успешно собрана и отправлена"
+    #     # )  # Выводим сообщение о успешном собрании и отправке телеметрии
+    # else:  # Если телеметрия не собрана
+    #     logger.logger.error(
+    #         "Ошибка при сборе и отправке телеметрии"
+    #     )  # Логируем ошибку при сборе и отправке телеметрии
+    #     print(
+    #         "Ошибка при сборе и отправке телеметрии"
+    #     )  # Выводим сообщение об ошибке при сборе и отправке телеметрии
     pass
 
 
@@ -1758,8 +1952,18 @@ else:
     pass
 
 # Кнопка выполнить
+def execute_all():
+    execute_old()
+    for tab_id in tab_control.tabs():
+        frame = tab_control.children.get(tab_id.split(".")[-1])
+        if frame and hasattr(frame, "apply_all"):
+            try:
+                frame.apply_all()
+            except Exception as e:
+                print(f"Ошибка apply_all: {e}")
+
 execute_button = ttk.Button(
-    top_right_panel, text="Выполнить", bootstyle="success-outline", command=execute_old
+    top_right_panel, text="Выполнить", bootstyle="success-outline", command=execute_all
 )  # Создаем кнопку "Выполнить"
 execute_button.pack(side="left", padx=5)  # Упаковываем кнопку "Выполнить"
 
@@ -3080,6 +3284,185 @@ def create_tab_content(
     bind_mousewheel_to_widgets(checkboxes_frame)
 
 
+def create_consolidated_optimization_tab(parent, tabs_dict, config, button_name="Оптимизация"):
+    main = ttk.Frame(parent)
+    main.pack(fill="both", expand=True)
+
+    top_actions = ttk.Frame(main)
+    top_actions.pack(fill="x", padx=10, pady=(10, 5))
+
+    all_vars = {}
+
+    def select_all():
+        for var in all_vars.values():
+            var.set(True)
+
+    def deselect_all():
+        for var in all_vars.values():
+            var.set(False)
+
+    select_all_btn = ttk.Button(
+        top_actions, text="Выбрать все твики",
+        bootstyle="primary-outline", command=select_all, width=22
+    )
+    select_all_btn.pack(side="left", padx=(0, 5))
+
+    deselect_all_btn = ttk.Button(
+        top_actions, text="Снять все",
+        bootstyle="secondary-outline", command=deselect_all, width=15
+    )
+    deselect_all_btn.pack(side="left", padx=(0, 5))
+
+    canvas = tk.Canvas(main, highlightthickness=0, height=400)
+    h_scrollbar = ttk.Scrollbar(main, orient=tk.HORIZONTAL, command=canvas.xview)
+    scrollable = ttk.Frame(canvas)
+
+    scrollable.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    canvas.create_window((0, 0), window=scrollable, anchor="nw")
+    canvas.configure(xscrollcommand=h_scrollbar.set)
+
+    canvas.pack(side="top", fill="both", expand=True, padx=10, pady=(0, 0))
+    h_scrollbar.pack(side="bottom", fill="x", padx=10)
+
+    def on_mousewheel(event):
+        if event.num == 5 or event.delta == -120:
+            canvas.xview_scroll(1, "units")
+        elif event.num == 4 or event.delta == 120:
+            canvas.xview_scroll(-1, "units")
+    canvas.bind("<MouseWheel>", on_mousewheel)
+    canvas.bind("<Button-4>", on_mousewheel)
+    canvas.bind("<Button-5>", on_mousewheel)
+    scrollable.bind("<MouseWheel>", on_mousewheel)
+    scrollable.bind("<Button-4>", on_mousewheel)
+    scrollable.bind("<Button-5>", on_mousewheel)
+
+    def bind_mw(w):
+        for child in w.winfo_children():
+            child.bind("<MouseWheel>", on_mousewheel)
+            child.bind("<Button-4>", on_mousewheel)
+            child.bind("<Button-5>", on_mousewheel)
+            if hasattr(child, 'winfo_children'):
+                bind_mw(child)
+
+    num_cols = config.getint("Columns", "default", fallback=3)
+    display_mode = config.get("General", "checkbox_display_mode", fallback="regular")
+    show_full_path = config.getboolean("General", "show_checkbox_full_path", fallback=True)
+
+    for tab_name, checkbox_names in tabs_dict.items():
+        section = ttk.Labelframe(scrollable, text=f" {tab_name} ", padding=8)
+        section.pack(side="left", fill="y", padx=(0, 10), anchor="n")
+
+        section_header = ttk.Frame(section)
+        section_header.pack(fill="x", pady=(0, 4))
+
+        sel_var = tk.BooleanVar(value=False)
+
+        section_cb = ttk.Checkbutton(
+            section_header, text="Выбрать всё",
+            variable=sel_var, bootstyle="primary-round-toggle"
+        )
+        section_cb.pack(side="left")
+
+        grid_frame = ttk.Frame(section)
+        grid_frame.pack(fill="x")
+
+        row = 0
+        col = 0
+        section_vars = {}
+
+        for checkbox_name in checkbox_names:
+            if not checkbox_name.strip():
+                continue
+
+            display_name = checkbox_name if show_full_path else os.path.basename(checkbox_name)
+            display_name = os.path.splitext(display_name)[0]
+            var = tk.BooleanVar(value=False)
+            all_vars[checkbox_name] = var
+            section_vars[checkbox_name] = var
+
+            if display_mode == "rectangle":
+                cb = RectangleCheckbox(grid_frame, display_name, var, "", "")
+                cb.grid(row=row, column=col, sticky="nsew", padx=3, pady=2)
+            elif display_mode == "expandable":
+                cb = ExpandableWideRectangleCheckbox(grid_frame, display_name, var, "", "")
+                cb.grid(row=row, column=col, columnspan=num_cols, sticky="nsew", padx=3, pady=2)
+                col += num_cols
+            elif display_mode == "sapphire":
+                cb = SapphireCheckbox(grid_frame, display_name, var, "", "")
+                cb.grid(row=row, column=col, columnspan=max(1, num_cols // 2), sticky="nsew", padx=3, pady=2)
+                col += max(1, num_cols // 2)
+            else:
+                cb = ttk.Checkbutton(
+                    grid_frame, text=display_name,
+                    variable=var, style="Custom.TCheckbutton"
+                )
+                cb.grid(row=row, column=col, sticky="w", padx=5, pady=1)
+
+            col += 1
+            if col >= num_cols:
+                col = 0
+                row += 1
+
+        if display_mode in ("rectangle", "expandable", "sapphire"):
+            for c in range(num_cols):
+                grid_frame.grid_columnconfigure(c, weight=1, uniform=f"sect_{tab_name}")
+
+        svars = section_vars.copy()
+        section_cb.config(command=lambda sv=sel_var, svars=svars: [v.set(sv.get()) for v in svars.values()])
+
+    bind_mw(scrollable)
+
+    bottom_frame = ttk.Frame(main)
+    bottom_frame.pack(fill="x", padx=10, pady=(5, 10))
+
+    def apply_all():
+        selected = []
+        for checkbox_name, var in all_vars.items():
+            if var.get():
+                for tn, names in tabs_dict.items():
+                    if checkbox_name in names:
+                        filepath = os.path.join("tweaks", button_name, tn, checkbox_name)
+                        selected.append(filepath)
+                        break
+
+        if not selected:
+            messagebox.showinfo("Информация", "Не выбрано ни одного твика")
+            return
+
+        count = len(selected)
+        if not messagebox.askyesno("Подтверждение", f"Применить {count} выбранных твиков?"):
+            return
+
+        success = 0
+        for filepath in selected:
+            try:
+                if not os.path.exists(filepath):
+                    continue
+                if filepath.endswith('.ps1'):
+                    subprocess.Popen(['powershell.exe', '-ExecutionPolicy', 'Bypass', '-File', filepath])
+                elif filepath.endswith('.reg'):
+                    subprocess.Popen(f'reg import "{filepath}"', shell=True)
+                elif filepath.endswith('.pow'):
+                    subprocess.Popen(f'powercfg /import "{filepath}"', shell=True)
+                else:
+                    subprocess.Popen(f'Utils\\launcher.exe "{filepath}"', shell=True)
+                success += 1
+            except Exception as e:
+                print(f"Ошибка при запуске {filepath}: {e}")
+
+        messagebox.showinfo("Результат", f"✅ {success}/{count} выполнено")
+
+    # apply_btn = ttk.Button(
+    #     bottom_frame, text="Применить выбранные",
+    #     bootstyle="success-outline", command=apply_all, width=22
+    # )
+    # apply_btn.pack(side="right")
+
+    main.all_vars = all_vars
+    main.apply_all = apply_all
+    return main
+
+
 """
 +------------------------------------+
 | Функция для подтверждения          |
@@ -3452,14 +3835,13 @@ def create_config_buttons(configs_list, parent_frame, columns=3, is_expert=False
                 text=cfg.get("button_text", cfg["name"]),
                 width=28,
                 bootstyle=btn_style,
-                command=lambda path=config_path: subprocess.Popen([path], shell=True,
-                                                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                command=lambda path=config_path: subprocess.call([path], shell=True)
             )
         else:
             btn = ttk.Button(
                 button_frame,
                 text=cfg.get("button_text", cfg["name"]),
-                width=28,
+                width=50,
                 bootstyle=btn_style,
                 command=lambda c=cfg["name"]: run_config(c)
             )
@@ -4741,8 +5123,7 @@ def switch_to_main():
                 text=cfg["name"],
                 width=28,
                 bootstyle=btn_style,
-                command=lambda path=config_path: subprocess.Popen([path], shell=True,
-                                                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                command=lambda path=config_path: subprocess.call([path], shell=True)
             )
             btn.pack(pady=(10, 5), padx=10)
 
@@ -4906,30 +5287,43 @@ def switch_to_main():
 
     # Проходим по всем элементам словаря tabs_main
     novice_mode = config.getboolean("General", "novice_mode", fallback=False)
-    # В режиме новичка используем безопасные твики из tabs_novice
     tabs_to_use_main = tabs_main_novice if novice_mode else tabs_main
     
-    for tab_name, checkbox_names in tabs_to_use_main.items():
-        if tab_name != "Главная":  # Пропускаем главную вкладку, так как она уже создана
-            # Скрываем опасные вкладки, если режим разработчика выключен (только если не режим новичка)
-            if not novice_mode and not developer_mode and tab_name in dangerous_main_tabs:
-                continue
-            tab = ttk.Frame(tab_control)
-            tab_control.add(tab, text=tab_name)
-            # Создаем метку-заполнитель
-            placeholder = ttk.Label(
-                tab,
-                text="Загрузка содержимого...",
-                font=("Segoe UI", 12),
-                foreground="#32FBE2",
-            )
-            placeholder.pack(expand=True)
-            # Сохраняем информацию о вкладке
-            tab.tab_info = {
-                "name": tab_name,
-                "checkbox_names": checkbox_names,
-                "loaded": False,
-            }
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
+
+    if frames_mode:
+        combined = {}
+        for tab_name, checkbox_names in tabs_to_use_main.items():
+            if tab_name != "Главная":
+                if not novice_mode and not developer_mode and tab_name in dangerous_main_tabs:
+                    continue
+                combined[tab_name] = checkbox_names
+        if combined:
+            try:
+                cons_frame = create_consolidated_optimization_tab(tab_control, combined, config, "Главная")
+                tab_control.add(cons_frame, text="Все твики")
+            except Exception as e:
+                print(f"Ошибка создания консолидированной вкладки: {e}")
+                import traceback; traceback.print_exc()
+    else:
+        for tab_name, checkbox_names in tabs_to_use_main.items():
+            if tab_name != "Главная":
+                if not novice_mode and not developer_mode and tab_name in dangerous_main_tabs:
+                    continue
+                tab = ttk.Frame(tab_control)
+                tab_control.add(tab, text=tab_name)
+                placeholder = ttk.Label(
+                    tab,
+                    text="Загрузка содержимого...",
+                    font=("Segoe UI", 12),
+                    foreground="#32FBE2",
+                )
+                placeholder.pack(expand=True)
+                tab.tab_info = {
+                    "name": tab_name,
+                    "checkbox_names": checkbox_names,
+                    "loaded": False,
+                }
 
     # Проверяем, есть ли вкладки в tab_control
     if tab_control.tabs():
@@ -4958,26 +5352,33 @@ def switch_to_drivers():
     for tab in tab_control.tabs():
         tab_control.forget(tab)
 
-    # Добавляем новые вкладки из tabs_1
-    for tab_name, checkbox_names in tabs_1.items():
-        tab_frame = ttk.Frame(tab_control)
-        tab_control.add(tab_frame, text=tab_name)
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
+    if frames_mode:
+        if tabs_1:
+            try:
+                cons_frame = create_consolidated_optimization_tab(tab_control, tabs_1, config, "Драйверы")
+                tab_control.add(cons_frame, text="Драйверы")
+            except Exception as e:
+                print(f"Ошибка создания вкладки драйверов: {e}")
+                import traceback; traceback.print_exc()
+    else:
+        for tab_name, checkbox_names in tabs_1.items():
+            tab_frame = ttk.Frame(tab_control)
+            tab_control.add(tab_frame, text=tab_name)
 
-        # Создаем метку-заполнитель
-        placeholder = ttk.Label(
-            tab_frame,
-            text="Загрузка содержимого...",
-            font=("Segoe UI", 12),
-            foreground="#666666",
-        )
-        placeholder.pack(expand=True)
+            placeholder = ttk.Label(
+                tab_frame,
+                text="Загрузка содержимого...",
+                font=("Segoe UI", 12),
+                foreground="#666666",
+            )
+            placeholder.pack(expand=True)
 
-        # Сохраняем информацию о вкладке
-        tab_frame.tab_info = {
-            "name": tab_name,
-            "checkbox_names": checkbox_names,
-            "loaded": False,
-        }
+            tab_frame.tab_info = {
+                "name": tab_name,
+                "checkbox_names": checkbox_names,
+                "loaded": False,
+            }
 
     # Выбираем первую вкладку
     if tab_control.tabs():
@@ -4999,58 +5400,57 @@ def switch_to_optimization():
     for tab in tab_control.tabs():
         tab_control.forget(tab)
 
-    # Создаем вкладку оптимизации (она будет первой)
-    try:
-        from optimization_tab import create_optimization_tab
-        optimization_frame = create_optimization_tab(tab_control, config)
-        tab_control.add(optimization_frame, text="Оптимизация")
-        print("✅ Вкладка оптимизации создана")
-    except Exception as e:
-        print(f"❌ Ошибка при создании вкладки оптимизации: {e}")
-        import traceback
-        traceback.print_exc()
-
-    # Добавляем остальные вкладки из tabs
     developer_mode = config.getboolean("General", "developer_mode", fallback=False)
     novice_mode = config.getboolean("General", "novice_mode", fallback=False)
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
     dangerous_tabs = ["Максимальная оптимизация", "Хардкор оптимизация", "Остальное"]
-    
-    # В режиме новичка используем безопасные твики из tabs_novice
+
     tabs_to_use = tabs_novice if novice_mode else tabs
-    
+    filtered_tabs = {}
     for tab_name, checkbox_names in tabs_to_use.items():
-        # Скрываем опасные вкладки, если режим разработчика выключен
         if not novice_mode and not developer_mode and tab_name in dangerous_tabs:
             continue
-        
-        # Специальная обработка для вкладки Службы
         if tab_name == "Службы":
+            continue
+        filtered_tabs[tab_name] = checkbox_names
+
+    if frames_mode:
+        # Вкладка оптимизации (vendor)
+        try:
+            optimization_frame = create_optimization_tab(tab_control, config)
+            tab_control.add(optimization_frame, text="Оптимизация")
+        except Exception as e:
+            print(f"Ошибка при создании вкладки оптимизации: {e}")
+            import traceback; traceback.print_exc()
+
+        # Все оптимизации как фреймы в одной вкладке
+        if filtered_tabs:
             try:
-                # services_frame = create_services_tab(tab_control, config)
-                # tab_control.add(services_frame, text=tab_name)
-                print(f"✅ Вкладка {tab_name} создана")
+                consolidated_frame = create_consolidated_optimization_tab(tab_control, filtered_tabs, config, "Оптимизация")
+                tab_control.add(consolidated_frame, text="Все оптимизации")
             except Exception as e:
-                print(f"❌ Ошибка при создании вкладки {tab_name}: {e}")
-        else:
-            # Обычная вкладка с чекбоксами
+                print(f"Ошибка при создании вкладки 'Все оптимизации': {e}")
+                import traceback; traceback.print_exc()
+    else:
+        # Традиционные вкладки для каждой категории
+        try:
+            optimization_frame = create_optimization_tab(tab_control, config)
+            tab_control.add(optimization_frame, text="Оптимизация")
+        except Exception as e:
+            print(f"Ошибка при создании вкладки оптимизации: {e}")
+            import traceback; traceback.print_exc()
+
+        for tab_name, checkbox_names in filtered_tabs.items():
             tab_frame = ttk.Frame(tab_control)
             tab_control.add(tab_frame, text=tab_name)
-            
-            placeholder = ttk.Label(
-                tab_frame,
-                text="Загрузка содержимого...",
-                font=("Segoe UI", 12),
-                foreground="#32FBE2",
-            )
+            placeholder = ttk.Label(tab_frame, text="Загрузка содержимого...", font=("Segoe UI", 12), foreground="#32FBE2")
             placeholder.pack(expand=True)
-            
             tab_frame.tab_info = {
                 "name": tab_name,
                 "checkbox_names": checkbox_names,
                 "loaded": False,
             }
-    
-    # Выбираем первую вкладку (Оптимизация)
+
     if tab_control.tabs():
         tab_control.select(0)
 
@@ -5085,27 +5485,41 @@ def switch_to_power():
     developer_mode = config.getboolean("General", "developer_mode", fallback=False)
     dangerous_power_tabs = ["Адские режимы электропитания", "Схемы где ЗАГРУЖЕННОСТЬ ПРОЦЕССОРА 100%", "Все планы электропитания"]
     
-    for tab_name, checkbox_names in tabs_2.items():
-        if tab_name != "Электропитание":  # Пропускаем, если уже добавили
-            # Скрываем опасные вкладки, если режим разработчика выключен
-            if not developer_mode and tab_name in dangerous_power_tabs:
-                continue
-            tab_frame = ttk.Frame(tab_control)
-            tab_control.add(tab_frame, text=tab_name)
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
 
-            placeholder = ttk.Label(
-                tab_frame,
-                text="Загрузка содержимого...",
-                font=("Segoe UI", 12),
-                foreground="#32FBE2",
-            )
-            placeholder.pack(expand=True)
+    if frames_mode:
+        filtered_power = {}
+        for tab_name, checkbox_names in tabs_2.items():
+            if tab_name != "Электропитание" and not (not developer_mode and tab_name in dangerous_power_tabs):
+                filtered_power[tab_name] = checkbox_names
+        if filtered_power:
+            try:
+                cons_frame = create_consolidated_optimization_tab(tab_control, filtered_power, config, "Электропитание")
+                tab_control.add(cons_frame, text="Все схемы")
+            except Exception as e:
+                print(f"Ошибка создания консолидированной вкладки: {e}")
+                import traceback; traceback.print_exc()
+    else:
+        for tab_name, checkbox_names in tabs_2.items():
+            if tab_name != "Электропитание":
+                if not developer_mode and tab_name in dangerous_power_tabs:
+                    continue
+                tab_frame = ttk.Frame(tab_control)
+                tab_control.add(tab_frame, text=tab_name)
 
-            tab_frame.tab_info = {
-                "name": tab_name,
-                "checkbox_names": checkbox_names,
-                "loaded": False,
-            }
+                placeholder = ttk.Label(
+                    tab_frame,
+                    text="Загрузка содержимого...",
+                    font=("Segoe UI", 12),
+                    foreground="#32FBE2",
+                )
+                placeholder.pack(expand=True)
+
+                tab_frame.tab_info = {
+                    "name": tab_name,
+                    "checkbox_names": checkbox_names,
+                    "loaded": False,
+                }
 
     # Выбираем вкладку с таблицей
     tab_control.select(power_tab)
@@ -5131,6 +5545,14 @@ def switch_to_fixes():
 
     # Выбираем вкладку исправлений
     tab_control.select(fixes_tab)
+
+
+def switch_to_game_mode():
+    for tab in tab_control.tabs():
+        tab_control.forget(tab)
+    from tweaks.game_mode_tab import create_game_mode_tab
+    game_tab = create_game_mode_tab(tab_control)
+    tab_control.select(game_tab)
 
 
 """
@@ -5168,28 +5590,41 @@ def switch_to_clean():
     novice_mode = config.getboolean("General", "novice_mode", fallback=False)
     tabs_to_use_4 = tabs_4_novice if novice_mode else tabs_4
     
-    for tab_name, checkbox_names in tabs_to_use_4.items():
-        # Скрываем опасные вкладки, если режим разработчика выключен
-        if not novice_mode and not developer_mode and tab_name in dangerous_clean_tabs:
-            continue
-        tab_frame = ttk.Frame(tab_control)
-        tab_control.add(tab_frame, text=tab_name)
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
 
-        # Создаем метку-заполнитель
-        placeholder = ttk.Label(
-            tab_frame,
-            text="Загрузка содержимого...",
-            font=("Segoe UI", 12),
-            foreground="#32FBE2",
-        )
-        placeholder.pack(expand=True)
+    if frames_mode:
+        filtered_clean = {}
+        for tab_name, checkbox_names in tabs_to_use_4.items():
+            if not novice_mode and not developer_mode and tab_name in dangerous_clean_tabs:
+                continue
+            filtered_clean[tab_name] = checkbox_names
+        if filtered_clean:
+            try:
+                cons_frame = create_consolidated_optimization_tab(tab_control, filtered_clean, config, "Очистка")
+                tab_control.add(cons_frame, text="Все очистки")
+            except Exception as e:
+                print(f"Ошибка создания консолидированной вкладки: {e}")
+                import traceback; traceback.print_exc()
+    else:
+        for tab_name, checkbox_names in tabs_to_use_4.items():
+            if not novice_mode and not developer_mode and tab_name in dangerous_clean_tabs:
+                continue
+            tab_frame = ttk.Frame(tab_control)
+            tab_control.add(tab_frame, text=tab_name)
 
-        # Сохраняем информацию о вкладке
-        tab_frame.tab_info = {
-            "name": tab_name,
-            "checkbox_names": checkbox_names,
-            "loaded": False,
-        }
+            placeholder = ttk.Label(
+                tab_frame,
+                text="Загрузка содержимого...",
+                font=("Segoe UI", 12),
+                foreground="#32FBE2",
+            )
+            placeholder.pack(expand=True)
+
+            tab_frame.tab_info = {
+                "name": tab_name,
+                "checkbox_names": checkbox_names,
+                "loaded": False,
+            }
 
     # Выбираем первую вкладку
     if tab_control.tabs():
@@ -5209,47 +5644,37 @@ def switch_to_other():
     for tab in tab_control.tabs():
         tab_control.forget(tab)
 
-    # Добавляем вкладку с удалением программ
-    for tab_name, checkbox_names in tabs_uninstall.items():
-        tab_frame = ttk.Frame(tab_control)
-        tab_control.add(tab_frame, text=tab_name)
+    tabs_to_use_other = {}
+    for tn, names in tabs_uninstall.items():
+        tabs_to_use_other[tn] = names
+    for tn, names in tabs_5.items():
+        tabs_to_use_other[tn] = names
 
-        # Создаем метку-заполнитель
-        placeholder = ttk.Label(
-            tab_frame,
-            text="Загрузка содержимого...",
-            font=("Segoe UI", 12),
-            foreground="#32FBE2",
-        )
-        placeholder.pack(expand=True)
-
-        # Сохраняем информацию о вкладке
-        tab_frame.tab_info = {
-            "name": tab_name,
-            "checkbox_names": checkbox_names,
-            "loaded": False,
-        }
-
-    # Добавляем новые вкладки из tabs_5
-    for tab_name, checkbox_names in tabs_5.items():
-        tab_frame = ttk.Frame(tab_control)
-        tab_control.add(tab_frame, text=tab_name)
-
-        # Создаем метку-заполнитель
-        placeholder = ttk.Label(
-            tab_frame,
-            text="Загрузка содержимого...",
-            font=("Segoe UI", 12),
-            foreground="#32FBE2",
-        )
-        placeholder.pack(expand=True)
-
-        # Сохраняем информацию о вкладке
-        tab_frame.tab_info = {
-            "name": tab_name,
-            "checkbox_names": checkbox_names,
-            "loaded": False,
-        }
+    frames_mode = config.getboolean("General", "frames_instead_of_tabs", fallback=False)
+    if frames_mode:
+        if tabs_to_use_other:
+            try:
+                cons_frame = create_consolidated_optimization_tab(tab_control, tabs_to_use_other, config, "Другое")
+                tab_control.add(cons_frame, text="Другое")
+            except Exception as e:
+                print(f"Ошибка создания консолидированной вкладки: {e}")
+                import traceback; traceback.print_exc()
+    else:
+        for tab_name, checkbox_names in tabs_to_use_other.items():
+            tab_frame = ttk.Frame(tab_control)
+            tab_control.add(tab_frame, text=tab_name)
+            placeholder = ttk.Label(
+                tab_frame,
+                text="Загрузка содержимого...",
+                font=("Segoe UI", 12),
+                foreground="#32FBE2",
+            )
+            placeholder.pack(expand=True)
+            tab_frame.tab_info = {
+                "name": tab_name,
+                "checkbox_names": checkbox_names,
+                "loaded": False,
+            }
 
     # Выбираем первую вкладку
     if tab_control.tabs():
@@ -5264,132 +5689,7 @@ def switch_to_other():
 
 
 def switch_to_minimal():
-    # Скрываем все элементы интерфейса
-    top_panel.pack_forget()
-    content_container.pack_forget()  # Скрываем content_container, который содержит sidebar и tab_control
-    
-    # Создаем минималистичный контейнер, который занимает всё пространство
-    if not hasattr(switch_to_minimal, 'minimal_container'):
-        switch_to_minimal.minimal_container = ttk.Frame(main_container)
-    else:
-        # Очищаем контейнер, если он уже существует
-        for widget in switch_to_minimal.minimal_container.winfo_children():
-            widget.destroy()
-    
-    switch_to_minimal.minimal_container.pack(fill="both", expand=True)
-    
-    # Создаем вертикальный контейнер
-    main_content_frame = ttk.Frame(switch_to_minimal.minimal_container)
-    main_content_frame.pack(fill="both", expand=True, padx=20, pady=20)
-    
-    # Текст "(полная версия)" - кликабельный
-    def open_full_version():
-        switch_to_minimal.minimal_container.pack_forget()
-        # Восстанавливаем в правильном порядке: сначала top_panel, потом content_container
-        top_panel.pack(fill="x", pady=(0, 20))
-        content_container.pack(fill="both", expand=True)
-        # switch_to_post_install()
-        switch_to_main()
-        # # Устанавливаем initial_tab в switch_to_main
-        # config["General"]["initial_tab"] = "switch_to_main"
-        # with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
-        #     config.write(configfile)
-    
-    # Заголовок "Extreme Tweaker"
-    title_label = ttk.Label(
-        main_content_frame,
-        text="⚡️ Extreme Tweaker Pro - Extreme optimization for Windows ⚡️",
-        font=("Terminal", 32, "bold", "italic"),
-    )
-    title_label.pack(pady=(0, 20))
-
-    # Добавляем обработчик клика на заголовок
-    title_label.bind("<Button-1>", lambda e: open_full_version())
-    title_label.configure(cursor="hand2")  # Меняем курсор на указатель
-    
-    # Создаем tab_control для минималистичной вкладки
-    minimal_tab_control = ttk.Notebook(main_content_frame, style="Custom.TNotebook")
-    minimal_tab_control.pack(fill="both", expand=True)
-    
-    # Добавляем вкладки из tabs_mini
-    if tabs_mini:
-        for tab_name, checkbox_names in tabs_mini.items():
-            tab_frame = ttk.Frame(minimal_tab_control)
-            minimal_tab_control.add(tab_frame, text=tab_name)
-            
-            # Создаем метку-заполнитель
-            placeholder = ttk.Label(
-                tab_frame,
-                text="Загрузка содержимого...",
-                font=("Segoe UI", 12),
-                foreground="#32FBE2",
-            )
-            placeholder.pack(expand=True)
-            
-            # Сохраняем информацию о вкладке
-            tab_frame.tab_info = {
-                "name": tab_name,
-                "checkbox_names": checkbox_names,
-                "loaded": False,
-            }
-        
-        # Выбираем первую вкладку
-        if minimal_tab_control.tabs():
-            minimal_tab_control.select(0)
-        
-        # Функция для обработки смены вкладки в минималистичном режиме
-        def on_minimal_tab_changed(event):
-            current = minimal_tab_control.select()
-            if not current:
-                return
-            
-            tab_frame = minimal_tab_control.children[current.split(".")[-1]]
-            
-            # Проверяем, загружена ли вкладка
-            if not hasattr(tab_frame, "tab_info") or tab_frame.tab_info["loaded"]:
-                return
-            
-            # Создаем содержимое вкладки
-            create_tab_content(
-                tab_frame.tab_info["name"], tab_frame, tab_frame.tab_info["checkbox_names"]
-            )
-            
-            tab_frame.tab_info["loaded"] = True
-        
-        # Привязываем обработчик смены вкладки
-        minimal_tab_control.bind("<<NotebookTabChanged>>", on_minimal_tab_changed)
-        
-        # Загружаем первую вкладку сразу
-        if minimal_tab_control.tabs():
-            first_tab_id = minimal_tab_control.tabs()[0]
-            first_tab_frame = minimal_tab_control.children[first_tab_id.split(".")[-1]]
-            if hasattr(first_tab_frame, "tab_info") and not first_tab_frame.tab_info["loaded"]:
-                create_tab_content(
-                    first_tab_frame.tab_info["name"], 
-                    first_tab_frame, 
-                    first_tab_frame.tab_info["checkbox_names"]
-                )
-                first_tab_frame.tab_info["loaded"] = True
-    
-    # Кнопка настроек внизу справа
-    def open_settings():
-        switch_to_minimal.minimal_container.pack_forget()
-        # Восстанавливаем в правильном порядке: сначала top_panel, потом content_container
-        top_panel.pack(fill="x", pady=(0, 20))
-        content_container.pack(fill="both", expand=True)
-        switch_to_settings()
-    
-    settings_frame = ttk.Frame(switch_to_minimal.minimal_container)
-    settings_frame.pack(side="bottom", fill="x", padx=20, pady=20)
-    
-    settings_btn = ttk.Button(
-        settings_frame,
-        text="⚙️",
-        command=open_settings,
-        bootstyle="dark-outline",
-        width=5
-    )
-    settings_btn.pack(side="right")
+    switch_to_game_mode()
 
 
 """
@@ -5671,8 +5971,7 @@ def switch_to_settings():
         theme_editor_frame,
         text="Открыть редактор",
         bootstyle="danger-outline",
-        command=lambda: subprocess.Popen(["python", "-m", "ttkcreator"],
-                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL),
+        command=lambda: subprocess.run(["python", "-m", "ttkcreator"]),
     )
     theme_editor_btn.pack(side="left")
 
@@ -5743,6 +6042,82 @@ def switch_to_settings():
 
     # Привязываем событие выбора
     checkbox_display_mode_dropdown.bind("<<ComboboxSelected>>", update_checkbox_display_mode)
+
+    # Фреймы вместо вкладок
+    frames_var = tk.StringVar(
+        value="Включено" if config.getboolean("General", "frames_instead_of_tabs", fallback=True) else "Выключено"
+    )
+    ttk.Label(
+        additional_section, text="Фреймы вместо вкладок:", font=("Segoe UI", 10)
+    ).pack(anchor="w", pady=(0, 5))
+    frames_dropdown = ttk.Combobox(
+        additional_section,
+        textvariable=frames_var,
+        values=["Включено", "Выключено"],
+        width=30,
+    )
+    frames_dropdown.pack(anchor="w", pady=(0, 10))
+
+    def update_frames_mode(event=None):
+        val = frames_var.get() == "Включено"
+        config["General"]["frames_instead_of_tabs"] = str(val)
+        with open("user_data//settings.ini", "w", encoding="cp1251") as f:
+            config.write(f)
+        messagebox.showinfo(
+            "Настройка применена",
+            "Режим отображения изменен. Переключитесь на другую вкладку и обратно, чтобы увидеть изменения."
+        )
+    frames_dropdown.bind("<<ComboboxSelected>>", update_frames_mode)
+
+    # Полный путь в названиях чекбоксов
+    show_path_var = tk.StringVar(
+        value="Включено" if config.getboolean("General", "show_checkbox_full_path", fallback=True) else "Выключено"
+    )
+    ttk.Label(
+        additional_section, text="Полный путь в названиях чекбоксов:", font=("Segoe UI", 10)
+    ).pack(anchor="w", pady=(0, 5))
+    show_path_dropdown = ttk.Combobox(
+        additional_section,
+        textvariable=show_path_var,
+        values=["Включено", "Выключено"],
+        width=30,
+    )
+    show_path_dropdown.pack(anchor="w", pady=(0, 10))
+
+    def update_show_path(event=None):
+        val = show_path_var.get() == "Включено"
+        config["General"]["show_checkbox_full_path"] = str(val)
+        with open("user_data//settings.ini", "w", encoding="cp1251") as f:
+            config.write(f)
+        messagebox.showinfo(
+            "Настройка применена",
+            "Настройка сохранена. Переключитесь на другую вкладку и обратно, чтобы увидеть изменения."
+        )
+    show_path_dropdown.bind("<<ComboboxSelected>>", update_show_path)
+
+    # Количество колонок
+    columns_var = tk.StringVar(value=config.get("Columns", "default", fallback="3"))
+    ttk.Label(
+        additional_section, text="Количество колонок:", font=("Segoe UI", 10)
+    ).pack(anchor="w", pady=(0, 5))
+    columns_dropdown = ttk.Combobox(
+        additional_section,
+        textvariable=columns_var,
+        values=["1", "2", "3", "4", "5", "6"],
+        width=30,
+    )
+    columns_dropdown.pack(anchor="w", pady=(0, 10))
+
+    def update_columns(event=None):
+        val = columns_var.get()
+        config["Columns"]["default"] = val
+        with open("user_data//settings.ini", "w", encoding="cp1251") as f:
+            config.write(f)
+        messagebox.showinfo(
+            "Настройка применена",
+            "Количество колонок изменено. Переключитесь на другую вкладку и обратно, чтобы увидеть изменения."
+        )
+    columns_dropdown.bind("<<ComboboxSelected>>", update_columns)
 
     # Новая функция для обновления полноэкранного режима
     def update_fullscreen(event=None):
@@ -5830,6 +6205,31 @@ def switch_to_settings():
     #         sidebar.pack_forget()
 
     # show_sidebar_dropdown.bind("<<ComboboxSelected>>", update_sidebar_visibility)
+
+    # # Настройка автообновления
+    # auto_update_var = tk.StringVar(
+    #     value="Включено"
+    #     if config.getboolean("General", "auto_update_enabled", fallback=True)
+    #     else "Выключено"
+    # )
+    # ttk.Label(
+    #     additional_section, text="Автообновление:", font=("Segoe UI", 10)
+    # ).pack(anchor="w", pady=(10, 5))
+    # auto_update_dropdown = ttk.Combobox(
+    #     additional_section,
+    #     textvariable=auto_update_var,
+    #     values=["Включено", "Выключено"],
+    #     width=30,
+    # )
+    # auto_update_dropdown.pack(anchor="w", pady=(0, 10))
+
+    # def update_auto_update(event=None):
+    #     new_value = auto_update_var.get() == "Включено"
+    #     config["General"]["auto_update_enabled"] = str(new_value)
+    #     with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+    #         config.write(configfile)
+
+    # auto_update_dropdown.bind("<<ComboboxSelected>>", update_auto_update)
 
     # # Привязываем события к элементам управления
     # font_family_dropdown.bind("<<ComboboxSelected>>", update_font)
@@ -6860,6 +7260,125 @@ def switch_to_settings():
     #             "loaded": False,
     #         }
 
+#     # Добавляем вкладку телеметрии
+#     telemetry_tab = ttk.Frame(tab_control)
+#     tab_control.add(telemetry_tab, text="Обратная связь")
+#     # tab_control.add(telemetry_tab, text="Телеметрия")
+
+#     # Создаем Canvas и Scrollbar для прокрутки всей вкладки
+#     telemetry_canvas = tk.Canvas(telemetry_tab)
+#     telemetry_scrollbar_main = ttk.Scrollbar(telemetry_tab, orient="vertical", command=telemetry_canvas.yview)
+#     telemetry_scrollable_frame = ttk.Frame(telemetry_canvas)
+    
+#     telemetry_scrollable_frame.bind(
+#         "<Configure>",
+#         lambda e: telemetry_canvas.configure(scrollregion=telemetry_canvas.bbox("all"))
+#     )
+    
+#     telemetry_canvas.create_window((0, 0), window=telemetry_scrollable_frame, anchor="nw")
+#     telemetry_canvas.configure(yscrollcommand=telemetry_scrollbar_main.set)
+    
+#     def on_telemetry_mousewheel(event):
+#         telemetry_canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+    
+#     telemetry_canvas.bind_all("<MouseWheel>", on_telemetry_mousewheel)
+    
+#     # Обновление размера окна canvas при изменении размера canvas
+#     def configure_telemetry_scroll_region(event):
+#         canvas_width = event.width
+#         canvas_items = telemetry_canvas.find_all()
+#         if canvas_items:
+#             telemetry_canvas.itemconfig(canvas_items[0], width=canvas_width)
+#         telemetry_canvas.configure(scrollregion=telemetry_canvas.bbox("all"))
+    
+#     telemetry_canvas.bind('<Configure>', configure_telemetry_scroll_region)
+    
+#     telemetry_canvas.pack(side="left", fill="both", expand=True)
+#     telemetry_scrollbar_main.pack(side="right", fill="y")
+
+#     # Создаем основной контейнер с отступами
+#     telemetry_frame = ttk.Frame(telemetry_scrollable_frame, padding=20)
+#     telemetry_frame.pack(fill="both", expand=True)
+
+#     # Заголовок
+#     telemetry_title = ttk.Label(
+#         telemetry_frame, text="Обратная связь", font=("Segoe UI", 16, "bold")
+#         # telemetry_frame, text="Телеметрия и обратная связь", font=("Segoe UI", 16, "bold")
+#     )
+#     telemetry_title.pack(anchor="w", pady=(0, 20))
+
+#     # Контейнер для двух колонок
+#     columns_container = ttk.Frame(telemetry_frame)
+#     columns_container.pack(fill="both", expand=True)
+
+#     # Левая колонка (телеметрия)
+#     left_column = ttk.Frame(columns_container)
+#     left_column.pack(side="left", fill="both", expand=True, padx=(0, 15))
+
+#     # Правая колонка (обратная связь)
+#     right_column = ttk.Frame(columns_container)
+#     right_column.pack(side="right", fill="both", expand=True)
+
+#     # Секция телеметрии
+#     telemetry_section = ttk.Labelframe(left_column, text="Телеметрия", padding=15)
+#     telemetry_section.pack(fill="x", expand=False)
+
+#     # Заголовок
+#     ttk.Label(
+#         telemetry_section, text="Отправка телеметрии", font=("Segoe UI", 14, "bold")
+#     ).pack(anchor="w", pady=(0, 5))
+
+#     # Описание
+#     description_text = """Отправка данных о работе программы и настроек для улучшения функциональности и внешнего вида.
+
+# Отправляемые данные:
+
+# • Сообщения об успешном запуске программы
+# • Сообщения об ошибках
+# • Лог-файлы
+# • Настройки Extreme
+# • Запущенные твики
+# • Время запуска
+# • Имя пользователя и версия Windows
+# • Список установленных программ для вкладки PostInstall"""
+
+#     ttk.Label(
+#         telemetry_section,
+#         text=description_text,
+#         font=("Segoe UI", 10),
+#         wraplength=500,
+#         justify="left",
+#     ).pack(anchor="w", pady=(0, 10))
+
+#     # Создаем переменную для хранения состояния отправки телеметрии при закрытии
+#     send_telemetry_on_close_var = tk.StringVar(
+#         value="Включено"
+#         if config.getboolean("Telemetry", "send_on_close", fallback=True)
+#         else "Выключено"
+#     )
+
+#     # Выпадающий список для выбора отправки телеметрии при закрытии
+#     ttk.Label(
+#         telemetry_section, text="Отправлять телеметрию:", font=("Segoe UI", 10)
+#     ).pack(anchor="w", pady=(0, 5))
+#     telemetry_on_close_dropdown = ttk.Combobox(
+#         telemetry_section,
+#         textvariable=send_telemetry_on_close_var,
+#         values=["Включено", "Выключено"],
+#         width=30,
+#     )
+#     telemetry_on_close_dropdown.pack(anchor="w", pady=(0, 10))
+
+#     # Функция для обновления настройки отправки телеметрии при закрытии
+#     def update_telemetry_on_close(event=None):
+#         new_value = send_telemetry_on_close_var.get() == "Включено"
+#         config["Telemetry"]["send_on_close"] = str(new_value)
+#         with open("user_data//settings.ini", "w", encoding="cp1251") as configfile:
+#             config.write(configfile)
+
+#     # Привязываем событие выбора
+#     telemetry_on_close_dropdown.bind("<<ComboboxSelected>>", update_telemetry_on_close)
+
 #     # Секция управления Windows Firewall
 #     firewall_section = ttk.Labelframe(telemetry_section, text="Управление Windows Firewall", padding=15)
 #     firewall_section.pack(fill="x", pady=(15, 0))
@@ -7101,6 +7620,82 @@ def switch_to_settings():
 #         bootstyle="info-outline",
 #         command=attach_image,
 #     ).pack(side="left", padx=5)
+
+#     # Функция для отправки сообщения
+#     def send_feedback():
+#         global attached_file, attached_image
+#         message = message_text.get("1.0", "end-1c").strip()
+#         if not message and not attached_file and not attached_image:
+#             print("Предупреждение: Пожалуйста, введите сообщение или прикрепите файл")
+#             return
+
+#         try:
+#             from telemetry.telemetry_manager import TelemetryManager
+
+#             manager = TelemetryManager()
+
+#             # Логируем начало отправки обратной связи
+#             logger.logger.info("Отправка обратной связи...")
+
+#             # Отправляем сообщение с префиксом "Обратная связь от пользователя:"
+#             # автоматически собираем информацию о пользователе
+#             try:
+#                 windows_username = os.getenv('USERNAME', 'unknown')
+#             except Exception:
+#                 windows_username = 'unknown'
+            
+#             user_info = (
+#                 f"👤 Пользователь: #{windows_username}\n"
+#             )
+#             user_info += (
+#                 f"💻 Версия Extreme: {version}\n"
+#                 f"🐍 Python версия: {sys.version}\n"
+#             )
+
+#             # объединяем информацию с сообщением от пользователя
+#             full_message = f"Обратная связь от пользователя:\n{message}\n\n{user_info}"
+
+#             # отправляем сообщение
+#             if manager.send_message(full_message):
+#                 logger.logger.info("Сообщение обратной связи успешно отправлено")
+#                 print("Сообщение успешно отправлено!")
+
+#                 # Отправляем файл, если он прикреплен
+#                 if attached_file:
+#                     if manager.send_telegram(attached_file):
+#                         logger.logger.info(
+#                             f"Файл {os.path.basename(attached_file)} успешно отправлен"
+#                         )
+#                         print("Файл успешно отправлен!")
+#                     else:
+#                         logger.logger.error(
+#                             f"Ошибка отправки файла {os.path.basename(attached_file)}"
+#                         )
+#                         print("Ошибка: Не удалось отправить файл")
+
+#                 # Отправляем изображение, если оно прикреплено
+#                 if attached_image:
+#                     if manager.send_telegram(attached_image):
+#                         logger.logger.info(
+#                             f"Изображение {os.path.basename(attached_image)} успешно отправлено"
+#                         )
+#                         print("Изображение успешно отправлено!")
+#                     else:
+#                         logger.logger.error(
+#                             f"Ошибка отправки изображения {os.path.basename(attached_image)}"
+#                         )
+#                         print("Ошибка: Не удалось отправить изображение")
+
+#                 # Очищаем форму
+#                 message_text.delete("1.0", "end")
+#                 attached_file = None
+#                 attached_image = None
+#             else:
+#                 logger.logger.error("Ошибка отправки сообщения обратной связи")
+#                 print("Ошибка: Не удалось отправить сообщение")
+#         except Exception as e:
+#             logger.logger.error(f"Ошибка при отправке обратной связи: {str(e)}")
+#             print(f"Ошибка: Произошла ошибка при отправке: {str(e)}")
 
 #     # Кнопка отправки доната
 #     ttk.Button(
@@ -7575,6 +8170,8 @@ def switch_to_gpt():
 # Определяем функции-обертки перед списком quick_buttons
 def switch_to_main_wrapper():
     confirm_switch_tab(switch_to_main)
+def switch_to_game_mode_wrapper():
+    confirm_switch_tab(switch_to_game_mode)
 def switch_to_drivers_wrapper():
     # Проверяем, нужно ли показывать предупреждение
     if config.getboolean("General", "drivers_warning_enabled", fallback=True):
@@ -7678,9 +8275,16 @@ def switch_to_clean_wrapper():
     confirm_switch_tab(switch_to_clean)
 def switch_to_other_wrapper():
     confirm_switch_tab(switch_to_other)
-# def switch_to_settings_wrapper():
+def switch_to_settings_wrapper():
+    confirm_switch_tab(switch_to_settings)
+# def switch_to_telemetry_wrapper():
+#     # Переключаемся на настройки и выбираем вкладку "Телеметрия"
 #     confirm_switch_tab(switch_to_settings)
-
+#     # После переключения выбираем вкладку "Телеметрия"
+#     if tab_control.tabs():
+#         for i, tab in enumerate(tab_control.tabs()):
+#             if tab_control.tab(tab, "text") == "Телеметрия":
+#                 tab_control.select(i)
 #                 break
 # Функции switch_to_system_wrapper и switch_to_about_wrapper удалены для упрощения твикера
 # def switch_to_gpt_wrapper():
@@ -7694,10 +8298,11 @@ def switch_to_other_wrapper():
 def get_quick_buttons_list():
     developer_mode = config.getboolean("General", "developer_mode", fallback=False)
     base_buttons = [
-        ("Главная", switch_to_main_wrapper, "⭐"),
+        ("Главная", switch_to_main_wrapper, "🏠"),
         ("Оптимизация", switch_to_optimization_wrapper, "⚡"),
         ("Очистка", switch_to_clean_wrapper, "☠️"),
-        # ("Настройки", switch_to_settings_wrapper, "⚙️"),
+        ("Настройки", switch_to_settings_wrapper, "⚙️"),
+        # ("Игровой режим", switch_to_game_mode_wrapper, "🚀"),
         ("Исправления", switch_to_fixes_wrapper, "⚜️"),
         ("Создать конфиг", lambda: create_batch_file([name for name, var in checkboxes.items() if var.get()]),"📝",),
     ]
@@ -7721,6 +8326,7 @@ icon_variants = {
     # "Настройки": ["⚙️", "⚙️", "⚙️"],
     # "Исправления": ["⚜️", "🔧", "🧷"],
     "Исправления": ["⚜️"],
+    "Игровой режим": ["🏆", "🏆", "🏆"],
     # "Антон AI": ["👻", "👽", "👾"],
     "Создать конфиг": ["📝", "📝", "📝"],
 }
@@ -8307,26 +8913,22 @@ for tab_name, checkbox_names in tabs_main.items():  # Изменяем tabs на
 
 
 def on_tab_changed(event):
-    # Получаем текущую вкладку
     current = tab_control.select()
     if not current:
         return
 
     tab_frame = tab_control.children[current.split(".")[-1]]
 
-    # Проверяем, загружена ли вкладка
     if not hasattr(tab_frame, "tab_info") or tab_frame.tab_info["loaded"]:
         return
 
-    # Проверяем, является ли это главной вкладкой
     if tab_frame.tab_info["name"] == "Главная":
         create_main_tab_content(tab_frame)
     else:
-        # Создаем содержимое обычной вкладки
         create_tab_content(
             tab_frame.tab_info["name"], tab_frame, tab_frame.tab_info["checkbox_names"]
         )
-    
+
     tab_frame.tab_info["loaded"] = True
 
 
@@ -8342,8 +8944,8 @@ def export_full_registry():
             f"FullRegistryBackup_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.reg",
         )
 
-        subprocess.Popen(["reg", "export", "HKLM", backup_file, "/y"],
-                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        # Export full registry
+        subprocess.run(["reg", "export", "HKLM", backup_file, "/y"], check=True)
 
         messagebox.showinfo(
             "Успех", f"Полная резервная копия реестра создана в:\n{backup_file}"
@@ -8378,11 +8980,10 @@ def import_registry_backup(backup_list=None):
                 reg_files = [f for f in os.listdir(backup_path) if f.endswith(".reg")]
                 for reg_file in reg_files:
                     full_path = os.path.join(backup_path, reg_file)
-                    subprocess.Popen(["reg", "import", full_path],
-                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    subprocess.run(["reg", "import", full_path], check=True)
             else:
-                subprocess.Popen(["reg", "import", backup_path],
-                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                # Single file backup
+                subprocess.run(["reg", "import", backup_path], check=True)
 
             messagebox.showinfo("Успех", "Бэкап успешно импортирован")
         except Exception as e:
@@ -8484,6 +9085,9 @@ root.bind("<F5>", reload_program)
 
 # Вызываем open_random_site после создания окна (неблокирующий вызов)
 root.after(1000, lambda: open_random_site(5))  # Задержка 1 секунда после запуска
+
+# Проверка обновлений после полного запуска программы (неблокирующий вызов)
+root.after(2000, check_for_updates_threaded)  # Задержка 2 секунды после запуска для проверки обновлений
 
 # Запуск главного цикла приложения для отображения окна
 logger.log_program_start()  # Логируем запуск программы
